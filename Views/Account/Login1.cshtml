@@ -1,0 +1,165 @@
+﻿@model VigilanceClearance.Models.ViewModel.LoginViewModel
+
+@{
+    ViewBag.Title = "Login";
+    Layout = null;
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link rel="stylesheet" href="~/css/Login.css" />
+
+<nav class="navbar navbar-expand-lg navbar-custom shadow-sm">
+    <div class="container-fluid justify-content-center">
+        <a class="navbar-brand" href="#" style="cursor: default;">Vigilance Clearance</a>
+    </div>
+</nav>
+
+<div class="login-container">
+    <div class="form-title">Sign In</div>
+
+    <form asp-action="Login" method="post" id="loginForm">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <div class="mb-3">
+            <label asp-for="Username" class="form-label"></label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                <input asp-for="Username" class="form-control" id="Username" placeholder="Enter Username" />
+            </div>
+            <span class="text-danger field-error" id="UsernameError"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Password" class="form-label"></label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                <input asp-for="Password" class="form-control" id="Password" placeholder="Enter Password" />
+                <button type="button" class="btn btn-outline-secondary" onclick="togglePassword()">
+                    <i class="fas fa-eye" id="toggleIcon"></i>
+                </button>
+            </div>
+            <span class="text-danger field-error" id="PasswordError"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Captcha" class="form-label"></label>
+            <div class="captcha-wrapper mb-2">
+                <img src="@Url.Action("GenerateCaptcha", "Account")" alt="CAPTCHA" id="captchaImage" class="border rounded" style="height: 40px;" />
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="reloadCaptcha()">
+                    <i class="fas fa-sync-alt"></i> Reload
+                </button>
+            </div>
+            <div class="input-group">
+                <span class="input-group-text bg-light"><i class="fas fa-shield-alt"></i></span>
+                <input asp-for="Captcha" class="form-control" id="Captcha" placeholder="Enter Captcha" />
+            </div>
+            <span class="text-danger field-error" id="CaptchaError"></span>
+        </div>
+
+        <div id="loginLoader" class="text-center text-primary mb-3" style="display:none;">
+            <span class="spinner-border spinner-border-sm"></span> Logging in...
+        </div>
+
+        <button type="submit" class="btn btn-primary">Login</button>
+    </form>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+<script>
+    $(document).ready(function () {
+        $("#loginForm").on("submit", function (e) {
+            e.preventDefault();                             // Stop normal form submit
+            $(".field-error").text("");                     // Clear previous errors
+
+            let isValid = true;
+
+            const username = $("#Username").val().trim();
+            const password = $("#Password").val().trim();
+            const captcha = $("#Captcha").val().trim();
+
+            if (username === "") {
+                $("#UsernameError").text("Username is required.");
+                isValid = false;
+            }
+
+            if (password === "") {
+                $("#PasswordError").text("Password is required.");
+                isValid = false;
+            }
+
+            if (captcha === "") {
+                $("#CaptchaError").text("Captcha is required.");
+                isValid = false;
+            }
+
+            if (!isValid) return;
+
+            $("#loginLoader").show();
+
+            $.ajax({
+                url: $(this).attr("action"),
+                method: "POST",
+                data: {
+                    Username: username,
+                    Password: password,
+                    Captcha: captcha
+                },
+                success: function (response) {
+                    // Handle login success
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Login Successful!',
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        window.location.href = response.redirectUrl;
+                    });
+                },
+                error: function (xhr) {
+                    $("#loginLoader").hide();
+
+                    let errorMsg = xhr.responseText || "Login failed. Try again.";
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Login Failed',
+                        text: errorMsg
+                    });
+
+                    // Optionally refresh CAPTCHA
+                    reloadCaptcha();
+                }
+            });
+        });
+
+    });
+</script>
+
+<script>
+    // hide/unhide password
+    function togglePassword() {
+        const passwordInput = document.getElementById("Password");
+        const icon = document.getElementById("toggleIcon");
+
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+        } else {
+            passwordInput.type = "password";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+        }
+    }
+
+    // relaod reloadCaptcha function
+    function reloadCaptcha() {
+        document.getElementById("captchaImage").src = "/Account/GenerateCaptcha?" + new Date().getTime();
+    }
+</script>

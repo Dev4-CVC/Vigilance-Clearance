@@ -1,0 +1,17 @@
+﻿@model VigilanceClearance.Models.ViewModel.CountryViewModel;
+@{
+    ViewData["Title"] = "CountryData";
+}
+
+<h1>CountryData</h1>
+
+<form asp-action="Index">
+    <div class="form-group">
+        <label for="country">Select Country</label>
+        @Html.DropDownListFor(m => m.SelectedCountry, Model.CountryList, "Choose...", new { @class = "form-select" })
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-2">Submit</button>
+</form>
+
+
