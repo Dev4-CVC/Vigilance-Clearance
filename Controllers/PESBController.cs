@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Mono.TextTemplating;
 
 namespace VigilanceClearance.Controllers
 {
@@ -16,18 +17,22 @@ namespace VigilanceClearance.Controllers
         {
             this._clientFactory = clientFactory;
         }
-        public IActionResult Index()
+
+        public IActionResult PESBDashboard()
         {
-            PESBViewModel model = new PESBViewModel();  
-            model.PostList = new List<SelectListItem>()
+            try
             {
-                new SelectListItem { Text= "Chairman", Value="Chairman" },
-                new SelectListItem { Text = "Chairman & Managing Director", Value = "CMD" },
-                new SelectListItem { Text = "Director", Value = "Director" }
-            };
-            return View(model);
+                ViewBag.title = "PESB Dashboard";
+                return View();
+            }
+            catch (Exception)
+            {
+                ViewBag.Error = "Something went wrong while loading the page.";
+                return View();
+            }
         }
 
+      
         [HttpGet]
         public async Task<IActionResult> CountryData()
         {
@@ -53,25 +58,6 @@ namespace VigilanceClearance.Controllers
                 return View(new CountryViewModel { CountryList = new List<SelectListItem>() });
             }
         }
-
-        [HttpPost]
-        public IActionResult Index(PESBViewModel model)
-        {
-            model.PostList = new List<SelectListItem>
-            {
-                new SelectListItem { Text= "Chairman", Value="Chairman" },
-                new SelectListItem { Text = "Chairman & Managing Director", Value = "CMD" },
-                new SelectListItem { Text = "Director", Value = "Director" }
-            };
-
-            if (ModelState.IsValid)
-            {
-                // Process and redirect or show success
-            }
-
-            return View(model);
-        }
-
 
     }
 }
