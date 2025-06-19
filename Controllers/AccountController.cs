@@ -100,7 +100,7 @@ namespace VigilanceClearance.Controllers
         //}
 
         [HttpPost]
-        public IActionResult Login(LoginViewModel obj)
+        public IActionResult Login(LoginViewModel obj) 
         {
 
             ModelState.Remove("Role");
@@ -119,10 +119,7 @@ namespace VigilanceClearance.Controllers
         {
             string captchaCode;
             byte[] captchaImage = _captchaService.GenerateCaptcha(out captchaCode);
-
-            // Store CAPTCHA in session
             HttpContext.Session.SetString("CaptchaCode", captchaCode);
-
             return File(captchaImage, "image/png");
         }
 

@@ -45,6 +45,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=PESB}/{action=Index}/{id?}");
+    pattern: "{controller=PESB}/{action=PESBDashboard}/{id?}");
 
 app.Run();
