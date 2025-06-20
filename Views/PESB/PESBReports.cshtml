@@ -1,0 +1,420 @@
+﻿@model VigilanceClearance.Models.ViewModel.PESBViewModel
+
+@{
+    Layout = "~/Views/Shared/_PESBLayout.cshtml";
+}
+
+@* Ensure Bootstrap CSS is linked *@
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+
+@* Flatpickr CSS  *@
+<link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+
+<style>
+    .modal-backdrop {
+        display: none !important;
+    }
+</style>
+
+@* 1st card "New Reference" *@
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="card card-primary card-outline mb-4">
+                <div class="card-header bg-info text-white">
+                    <div class="card-title">New Reference</div>
+                </div>
+
+                <form asp-action="PESBReports" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Post Description</label>
+                            @Html.DropDownListFor(model => model.PostCode, Model.PostDescriptionList,
+                            "-- Select Post --",
+                            new { @class = "form-control", id = "PostCode", tabindex = "-1", @aria_label = "-- Post dropdown --" })
+                            <span asp-validation-for="PostCode" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>SubPost Description</label>
+                            @Html.DropDownListFor(model => model.SubPostCode, Model.SubPostDescriptionList,
+                            "-- Select Sub Post --",
+                            new { @class = "form-control", id = "SubPostCode", tabindex = "-1", @aria_label = "-- Sub Post dropdown --" })
+                            <span asp-validation-for="SubPostCode" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group" id="OtherSubPostDiv" style="display: none;">
+                            <label>Other Post</label>
+                            <input type="text" id="OtherSubPost" name="OtherSubPost" class="form-control"
+                                   placeholder="Enter other sub post" value="@Model.OtherSubPost" />
+                            <span asp-validation-for="OtherSubPost" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="card-footer text-end">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* 2nd card "Details of the officer" *@
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="card card-primary card-outline mb-4">
+                <div class="card-header bg-info text-white">
+                    <div class="card-title">Details of the officer</div>
+                </div>
+
+                <form asp-action="PESBReports" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <div class="card-body">
+
+                        <div class="form-group">
+                            <label>Name of the Applicant</label>
+                            <input type="text" class="form-control text-uppercase" name="ApplicantName" oninput="this.value = this.value.toUpperCase()" />
+                            <span asp-validation-for="PostCode" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Name of Father</label>
+                            <input type="text" class="form-control text-uppercase" name="FatherName" oninput="this.value = this.value.toUpperCase()" />
+                            <span asp-validation-for="PostCode" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Name of Father</label>
+                            <input type="text" class="form-control" />
+                            <span asp-validation-for="SubPostCode" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="DateOfBirth"></label>
+                            <input asp-for="DateOfBirth" class="form-control datepicker" placeholder="yyyy-mm-dd" />
+                            <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="DateOfRetirement"></label>
+                            <input asp-for="DateOfRetirement" class="form-control datepicker" placeholder="yyyy-mm-dd" />
+                            <span asp-validation-for="DateOfRetirement" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="DateOfEntry"></label>
+                            <input asp-for="DateOfEntry" class="form-control datepicker" placeholder="yyyy-mm-dd" />
+                            <span asp-validation-for="DateOfEntry" class="text-danger"></span>
+                        </div>
+
+
+
+                        <div class="form-group">
+                            <label>Service</label>
+                            @Html.DropDownListFor(model => model.Service, Model.ServiceList,
+                            "-- Select Service --",
+                            new { @class = "form-control", style="width: 100%;" ,id = "Service", tabindex="-1" ,@aria_label = "-- Service dropdown --" })
+                            <span asp-validation-for="Service" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group" id="OtherServiceDiv" style="display: none;">
+                            <label>Other Service</label>
+                            <input type="text" id="OtherService" name="OtherService" class="form-control" placeholder="Enter Other Service" value="@Model.OtherService" />
+                            <span asp-validation-for="OtherService" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Batch</label>
+                            @Html.DropDownListFor(model => model.Batch, Model.BatchList,
+                            "-- Select Batch --",
+                            new { @class = "form-control", style="width: 100%;" ,id = "Batch", tabindex="-1" ,@aria_label = "-- Batch dropdown --" })
+                            <span asp-validation-for="Batch" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Cadre</label>
+                            @Html.DropDownListFor(model => model.Cadre, Model.CadreList,
+                            "-- Select Cadre --",
+                            new { @class = "form-control", style="width: 100%;" ,id = "Cadre", tabindex="-1" ,@aria_label = "-- Cadre dropdown --" })
+                            <span asp-validation-for="Cadre" class="text-danger"></span>
+                        </div>
+
+                    </div>
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* 3rd card "Positions Held" *@
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="card card-primary card-outline mb-4">
+                <div class="card-header bg-info text-white">
+                    <div class="card-title">
+                        Positions held during the 10 preceding years
+                    </div>
+                </div>
+
+                <form asp-action="PESBReports" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="positionsTable">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th style="width: 5%;">S.No</th>
+                                        <th>Organization (Name in Full)</th>
+                                        <th>Designation & Place of Posting</th>
+                                        <th>Administrative/Nodal/Ministry/Department Concerned</th>
+                                        <th style="width: 20%;">From</th>
+                                        <th style="width: 20%;">To</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Dynamic rows will be added here -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <button type="button" class="btn btn-primary mt-3 mb-3" data-toggle="modal" data-target="#positionHeldModal">
+                            Add New Position Detail
+                        </button>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Modal *@
+<div class="modal" id="positionHeldModal" tabindex="-1" role="dialog" aria-labelledby="positionHeldModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <h5 class="modal-title">Add Position Held</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="orgName">Organization (Name in Full)</label>
+                    <select class="form-control" id="orgName">
+                        <option value="">-- Select Organization --</option>
+                        <option value="ABC Corporation Ltd">ABC Corporation Ltd</option>
+                        <option value="XYZ Power Company">XYZ Power Company</option>
+                        <option value="National Highway Authority">National Highway Authority</option>
+                        <option value="Ministry of Health">Ministry of Health</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <span id="orgError" class="text-danger d-none">Please select organization</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="designation">Designation & Place of Posting</label>
+                    <input type="text" class="form-control" id="designation" placeholder="e.g., Deputy Manager, Mumbai" />
+                    <span id="desigError" class="text-danger d-none">Please enter designation</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="department">Administrative/Nodal/Ministry/Department Concerned</label>
+                    <input type="text" class="form-control" id="department" placeholder="e.g., Ministry of Power" />
+                    <span id="deptError" class="text-danger d-none">Please enter department</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="fromDate">From</label>
+                    <input type="date" class="form-control datepicker" id="fromDate" placeholder="yyyy-mm-dd" />
+                    <span id="fromError" class="text-danger d-none">Select from date</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="toDate">To</label>
+                    <input type="date" class="form-control datepicker" id="toDate" placeholder="yyyy-mm-dd" />
+                    <span id="toError" class="text-danger d-none">Select to date</span>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" id="addPositionBtn" class="btn btn-primary">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+
+@* 1st Card Script *@
+<script>
+    $(document).ready(function () {
+        function toggleOtherField() {
+            var subPostVal = $('#SubPostCode').val();
+            if (subPostVal === 'Other') {
+                $('#OtherSubPostDiv').show();
+            } else {
+                $('#OtherSubPostDiv').hide();
+                $('#OtherSubPost').val('');
+            }
+        }
+
+        // On SubPost dropdown change
+        $('#SubPostCode').change(function () {
+            toggleOtherField();
+        });
+
+        // On Post dropdown change - reload SubPost options
+        $('#PostCode').change(function () {
+            var selectedPost = $(this).val();
+            $.ajax({
+                url: '@Url.Action("GetSubPostsByPostCode", "PESB")',
+                type: 'GET',
+                data: { postCode: selectedPost },
+                success: function (data) {
+                    var subPostSelect = $('#SubPostCode');
+                    subPostSelect.empty();
+                    subPostSelect.append($('<option>').val('').text('-- Select Sub Post --'));
+
+                    $.each(data, function (i, item) {
+                        subPostSelect.append($('<option>').val(item.value).text(item.text));
+                    });
+
+                    $('#OtherSubPostDiv').hide();
+                    $('#OtherSubPost').val('');
+                },
+                error: function () {
+                    alert("Error fetching sub posts.");
+                }
+            });
+        });
+
+        // On page load (if returning after failed submission)
+        toggleOtherField();
+    });
+</script>
+
+@* 2nd Card Script (date picker)*@
+<script>
+    flatpickr(".datepicker", {
+        dateFormat: "Y-m-d",
+        allowInput: true,
+        altInput: false
+    });
+</script>
+
+@* 2nd Card script (other service toggle)  *@
+<script>
+    $(document).ready(function () {
+        function toggleOtherServiceField() {
+            var selectedValue = $('#Service').val();
+            if (selectedValue === 'Other') {
+                $('#OtherServiceDiv').show();
+            } else {
+                $('#OtherServiceDiv').hide();
+                $('#OtherService').val('');
+            }
+        }
+
+        $('#Service').change(function () {
+            toggleOtherServiceField();
+        });
+
+        // Show/hide on page load (important for form re-display after validation failure)
+        toggleOtherServiceField();
+    });
+</script>
+
+@* 3rd Card Script *@
+<script>
+    $(function () {
+        let rowIndex = 0;
+
+        $('#addPositionBtn').on('click', function () {
+            const org = $('#orgName').val().trim();
+            const desig = $('#designation').val().trim();
+            const dept = $('#department').val().trim();
+            const from = $('#fromDate').val();
+            const to = $('#toDate').val();
+
+            let isValid = true;
+            $('.text-danger').addClass('d-none');
+
+            if (!org) { $('#orgError').removeClass('d-none'); isValid = false; }
+            if (!desig) { $('#desigError').removeClass('d-none'); isValid = false; }
+            if (!dept) { $('#deptError').removeClass('d-none'); isValid = false; }
+            if (!from) { $('#fromError').removeClass('d-none'); isValid = false; }
+            if (!to) { $('#toError').removeClass('d-none'); isValid = false; }
+
+            if (!isValid) return;
+
+            const newRow = `
+                <tr>
+                    <td>${++rowIndex}</td>
+                    <td>${org}</td>
+                    <td>${desig}</td>
+                    <td>${dept}</td>
+                    <td>${from}</td>
+                    <td>${to}</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-warning edit-row">Edit</button>
+                        <button type="button" class="btn btn-sm btn-danger delete-row">Delete</button>
+                    </td>
+                </tr>`;
+
+            $('#positionsTable tbody').append(newRow);
+            $('#positionHeldModal').modal('hide');
+        });
+
+        $('#positionHeldModal').on('hidden.bs.modal', function () {
+            $('#orgName, #designation, #department, #fromDate, #toDate').val('');
+            $('.text-danger').addClass('d-none');
+        });
+
+        // Delete Row
+        $(document).on('click', '.delete-row', function () {
+            $(this).closest('tr').remove();
+            // Re-index S.No
+            $('#positionsTable tbody tr').each(function (index) {
+                $(this).find('td:first').text(index + 1);
+            });
+            rowIndex = $('#positionsTable tbody tr').length;
+        });
+
+        // Edit Row
+        $(document).on('click', '.edit-row', function () {
+            const row = $(this).closest('tr');
+            const cells = row.find('td');
+
+            // Populate modal
+            $('#orgName').val(cells.eq(1).text());
+            $('#designation').val(cells.eq(2).text());
+            $('#department').val(cells.eq(3).text());
+            $('#fromDate').val(cells.eq(4).text());
+            $('#toDate').val(cells.eq(5).text());
+
+            // Remove the current row
+            row.remove();
+            // Reindex
+            $('#positionsTable tbody tr').each(function (index) {
+                $(this).find('td:first').text(index + 1);
+            });
+            rowIndex = $('#positionsTable tbody tr').length;
+
+            // Show modal again
+            $('#positionHeldModal').modal('show');
+        });
+    });
+</script>
