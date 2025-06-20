@@ -1,0 +1,122 @@
+﻿@model VigilanceClearance.Models.ViewModel.UpdateReferenceReceivedFromCVCModel;
+
+@{
+    ViewData["Title"] = "UpdateReferenceReceivedCVC";
+    Layout = "~/Views/Shared/_MinistryLayout.cshtml";
+}
+
+
+
+<section style="width: 100%; height: 500px; overflow: auto; border: 1px solid #ccc;">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-end" style="background-color: #007bff; color: white;">
+            <h3 class="mb-0">UpdateReferenceReceivedCVC</h3>
+            <a asp-action="ViewReferenceReceivedCVC" asp-route-id="101" class="btn btn-light btn-sm">Back</a>
+        </div>
+        <div class="card-body">
+           <div class="form-group">
+               <div class="row mt-1">
+                   <div class="col-md-4">
+                        @Html.LabelFor(m => m.Officer_Name)
+                        @Html.TextBoxFor(m => m.Officer_Name, new { @class = "form-control" , disabled = "disabled" })
+                   </div>
+                   <div class="col-md-4">
+                        @Html.LabelFor(m => m.Officer_FatherName)
+                        @Html.TextBoxFor(m => m.Officer_FatherName, new { @class = "form-control", disabled = "disabled" })
+                   </div>
+                    <div class="col-md-4">
+                        @Html.LabelFor(m => m.Officer_DateOfBirth)
+                        @Html.TextBoxFor(m => m.Officer_DateOfBirth, new { @class = "form-control", disabled = "disabled" })
+                    </div>
+                   
+               </div>
+
+                <div class="row mt-1">
+                    <div class="col-md-4">
+                        @Html.LabelFor(m => m.Officer_RetirementDate)
+                        @Html.TextBoxFor(m => m.Officer_RetirementDate, new { @class = "form-control", disabled = "disabled" })
+                    </div>
+                    <div class="col-md-4">
+                        @Html.LabelFor(m => m.Officer_ServiceEntryDate)
+                        @Html.TextBoxFor(m => m.Officer_ServiceEntryDate, new { @class = "form-control", disabled = "disabled" })
+                    </div>
+                    <div class="col-md-4">
+                        @Html.LabelFor(m => m.Officer_Service)
+                        @Html.DropDownListFor(m => m.SelectedCountry, Model.CountryList, "Choose...", new { @class = "form-control form-select" })
+                    </div>
+
+                </div>
+
+                <div class="row mt-1">
+                    <div class="col-md-4">
+                        @Html.LabelFor(m => m.Officer_Batch_Year)
+                        @Html.TextBoxFor(m => m.Officer_Batch_Year, new { @class = "form-control", disabled = "disabled" })
+                    </div>
+                    <div class="col-md-4">
+                        @Html.LabelFor(m => m.Cadre)
+                        @Html.TextBoxFor(m => m.Cadre, new { @class = "form-control", disabled = "disabled" })
+                    </div>
+                    @* <div class="col-md-4">
+                        @Html.LabelFor(m => m.Officer_Service)
+                        @Html.DropDownListFor(m => m.SelectedCountry, Model.CountryList, "Choose...", new { @class = "form-control form-select" })
+                    </div> *@
+
+                </div>
+
+                <hr />
+
+                <h6 style="background-color:bisque">Positions Held including whether the officer has functioned as a CVO in part time or additional charge capacity or any other additional charge -(During the Ten Preceding Years) </h6>
+                <hr />
+                <a asp-action="ViewReferenceReceivedCVC" asp-route-id="101" class="btn btn-primary btn-sm">Add Row</a>
+                <div class="row mt-1">
+                    <div class="col-md-3">
+                        @Html.LabelFor(m => m.Organization)
+                        @Html.TextBoxFor(m => m.Organization, new { @class = "form-control" })   @* //Dropdown *@
+                    </div>
+                    <div class="col-md-3">
+                        @Html.LabelFor(m => m.Designation)
+                        @Html.TextBoxFor(m => m.Designation, new { @class = "form-control" })
+                    </div>
+                    <div class="col-md-3">
+                        @Html.LabelFor(m => m.TenureFrom)
+                        @Html.TextBoxFor(m => m.TenureFrom, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy" })
+                    </div>
+                    <div class="col-md-3">
+                        @Html.LabelFor(m => m.TenureTo)
+                        @Html.TextBoxFor(m => m.TenureTo, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy" })
+                    </div>
+
+                </div>
+
+                <hr />
+
+                <h6 style="background-color:bisque">Whether the officer has been placed on the "Agreed List or List of Officer of Doubtful Integrity" </h6>
+                <hr />
+                <a asp-action="ViewReferenceReceivedCVC" asp-route-id="101" class="btn btn-primary btn-sm">Add Row</a>
+                <div class="row mt-1">
+                    <div class="col-md-4">
+                        @Html.LabelFor(m => m.IsAgreed)
+                        @Html.DropDownListFor(model => model.IsAgreed,
+                        new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "true" },
+                                                   new SelectListItem { Text = "No", Value = "false" }
+                                                 },"-- Select --", new { @class = "form-control" })
+                    </div>
+                    
+                    <div class="col-md-4">
+                        @Html.LabelFor(m => m.YearFrom)
+                        @Html.TextBoxFor(m => m.YearFrom, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy" })
+                    </div>
+                    <div class="col-md-4">
+                        @Html.LabelFor(m => m.YearTo)
+                        @* @Html.TextBoxFor(m => m.YearTo, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" }) *@
+                        @Html.TextBoxFor(m => m.YearTo, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy", })
+
+                    </div>
+
+                </div>
+           </div>
+        </div>
+
+    </div>
+
+</section>
