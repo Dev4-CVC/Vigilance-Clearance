@@ -32,6 +32,10 @@ namespace VigilanceClearance.Models.ViewModel
 
 //7
         public string? Organization { get; set; }
+
+        public List<SelectListItem> OrganizationList { get; set; } = new();
+        public string? Ministry { get; set; }
+        public List<SelectListItem> MinistryList { get; set; } = new();
         public string? Designation { get; set; }
         public DateTime TenureFrom { get; set; }
         public DateTime TenureTo { get; set; }
@@ -41,6 +45,46 @@ namespace VigilanceClearance.Models.ViewModel
         public bool? IsAgreed { get; set; }
         public DateTime YearFrom { get; set; }
         public DateTime YearTo { get; set; }
+        public DateTime RemovedFromAgreedlistDate  { get; set; }
+
+
+        //9
+        public string? AllegationMisconduct { get; set; }
+        public string? Casedetails { get; set; }
+        public DateTime Presentstatusasondate { get; set; }
+
+
+        //10
+
+        public string? PunishmentAwarded { get; set; }
+        public string? Penaltydetails { get; set; }
+        public DateTime CurrencyofpenaltyFrom { get; set; }
+        public DateTime CurrencyofpenaltyTo { get; set; }
+
+        //11 
+        public string? DisciplinaryProceeding { get; set; }
+        public string? SuspensionDate { get; set; }
+        public string? WhetherRevoked { get; set; }
+        public DateTime DateofRevocation { get; set; }
+
+        //12
+
+        public string? ContemplatedAgainst { get; set; }
+        public string? ContemplatedAgainstCaseDetail { get; set; }
+        public string? ContemplatedAgainstCasestatus { get; set; }
+        public DateTime ContemplatedAgainstStatusasondate { get; set; }
+
+        //13
+
+        public string? ComplaintwithVigilanceAngle  { get; set; }
+        public string? ComplaintwithVigilanceAngleCaseDetail { get; set; }
+        public string? ComplaintwithVigilanceAnglePresentstatus { get; set; }
+        public DateTime ComplaintwithVigilanceAnglePresentstatusasondate { get; set; }
+
+
+        public TestModel testmodel { get; set; }
+
+        public List<TestModel> testmodel1 { get; set; }
 
     }
 }
