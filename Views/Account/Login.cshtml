@@ -1,4 +1,4 @@
-﻿@model VigilanceClearance.Models.ViewModel.LoginViewModel
+﻿@model VigilanceClearance.Models.ViewModel.Account.LoginViewModel
 
 @{
     ViewData["Title"] = "Login";
@@ -7,20 +7,40 @@
 <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 <link rel="stylesheet" href="~/VigilanceClearance.styles.css" asp-append-version="true" />
-<link href="~/css/login.css" rel="stylesheet" />
 
+<style>
+    /* Custom Navbar Styling */
+    .navbar-custom {
+        background: linear-gradient(90deg, #0d6efd, #20c997); /* Blue to teal gradient */
+        padding: 0.75rem 1.5rem;
+        color: #fff;
+        font-family: 'Poppins', sans-serif;
+    }
+
+        /* Navbar Brand Styling */
+        .navbar-custom .navbar-brand {
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 1.5rem;
+            letter-spacing: 0.5px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            pointer-events: none; /* Prevents clicking */
+        }
+
+</style>
 @* Navbar *@
 <nav class="navbar navbar-expand-lg navbar-custom shadow-sm">
     <div class="container-fluid justify-content-center">
-        <a class="navbar-brand" href="#" style="cursor: default;">Vigilance Clearance</a>
+        <a class="navbar-brand mb-0 h1" href="#" style="cursor: default;">Vigilance Clearance</a>
     </div>
 </nav>
+
 
 @* Login Form *@
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-4">
-            <div class="card shadow-sm">
+        <div class="col-md-8 col-lg-5">
+            <div class="card shadow login-card border-0 rounded-4">
                 <div class="card-header bg-primary text-white text-center">
                     <h4 class="mb-0">User Login</h4>
                 </div>

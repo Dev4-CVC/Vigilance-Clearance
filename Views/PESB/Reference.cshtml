@@ -1,0 +1,125 @@
+﻿@model VigilanceClearance.Models.ViewModel.PESBViewModel
+
+@{
+    Layout = "~/Views/Shared/_PESBLayout.cshtml";
+}
+
+@* Ensure Bootstrap CSS is linked *@
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+
+@* 1st card "New Reference" *@
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="card card-primary card-outline mb-4">
+                <div class="card-header bg-info text-white">
+                    <div class="card-title">New Reference</div>
+                </div>
+
+                <form asp-action="PESBReports" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <div class="card-body">
+                        <div class="row align-items-end">
+                            <div class="col-md-3 mb-3">
+                                <label>Post Description</label>
+                                @Html.DropDownListFor(model => model.PostCode, Model.PostDescriptionList,
+                                "-- Select Post --",
+                                new { @class = "form-control", id = "PostCode", tabindex = "-1", @aria_label = "-- Post dropdown --" })
+                                <span asp-validation-for="PostCode" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label>Sub Post Description</label>
+                                @Html.DropDownListFor(model => model.SubPostCode, Model.SubPostDescriptionList,
+                                "-- Select Sub Post --",
+                                new {
+                                @class = "form-control", id = "SubPostCode", tabindex = "-1", @aria_label = "-- Sub Post dropdown --", disabled = "disabled" })
+                                <span asp-validation-for="SubPostCode" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-3 mb-3" id="OtherSubPostDiv" style="display: none;">
+                                <label>Other Post</label>
+                                <input type="text" id="OtherSubPost" name="OtherSubPost" class="form-control"
+                                       placeholder="Enter other sub post" value="@Model.OtherSubPost" />
+                                <span asp-validation-for="OtherSubPost" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+@* 1st Card Script *@
+<script>
+    $(document).ready(function () {
+        function toggleOtherField() {
+            var subPostVal = $('#SubPostCode').val();
+            if (subPostVal === 'Other') {
+                $('#OtherSubPostDiv').show();
+            } else {
+                $('#OtherSubPostDiv').hide();
+                $('#OtherSubPost').val('');
+            }
+        }
+
+        // Initial check: disable SubPost if Post is not selected
+        var initialPost = $('#PostCode').val();
+        if (!initialPost) {
+            $('#SubPostCode').prop('disabled', true);
+        }
+
+        // SubPost dropdown change
+        $('#SubPostCode').change(function () {
+            toggleOtherField();
+        });
+
+        // Post dropdown change
+        $('#PostCode').change(function () {
+            var selectedPost = $(this).val();
+            var subPostSelect = $('#SubPostCode');
+
+            if (!selectedPost) {
+                subPostSelect.prop('disabled', true);
+                subPostSelect.empty().append($('<option>').val('').text('-- Select Sub Post --'));
+                $('#OtherSubPostDiv').hide();
+                $('#OtherSubPost').val('');
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("GetSubPostsByPostCode", "PESB")',
+                type: 'GET',
+                data: { postCode: selectedPost },
+                success: function (data) {
+                    subPostSelect.empty();
+                    subPostSelect.append($('<option>').val('').text('-- Select Sub Post --'));
+
+                    $.each(data, function (i, item) {
+                        subPostSelect.append($('<option>').val(item.value).text(item.text));
+                    });
+
+                    subPostSelect.prop('disabled', false); // ✅ Enable only after load
+
+                    toggleOtherField();
+                },
+                error: function (xhr) {
+                    alert("Error fetching sub posts: " + xhr.statusText);
+                }
+            });
+        });
+
+        // Initial load check for 'Other'
+        toggleOtherField();
+    });
+</script>

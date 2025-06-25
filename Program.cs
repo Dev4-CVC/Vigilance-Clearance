@@ -1,4 +1,3 @@
-
 using VigilanceClearance.Services;
 
 var time = 30;
@@ -45,6 +44,8 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=PESB}/{action=PESBDashboard}/{id?}");
+    pattern: "{controller=Account}/{action=Login}/{id?}");
+    //pattern: "{controller=PESB}/{action=PESBDashboard}/{id?}");
+//pattern: "{controller=Ministry_New_Reference}/{action=Ministry_New_Reference_Dashboard}/{id?}");
 
 app.Run();
