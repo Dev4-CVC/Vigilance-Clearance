@@ -1,0 +1,109 @@
+﻿
+@{
+    ViewData["Title"] = "viewDetailsReferenceReceivedCVC";
+    Layout = "~/Views/Shared/_MinistryLayout.cshtml";
+}
+
+
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+    }
+
+    .table-container {
+        overflow-x: auto;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 600px;
+    }
+
+    th, td {
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+</style>
+
+<section>
+    <div class="card">
+        <div class="card-header" style=" background-color: #007bff; color: white;">
+            <div class="card-header d-flex justify-content-between align-items-end" style="background-color: #007bff; color: white;">
+                <h3 class="mb-0">View Details Reference Received CVC</h3>
+                <a asp-action="ViewReferenceReceivedCVC" asp-route-id="101" class="btn btn-light btn-sm">Back</a>
+            </div>
+            @* <div class="card-title">
+                <h3>viewDetailsReferenceReceivedCVC</h3>
+                <a asp-action="ViewReferenceReceivedCVC" asp-route-id="101" class="btn btn-info btn-sm"> Back</a>
+            </div> *@
+        </div>
+        <div class="card-body">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Designation</th>
+                            <th>Date of Birth</th>
+                            <th>Date of Retirement</th>
+                            <th>Department</th>
+                            <th>Joining Date</th>
+                            <th>Service</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>101</td>
+                            <td>Meher Kumar</td>
+                            <td>Developer</td>
+                            <td>2022-01-15</td>
+                            <td>2022-01-15</td>
+                            <td>IT</td>
+                            <td>2022-01-15</td>
+                            <td>
+                                IAS
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>102</td>
+                            <td>Anjali Verma</td>
+                            <td>Designer</td>
+                            <td>2022-01-15</td>
+                            <td>2022-01-15</td>
+                            <td>UI/UX</td>
+                            <td>2021-08-20</td>
+                            <td>
+                                IPS
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>103</td>
+                            <td>Raj Singh</td>
+                            <td>Tester</td>
+                            <td>2022-01-15</td>
+                            <td>2022-01-15</td>
+                            <td>QA</td>
+                            <td>2023-03-10</td>
+                            <td>
+                                IRS
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+</section>

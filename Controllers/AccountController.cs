@@ -8,7 +8,9 @@ using VigilanceClearance.Models.Entities;
 using Microsoft.AspNetCore.Http;
 using CVOIS.Services;
 using VigilanceClearance.Services;
+
 using VigilanceClearance.Models.ViewModel.Account;
+
 using VigilanceClearance.Models.ViewModel;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -73,7 +75,7 @@ namespace VigilanceClearance.Controllers
                 }
 
                 HttpContext.Session.SetString("AccessToken", tokenResponse.Token);
-                return RedirectToAction("PESB_Dashboard", "PESB");
+                return RedirectToAction("PESB_Dashboard", "PESB");                
             }
             catch (Exception ex)
             {
