@@ -1,0 +1,125 @@
+﻿@{
+    Layout = "~/Views/Shared/_Ministry_new_referenceLayout.cshtml";
+}
+
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+
+    /* Container for cards */
+    .card-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 25px;
+        justify-content: center;
+        padding: 30px 20px;
+    }
+
+    /* General card styling */
+    .card {
+        flex: 1 1 300px;
+        max-width: 380px;
+        border-radius: 20px;
+        position: relative;
+        color: #ffffff;
+        overflow: hidden;
+        transition: transform 0.4s ease, box-shadow 0.4s ease;
+        padding: 30px 20px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(12px);
+        background: rgba(255, 255, 255, 0.1);
+        text-align: center;
+    }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.15), transparent);
+            transform: rotate(25deg);
+            z-index: 1;
+        }
+
+    /* Ensure body content isn't overlapped by background */
+    .card-body {
+        z-index: 2;
+    }
+
+    /* Card icons */
+    .card-icon {
+        font-size: 3rem;
+        color: rgba(255, 255, 255, 0.4);
+        position: absolute;
+        top: 20px;
+        right: 25px;
+    }
+
+    /* Buttons inside cards */
+    .card a.btn {
+        display: inline-block;
+        margin-top: 1.2rem;
+        padding: 12px 26px;
+        border-radius: 30px;
+        background: #ffffff;
+        color: #007bff;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        border: none;
+    }
+
+        .card a.btn:hover {
+            background: #007bff;
+            color: #ffffff;
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.5);
+        }
+
+    /* Theme-specific backgrounds */
+    .NewReferenceToCVC-card {
+        background: linear-gradient(135deg, #1d976c, #93f9b9); /* Emerald to mint green */
+    }
+
+    .ReferenceReceivedFromCVC-card {
+        background: linear-gradient(135deg, #ff6a00, #ee0979); /* Vibrant orange to pink */
+    }
+
+    /* Responsive tweaks */
+    @@media (max-width: 768px) {
+        .card-container {
+            flex-direction: column;
+            align-items: center;
+        }
+    }
+
+</style>
+
+
+<div class="card-container">
+
+    <div class="card NewReferenceToCVC-card">
+        <div class="card-body">
+            <i class="card-icon fas fa-paper-plane"></i>
+            <a asp-controller="Ministry_New_Reference" asp-action="NewReferenceToCVC" class="btn">New Reference To CVC</a>
+        </div>
+    </div>
+
+    <div class="card ReferenceReceivedFromCVC-card">
+        <div class="card-body">
+            <i class="card-icon fas fa-inbox"></i>
+            <a asp-controller="Ministry_New_Reference" asp-action="ReferenceReceivedFromCVC" class="btn">Reference Received From CVC</a>
+        </div>
+    </div>
+
+</div>
+
+

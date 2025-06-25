@@ -221,7 +221,7 @@
                     <div class="image">
                         <img src="@Url.Content("~/images/logo/cvcimage.jpg")" class="img-circle elevation-2" alt="User Image" />
                     </div>
-                    <div class="info"> <span class="d-block text-white">PESB</span></div>
+                    <div class="info"> <span class="d-block text-white">Ministry New Reference</span></div>
                 </div>
 
                 @* Sidebar Menu *@
@@ -233,15 +233,23 @@
                         </li>
 
                         <li class="nav-item">
-                            <a href="@Url.Content("~/PESB/PESB_Dashboard")" class="nav-link hover-link">
+                            <a href="@Url.Content("~/Ministry_New_Reference/Ministry_New_Reference_Dashboard")" class="nav-link hover-link">
                                 <i class="nav-icon fas fa-home"></i><p>Home</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="@Url.Content("")" class="nav-link hover-link">
-                                <i class="nav-icon fas fa-users"></i><p>Add New Reference</p>
+                            <a href="@Url.Content("~/Ministry_New_Reference/NewReferenceToCVC")" class="nav-link hover-link">
+                                <i class="nav-icon fas fa-paper-plane"></i>
+                                <p>New Reference To CVC</p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="@Url.Content("~/Ministry_New_Reference/ReferenceReceivedFromCVC")" class="nav-link hover-link">
+                                <i class="nav-icon fas fa-inbox"></i>
+                                <p>Reference Received From CVC</p>
+                            </a>
+                        </li>
+
 
                         @*  <li class="nav-item has-treeview">
                         <a href="#" class="nav-link hover-link">
@@ -278,12 +286,11 @@
                     <div class="row mb-2">
                         <div class="col-12 d-flex justify-content-between align-items-center flex-wrap">
                             <h1 class="mb-0">@ViewBag.title</h1>
-
                             <!-- Right Side: Breadcrumb -->
                             <div class="d-flex align-items-center flex-wrap">
                                 <ol class="breadcrumb mb-0">
                                     <li class="breadcrumb-item">
-                                        <a href="@Url.Content("~/PESB/PESB_Dashboard")">Home</a>
+                                        <a href="@Url.Content("~/Ministry_New_Reference/Ministry_New_Reference_Dashboard")">Home</a>
                                     </li>
                                     <li class="breadcrumb-item active">@ViewBag.Title</li>
                                 </ol>
