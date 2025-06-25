@@ -1,0 +1,75 @@
+﻿@model VigilanceClearance.Models.ViewModel.NewReferenceToCVC.NewReferenceToCVCViewModel
+
+@{
+    Layout = "~/Views/Shared/_Ministry_new_referenceLayout.cshtml";
+}
+
+@* 1st card "New Reference" *@
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="card card-primary card-outline mb-4">
+                <div class="card-header bg-info text-white">
+                    <div class="card-title">New Reference</div>
+                </div>
+
+                <form asp-action="PESBReports" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <div class="card-body">
+                        <div class="row align-items-end">
+                            <div class="col-md-3 mb-3">
+                                <label>Empanelment</label>
+                                @Html.DropDownListFor(model => model.Empanelment, Model.EmpanelmentList,
+                                "-- Select Extension--",
+                                new { @class = "form-control", id = "Empanelment", tabindex = "-1", @aria_label = "-- Empanelment dropdown --" })
+                                <span asp-validation-for="Empanelment" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label>Appointment</label>
+                                @Html.DropDownListFor(model => model.Appointment, Model.AppointmentList,
+                                "-- Select Appointment --",
+                                new {
+                                @class = "form-control", id = "Appointment", tabindex = "-1", @aria_label = "-- Appointment dropdown --" })
+                                <span asp-validation-for="Appointment" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>Extension</label>
+                                @Html.DropDownListFor(model => model.Appointment, Model.AppointmentList,
+                                "-- Select Extension --",
+                                new {
+                                @class = "form-control", id = "Appointment", tabindex = "-1", @aria_label = "-- Extension dropdown --" })
+                                <span asp-validation-for="Appointment" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-3 mb-3">
+                                <label>Additional Charge</label>
+                                @Html.DropDownListFor(model => model.Appointment, Model.AppointmentList,
+                                "-- Select Additional Charge --",
+                                new {
+                                @class = "form-control", id = "Appointment", tabindex = "-1", @aria_label = "-- Additional Charge dropdown --" })
+                                <span asp-validation-for="Appointment" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label>Confirmation</label>
+                                @Html.DropDownListFor(model => model.Appointment, Model.AppointmentList,
+                                "-- Select Confirmation --",
+                                new {
+                                @class = "form-control", id = "Appointment", tabindex = "-1", @aria_label = "-- Confirmation dropdown --" })
+                                <span asp-validation-for="Appointment" class="text-danger"></span>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                    <div class="card-footer d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+

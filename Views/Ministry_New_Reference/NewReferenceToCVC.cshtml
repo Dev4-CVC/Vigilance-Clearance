@@ -1,0 +1,159 @@
+﻿@{
+    Layout = "~/Views/Shared/_Ministry_new_referenceLayout.cshtml";
+}
+
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    .card-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 25px;
+        justify-content: center;
+        padding: 30px 20px;
+    }
+
+    .card {
+        flex: 1 1 280px;
+        max-width: 350px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(12px);
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 30px 20px;
+        position: relative;
+        color: #fff;
+        overflow: hidden;
+        transition: transform 0.4s ease, box-shadow 0.4s ease;
+        text-align: center;
+    }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(25deg);
+            z-index: 1;
+        }
+
+    .card-body {
+        z-index: 2;
+    }
+
+    .card a.btn {
+        display: inline-block;
+        margin-top: 1rem;
+        padding: 10px 24px;
+        border-radius: 30px;
+        background: #ffffff;
+        color: #007bff;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        border: none;
+    }
+
+        .card a.btn:hover {
+            background: #007bff;
+            color: #ffffff;
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.5);
+        }
+
+    .card-icon {
+        font-size: 3rem;
+        color: rgba(255, 255, 255, 0.3);
+        position: absolute;
+        top: 20px;
+        right: 20px;
+    }
+
+    /* Theme background gradients */
+    .empanelment-card {
+        background: linear-gradient(135deg, #2980b9, #6dd5fa);
+    }
+
+    .appointment-card {
+        background: linear-gradient(135deg, #8e2de2, #4a00e0);
+    }
+
+    .extension-card {
+        background: linear-gradient(135deg, #ff512f, #dd2476);
+    }
+
+    .additionalcharge-card {
+        background: linear-gradient(135deg, #1d976c, #93f9b9);
+    }
+
+    .confirmation-card {
+        background: linear-gradient(135deg, #f7971e, #ffd200);
+    }
+
+    /* Responsive tweaks */
+    @@media (max-width: 768px) {
+        .card-container {
+            flex-direction: column;
+            align-items: center;
+        }
+    }
+
+</style>
+
+
+
+
+<div class="d-flex justify-content-end mb-3">
+    <a asp-controller="Ministry_New_Reference" asp-action="AddNewReference" class="btn btn-success">
+        <i class="fas fa-plus me-1"></i> Add New Reference
+    </a>
+</div>
+
+<div class="card-container">
+
+    <div class="card empanelment-card">
+        <div class="card-body">
+            <i class="card-icon fas fa-user-tie"></i>
+            <a asp-controller="Ministry_New_Reference" asp-action="Empanelment" class="btn">Empanelment</a>
+        </div>
+    </div>
+
+    <div class="card appointment-card">
+        <div class="card-body">
+            <i class="card-icon fas fa-calendar-check"></i>
+            <a asp-controller="Ministry_New_Reference" asp-action="Appointment" class="btn">Appointment</a>
+        </div>
+    </div>
+
+    <div class="card extension-card">
+        <div class="card-body">
+            <i class="card-icon fas fa-clock"></i>
+            <a asp-controller="Ministry_New_Reference" asp-action="Extension" class="btn">Extension</a>
+        </div>
+    </div>
+
+    <div class="card additionalcharge-card">
+        <div class="card-body">
+            <i class="card-icon fas fa-tasks"></i>
+            <a asp-controller="Ministry_New_Reference" asp-action="AdditionalCharge" class="btn">Additional Charge</a>
+        </div>
+    </div>
+
+    <div class="card confirmation-card">
+        <div class="card-body">
+            <i class="card-icon fas fa-check-circle"></i>
+            <a asp-controller="Ministry_New_Reference" asp-action="Confirmation" class="btn">Confirmation</a>
+        </div>
+    </div>
+
+</div>
+

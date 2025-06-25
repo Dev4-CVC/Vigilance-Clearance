@@ -6,9 +6,14 @@ namespace VigilanceClearance.Models.ViewModel
 {
     public class PESBViewModel
     {
+        public int Id { get; set; }
+
+
         [Required(ErrorMessage = "Please select Post")]
         public string? PostCode { get; set; }
+        public string? Postcode { get; set; }
 
+        public string? Description { get; set; }
         public string? PostDescription { get; set; }
         public List<SelectListItem> PostDescriptionList { get; set; } = new();
 
@@ -18,7 +23,23 @@ namespace VigilanceClearance.Models.ViewModel
         public string? SubPostDescription { get; set; }
         public List<SelectListItem> SubPostDescriptionList { get; set; } = new();
 
+
+        public string? ReferenceCode { get; set; }
+        public string? ReferenceDesc { get; set; }
+        public List<SelectListItem> ReferenceDescList { get; set; } = new();
+
+     
+
+
         public string? OtherSubPost { get; set; }
+
+
+        [Required(ErrorMessage = "Name of the Applicant is required")]
+        public string? ApplicantName { get; set; }
+
+        [Required(ErrorMessage = "Name of Father is required")]
+        public string? FatherName { get; set; }
+
 
 
 
@@ -57,6 +78,7 @@ namespace VigilanceClearance.Models.ViewModel
         public string? Cadre { get; set; }
         public List<SelectListItem> CadreList { get; set; } = new();
 
+        [Required(ErrorMessage = "Please Enter Other Service")]
         public string? OtherService { get; set; }
 
     }

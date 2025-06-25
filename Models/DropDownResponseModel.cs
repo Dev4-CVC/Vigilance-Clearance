@@ -1,4 +1,4 @@
-﻿namespace VigilanceClearance.Models.ViewModel
+﻿namespace VigilanceClearance.Models
 {
     public class DropDownResponseModel
     {

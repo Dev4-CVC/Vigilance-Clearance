@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
+using VigilanceClearance.Models;
 using VigilanceClearance.Models.ViewModel;
 
 namespace VigilanceClearance.Controllers
