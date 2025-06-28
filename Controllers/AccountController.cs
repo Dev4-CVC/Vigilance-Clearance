@@ -66,7 +66,8 @@ namespace VigilanceClearance.Controllers
 
                 HttpContext.Session.SetString("AccessToken", tokenResponse.Token);
                 HttpContext.Session.SetString("Username", model.Username);
-                return RedirectToAction("PESB_Dashboard", "PESB");
+                return RedirectToAction("PESB_Dashboard", "PESB");                
+
             }
             catch
             {
