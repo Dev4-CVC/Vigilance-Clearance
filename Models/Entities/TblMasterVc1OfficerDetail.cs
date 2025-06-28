@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace VigilanceClearance.Models.Entities;
+namespace VigilanceClearance.Infrastructure.Infrastructure.Persistence.Models;
 
 public partial class TblMasterVc1OfficerDetail
 {
@@ -60,4 +60,6 @@ public partial class TblMasterVc1OfficerDetail
     public string? UpdatedBySessionId { get; set; }
 
     public string? UpdatedByIp { get; set; }
+
+    public string? PendingWith { get; set; }
 }

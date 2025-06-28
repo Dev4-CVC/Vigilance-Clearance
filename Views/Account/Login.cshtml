@@ -1,71 +1,51 @@
-﻿@model VigilanceClearance.Models.ViewModel.Account.LoginViewModel
+﻿@model VigilanceClearance.Models.Modal_Properties.Account.LoginViewModel
 
 @{
-    ViewData["Title"] = "Login";
     Layout = null;
 }
+
 <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-<link rel="stylesheet" href="~/VigilanceClearance.styles.css" asp-append-version="true" />
+<link href="~/css/login.css" rel="stylesheet" />
 
-<style>
-    /* Custom Navbar Styling */
-    .navbar-custom {
-        background: linear-gradient(90deg, #0d6efd, #20c997); /* Blue to teal gradient */
-        padding: 0.75rem 1.5rem;
-        color: #fff;
-        font-family: 'Poppins', sans-serif;
-    }
 
-        /* Navbar Brand Styling */
-        .navbar-custom .navbar-brand {
-            color: #ffffff;
-            font-weight: 600;
-            font-size: 1.5rem;
-            letter-spacing: 0.5px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-            pointer-events: none; /* Prevents clicking */
-        }
-
-</style>
 @* Navbar *@
 <nav class="navbar navbar-expand-lg navbar-custom shadow-sm">
     <div class="container-fluid justify-content-center">
-        <a class="navbar-brand mb-0 h1" href="#" style="cursor: default;">Vigilance Clearance</a>
+        <span class="navbar-brand mb-0 h1">Vigilance Clearance</span>
     </div>
 </nav>
-
 
 @* Login Form *@
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-5">
-            <div class="card shadow login-card border-0 rounded-4">
+            <div class="card shadow border-0 rounded-4">
                 <div class="card-header bg-primary text-white text-center">
-                    <h4 class="mb-0">User Login</h4>
+                    <h3 class="mb-0">Login</h3>
                 </div>
                 <div class="card-body">
                     <form asp-action="Login">
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
-                        <div class="mb-3">
+                        <div class="mb-4">
                             <label asp-for="Username" class="form-label"></label>
-                            <input asp-for="Username" class="form-control" placeholder="Enter username" />
+                            <input asp-for="Username" class="form-control" placeholder="Enter Username" />
                             <span asp-validation-for="Username" class="text-danger"></span>
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-4">
                             <label asp-for="Password" class="form-label"></label>
-                            <input asp-for="Password" class="form-control" placeholder="Enter password" />
+                            <input asp-for="Password" class="form-control" placeholder="Enter Password" />
                             <span asp-validation-for="Password" class="text-danger"></span>
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-4">
                             <label asp-for="Captcha" class="form-label"></label>
-                            <div class="captcha-wrapper mb-2">
+                            <div class="d-flex align-items-center mb-2">
                                 <img src="@Url.Action("GenerateCaptcha", "Account")" alt="CAPTCHA" id="captchaImage" class="border rounded" style="height: 40px;" />
-                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="reloadCaptcha()">
-                                    <i class="fas fa-sync-alt"></i> Reload
+                                <button type="button" class="btn btn-outline-secondary btn-sm ms-2" onclick="reloadCaptcha()">
+                                    Reload
                                 </button>
                             </div>
                             <input asp-for="Captcha" class="form-control" placeholder="Enter CAPTCHA" />
@@ -82,10 +62,15 @@
     </div>
 </div>
 
-@* JS Scripts  *@
+@* Required Scripts only  *@
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
-<script src="~/js/site.js" asp-append-version="true"></script>
-<script src="~/js/account.js"></script>
+
+@* Reload captcha image *@
+<script>
+    function reloadCaptcha() {
+        document.getElementById("captchaImage").src = "/Account/GenerateCaptcha?" + new Date().getTime();
+    }
+</script>

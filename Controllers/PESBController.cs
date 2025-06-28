@@ -17,6 +17,9 @@ using VigilanceClearance.Models;
 using System.Net.Http.Headers;
 using System.IO;
 using VigilanceClearance.Models.ViewModel.PESB;
+using System.ComponentModel.Design;
+using VigilanceClearance.Interface.PESB;
+using VigilanceClearance.Models.Modal_Properties.PESB;
 
 namespace VigilanceClearance.Controllers
 {
@@ -25,13 +28,13 @@ namespace VigilanceClearance.Controllers
         private readonly IHttpClientFactory _clientFactory;
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
-        private readonly string APIURL;
-        public PESBController(IHttpClientFactory clientFactory, HttpClient httpClient, IConfiguration configuration)
+        private readonly IPESB _pesb;
+        public PESBController(IHttpClientFactory clientFactory, HttpClient httpClient, IConfiguration configuration, IPESB pesb)
         {
             this._clientFactory = clientFactory;
-            _httpClient = httpClient;
-            _configuration = configuration;
-            APIURL = _configuration["APIURL"]!;
+            this._httpClient = httpClient;
+            this._configuration = configuration;
+            this._pesb = pesb;
         }
 
 
@@ -52,14 +55,17 @@ namespace VigilanceClearance.Controllers
         [HttpGet]
         public async Task<IActionResult> PESBReports()
         {
+            ViewBag.title = "PESB : Add New Reference";
+            var ReferenceCode = "APPOINTMENT";
+            string id = "0";
             try
             {
                 ViewBag.title = "PESB : Add New Reference";
 
                 var model = new PESBViewModel
                 {
-                    PostDescriptionList = await GetPostDescriptionsDropDownAsync("APPOINTMENT"),
-                    SubPostDescriptionList = await GetSubPostsByPostCodeInternal(""),
+                    ReferenceDescList = await _pesb.GetReferenceDropDownAsync(),
+                    PostDescriptionList = await _pesb.GetPostDescriptionsDropDownAsync(ReferenceCode),
                     ServiceList = await GetService(),
                     BatchList = await GetBatch(),
                     CadreList = await GetCadre()
@@ -80,28 +86,44 @@ namespace VigilanceClearance.Controllers
             try
             {
                 ViewBag.title = "PESB Appointment";
-                return await Task.FromResult(View());
+
+                var data = new PESB_Add_New_Reference_Model
+                {
+                    //ReferenceCode = TempData["ReferenceCode"]?.ToString(),
+                    //PostCode = TempData["PostCode"]?.ToString(),
+                    //SubPostCode = TempData["SubPostCode"]?.ToString(),
+                    //OtherSubPost = TempData["OtherSubPost"]?.ToString()
+                };
+
+                return View(data);
             }
             catch (Exception)
             {
                 ViewBag.Error = "Something went wrong while loading the page.";
-                return await Task.FromResult(View());
+                return View();
             }
         }
+
+
+
+
 
         [HttpGet]
         public async Task<IActionResult> PESB_Add_New_Reference()
         {
+            ViewBag.title = "PESB : Add New Reference";
+            var referenceReceivedFor = "APPOINTMENT";
+            string id = "0";
             try
             {
-                ViewBag.title = "PESB : Add New Reference";
-                var ReferenceCode = "APPOINTMENT";
-                var model = new PESB_Add_New_Reference_ViewModel
+                var model = new AddNewReference_VM
                 {
-                    ReferenceDescList = await GetReferenceDropDownAsync(),
-                    PostDescriptionList = await GetPostDescriptionsDropDownAsync(ReferenceCode),
-                    SubPostDescriptionList= new List<SelectListItem>(),
-                    ReferenceCode = "APPOINTMENT"
+                    referenceReceivedFor_List = await _pesb.GetReferenceDropDownAsync(),
+                    selectionForThePostCategory_List = await _pesb.GetPostDescriptionsDropDownAsync(referenceReceivedFor),
+                    selectionForThePostSubCategory_List = new List<SelectListItem>(),
+                    orgName_List = await _pesb.GetOrganizationDropDownAsync(id),
+                    minDesc_List = new List<SelectListItem>(),
+                    referenceReceivedFor = "APPOINTMENT"
                 };
 
                 return View(model);
@@ -114,84 +136,12 @@ namespace VigilanceClearance.Controllers
         }
 
 
-
-        //db table name: tbl_Master_Vc_Reference
-        private async Task<List<SelectListItem>> GetReferenceDropDownAsync()
-        {
-            var accessToken = HttpContext.Session.GetString("AccessToken");
-            if (string.IsNullOrEmpty(accessToken)) return new List<SelectListItem>();
-
-            try
-            {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-
-                var response = await _httpClient.GetAsync($"{APIURL}DropDown/VcReferenceGetAll");
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    return new List<SelectListItem>();
-                }
-
-                var json = await response.Content.ReadAsStringAsync();
-                var items = JsonConvert.DeserializeObject<List<DropDownResponseModel>>(json) ?? new();
-
-                return items.Select(item => new SelectListItem
-                {
-                    Value = item.Value,
-                    Text = item.Text
-                }).ToList();
-            }
-            catch (Exception ex)
-            {
-                return new List<SelectListItem>();
-            }
-        }
-
-
-        //db table name: tbl_Master_Vc_Post
-        private async Task<List<SelectListItem>> GetPostDescriptionsDropDownAsync(string ReferenceCode)
-        {
-            if (string.IsNullOrWhiteSpace(ReferenceCode)) return new List<SelectListItem>();
-
-            var accessToken = HttpContext.Session.GetString("AccessToken");
-
-            if (string.IsNullOrEmpty(accessToken)) return new List<SelectListItem>();
-
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-
-            var requestUrl = $"{APIURL}DropDown/VcPostGetByReferenceNumber?ReferenceNumber={Uri.EscapeDataString(ReferenceCode)}";
-
-            try
-            {
-                var response = await _httpClient.GetAsync(requestUrl);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    return new List<SelectListItem>();
-                }
-
-                var json = await response.Content.ReadAsStringAsync();
-                var items = JsonConvert.DeserializeObject<List<DropDownResponseModel>>(json) ?? new List<DropDownResponseModel>();
-
-                return items.Select(item => new SelectListItem
-                {
-                    Value = item.Value,
-                    Text = item.Text
-                }).ToList();
-            }
-            catch (Exception ex)
-            {
-                return new List<SelectListItem>();
-            }
-        }
-
-
         [HttpGet]
         public async Task<IActionResult> GetSubPostsByPostCode(string postCode)
-         {
+        {
             try
             {
-                var subPosts = await GetSubPostsByPostCodeInternal(postCode);
+                var subPosts = await _pesb.GetSubPostsByPostCodeInternal(postCode);
                 return Json(subPosts);
             }
             catch
@@ -200,50 +150,118 @@ namespace VigilanceClearance.Controllers
             }
         }
 
-        //db table name: tbl_Master_Vc_Post_SubCategory
-        private async Task<List<SelectListItem>> GetSubPostsByPostCodeInternal(string postCode)
+
+        [HttpGet]
+        public async Task<IActionResult> GetMinistryByOrgCode(string id)
         {
-            if (string.IsNullOrWhiteSpace(postCode)) return new List<SelectListItem>();
-
-            var accessToken = HttpContext.Session.GetString("AccessToken");
-            if (string.IsNullOrEmpty(accessToken)) return new List<SelectListItem>();
-
             try
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-
-                var requestUrl = $"{APIURL}DropDown/VcPostSubCategoryGetById?Id={Uri.EscapeDataString(postCode)}";
-
-                var response = await _httpClient.GetAsync(requestUrl);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    return new List<SelectListItem>();
-                }
-
-                var jsonContent = await response.Content.ReadAsStringAsync();
-                var items = JsonConvert.DeserializeObject<List<DropDownResponseModel>>(jsonContent) ?? new List<DropDownResponseModel>();
-
-                return items.Select(item => new SelectListItem
-                {
-                    Value = item.Value,
-                    Text = item.Text
-                }).ToList();
+                var ministry = await _pesb.GetMinistryByPostCodeInternal(id);
+                return Json(ministry);
             }
-            catch (Exception ex)
+            catch
             {
-                return new List<SelectListItem>();
+                return Json(new { Error = "Failed to load sub-posts." });
             }
         }
 
-       
 
+        [HttpPost]
+        public async Task<IActionResult> PESB_Add_New_Reference(AddNewReference_VM model)
+        {
+            PESB_Add_New_Reference_Model objmodel = new PESB_Add_New_Reference_Model();
+            ViewBag.title = "PESB : Add New Reference";
+            string id = "0";
+            try
+            {
+                // Remove list properties from ModelState to exclude them from validation
+                ModelState.Remove("ReferenceReceivedFor_List");
+                ModelState.Remove("selectionForThePostCategory_List");
+                ModelState.Remove("selectionForThePostSubCategory_List");
+                ModelState.Remove("orgName_List");
+                ModelState.Remove("minDesc_List");
 
+                if (!ModelState.IsValid)
+                {
+                    // Re-populate dropdown lists for view rendering
+                    model.referenceReceivedFor_List = await _pesb.GetReferenceDropDownAsync();
+                    model.selectionForThePostCategory_List = await _pesb.GetPostDescriptionsDropDownAsync(model.referenceReceivedFor ?? "APPOINTMENT");
+                    model.selectionForThePostSubCategory_List = new List<SelectListItem>();
+                    model.orgName_List = await _pesb.GetOrganizationDropDownAsync(id);
+                    model.minDesc_List = new List<SelectListItem>();
+                    model.referenceReceivedFor = "APPOINTMENT";
+                    return View(model);
+                }
 
+                else
+                {
+                    //if (model.selectionForThePostSubCategory == "Other" && string.IsNullOrWhiteSpace(model.OtherSubPost))
+                    //{
+                    //    ModelState.AddModelError("OtherSubPost", "Please enter sub post.");
+                    //}
+                    objmodel.referenceReceivedFor = model.referenceReceivedFor;
+                    objmodel.referenceReceivedFrom = "PESB";
+                    objmodel.referenceReceivedFromCode = "PESB";
 
+                    objmodel.selectionForThePostCategory = model.selectionForThePostCategory;
+                    objmodel.selectionForThePostSubCategory = model.selectionForThePostSubCategory;
 
+                    objmodel.orgCode = model.orgCode;
+                    objmodel.orgName = null;
 
+                    objmodel.minCode = model.minCode;
+                    objmodel.minDesc = null;
+
+                    objmodel.referenceNoFileNo = model.referenceNoFileNo;
+                    objmodel.referenceOrSubmissionToCvcDate = model.referenceOrSubmissionToCvcDate;
+                    objmodel.cvcReferenceIdFileNo = model.cvcReferenceIdFileNo;
+
+                    objmodel.createdBy = HttpContext.Session.GetString("Username");
+                    objmodel.createdOn = DateTime.Now;
+                    objmodel.createdBySessionId = HttpContext.Session.GetString("Username");
+                    objmodel.createdByIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+
+                    objmodel.updateBy = HttpContext.Session.GetString("Username");
+                    objmodel.updatedOn = DateTime.Now;
+                    objmodel.updatedBySessionId = HttpContext.Session.GetString("Username");
+                    objmodel.updatedByIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+
+                    objmodel.pendingWith = "CVC";
+                    objmodel.uid = null;
+                    objmodel.referenceId = null;
+
+                    int num = await _pesb.InsertAddNewReferenceAsync(objmodel);
+                    if (num == 0)
+                    {
+                        ModelState.AddModelError(string.Empty, "Record not saved.");
+                        model.referenceReceivedFor_List = await _pesb.GetReferenceDropDownAsync();
+                        model.selectionForThePostCategory_List = await _pesb.GetPostDescriptionsDropDownAsync(model.referenceReceivedFor ?? "APPOINTMENT");
+                        model.selectionForThePostSubCategory_List = new List<SelectListItem>();
+                        model.orgName_List = await _pesb.GetOrganizationDropDownAsync(id);
+                        model.minDesc_List = new List<SelectListItem>();
+                        return View("PESB_Add_New_Reference", model);
+                    }
+                    else
+                    {
+                        TempData["SuccessMessage"] = "Reference added successfully!";
+                        return RedirectToAction("PESB_Add_New_Reference");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                ViewBag.Error = "An unexpected error occurred. Please try again.";
+                model.referenceReceivedFor_List = await _pesb.GetReferenceDropDownAsync();
+                model.selectionForThePostCategory_List = await _pesb.GetPostDescriptionsDropDownAsync(model.referenceReceivedFor ?? "APPOINTMENT");
+                model.selectionForThePostSubCategory_List = await _pesb.GetSubPostsByPostCodeInternal(model.selectionForThePostCategory ?? "");
+                model.orgName_List = await _pesb.GetOrganizationDropDownAsync("0");
+                model.minDesc_List = string.IsNullOrWhiteSpace(model.minCode)
+                    ? new List<SelectListItem>()
+                    : await _pesb.GetMinistryByPostCodeInternal(model.minCode);
+                return View("PESB_Add_New_Reference", model);
+            }
+        }
 
 
 
@@ -308,11 +326,6 @@ namespace VigilanceClearance.Controllers
             }
         }
 
-
-
-
-
-
         [HttpPost]
         public async Task<IActionResult> PESBReports(PESBViewModel model)
         {
@@ -331,8 +344,8 @@ namespace VigilanceClearance.Controllers
 
                 if (!ModelState.IsValid)
                 {
-                    model.PostDescriptionList = await GetPostDescriptionsDropDownAsync("APPOINTMENT");
-                    model.SubPostDescriptionList = await GetSubPostsByPostCodeInternal("");
+                    //model.PostDescriptionList = await GetPostDescriptionsDropDownAsync("APPOINTMENT");
+                    //model.SubPostDescriptionList = await GetSubPostsByPostCodeInternal("");
                     model.ServiceList = await GetService();
                     model.BatchList = await GetBatch();
                     model.CadreList = await GetCadre();
@@ -343,8 +356,8 @@ namespace VigilanceClearance.Controllers
             catch (Exception ex)
             {
                 ViewBag.Error = "An unexpected error occurred. Please try again.";
-                model.PostDescriptionList = await GetPostDescriptionsDropDownAsync("APPOINTMENT");
-                model.SubPostDescriptionList = await GetSubPostsByPostCodeInternal("");
+                //model.PostDescriptionList = await GetPostDescriptionsDropDownAsync("APPOINTMENT");
+                //model.SubPostDescriptionList = await GetSubPostsByPostCodeInternal("");
                 return View(model);
             }
         }
@@ -352,82 +365,3 @@ namespace VigilanceClearance.Controllers
 
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-//private async Task<List<SelectListItem>> GetReferenceDropDownAsync()
-//{
-//    var accessToken = HttpContext.Session.GetString("AccessToken");
-//    if (string.IsNullOrEmpty(accessToken)) return new List<SelectListItem>();
-
-//    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-
-//    var response = await _httpClient.GetAsync(APIURL + "DropDown/VcReferenceGetAll");
-
-//    var json = await response.Content.ReadAsStringAsync();
-//    var items = JsonConvert.DeserializeObject<List<DropDownResponseModel>>(json) ?? new();
-
-//    var selectList = items.Select(item => new SelectListItem
-//    {
-//        Value = item.Value,
-//        Text = item.Text
-//    }).ToList();
-
-//    return selectList;
-//}
-
-//private async Task<List<SelectListItem>> GetPostDescriptionsDropDownAsync(string id)
-//{
-//    var accessToken = HttpContext.Session.GetString("AccessToken");
-//    _httpClient.DefaultRequestHeaders.Authorization =
-//        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
-
-//    var response = await _httpClient.GetAsync(APIURL + "DropDown/VcPostGetByReferenceNumber?ReferenceNumber=APPOINTMENT");
-
-//    if (!response.IsSuccessStatusCode)
-//        return new List<SelectListItem>(); // Or handle error accordingly
-
-//    var json = await response.Content.ReadAsStringAsync();
-//    var items = JsonConvert.DeserializeObject<List<DropDownResponseModel>>(json);
-
-//    var selectList = items.Select(item => new SelectListItem
-//    {
-//        Value = item.Value,
-//        Text = item.Text
-//    }).ToList();
-
-//    return selectList;
-//}
-
-// private Task<List<SelectListItem>> GetSubPostsByPostCodeInternal(string postCode)
-//{
-//    var subPostMap = new Dictionary<string, List<SelectListItem>>(StringComparer.OrdinalIgnoreCase)
-//    {
-//        ["DIRECTOR"] = new List<SelectListItem>
-//        {
-//            new SelectListItem { Value = "TECH", Text = "TECHNICAL" },
-//            new SelectListItem { Value = "HR", Text = "HR" },
-//            new SelectListItem { Value = "OPERATIONS", Text = "OPERATIONS" },
-//            new SelectListItem { Value = "COMMERCIAL", Text = "COMMERCIAL" },
-//            new SelectListItem { Value = "MARKETING", Text = "MARKETING" },
-//            new SelectListItem { Value = "BD", Text = "BUSINESS DEVELOPMENT" },
-//            new SelectListItem { Value = "GREENENERGY", Text = "GREEN ENERGY" },
-//            new SelectListItem { Value = "Other", Text = "Other" },
-//        }
-//    };
-
-//    if (!string.IsNullOrWhiteSpace(postCode) && subPostMap.TryGetValue(postCode, out var result))
-//        return Task.FromResult(result);
-
-//    return Task.FromResult(new List<SelectListItem>());
-//}

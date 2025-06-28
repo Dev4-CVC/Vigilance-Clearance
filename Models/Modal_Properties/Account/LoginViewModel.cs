@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace VigilanceClearance.Models.ViewModel.Account
+namespace VigilanceClearance.Models.Modal_Properties.Account
 {
     public class LoginViewModel
     {

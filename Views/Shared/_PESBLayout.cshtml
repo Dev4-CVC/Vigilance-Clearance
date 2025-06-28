@@ -30,22 +30,53 @@
 
     <link href="~/css/stylesheet.css" rel="stylesheet" />
     <style>
+        /* Sidebar */
+        .main-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 250px;
+            overflow-y: auto;
+            z-index: 1030;
+            transition: width 0.3s ease;
+        }
+
+        /* Content wrapper */
         .content-wrapper {
             background-color: #f4f6f9;
-        }
-
-        .ml-custom-header {
+            transition: margin-left 0.3s ease;
             margin-left: 250px;
-            border-bottom: 1px solid black;
         }
 
+
+        /* Top header */
+        .ml-custom-header {
+            margin-left: 250px; /* Align with sidebar */
+            transition: margin-left 0.3s ease;
+            background: linear-gradient(90deg, #0d6efd, #20c997);
+            color: #fff;
+        }
+        /* Collapse mode */
+        body.sidebar-collapse .main-sidebar {
+            width: 73px; /* Match your collapsed sidebar width */
+        }
+
+        body.sidebar-collapse .content-wrapper,
+        body.sidebar-collapse .ml-custom-header {
+            margin-left: 73px;
+        }
+
+        /* Optional: smoother breadcrumb/header spacing */
         .content-header {
             padding: 5px 10px;
             background-color: #FFF;
             border-bottom: 1px solid black;
             margin-top: 0px;
-            margin-bottom: 12px
+            margin-bottom: 12px;
         }
+
+
 
         .hover-link:hover {
             background-color: #20B2AA !important;
@@ -67,15 +98,7 @@
             color: #000 !important;
         }
 
-        .main-sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            width: 250px;
-            overflow-y: auto;
-            z-index: 1030;
-        }
+      
 
         #visitorCount {
             font-weight: bold;
@@ -181,6 +204,10 @@
         <div class="content-header ml-custom-header" style="margin-bottom: 0rem;">
             <div class="container-fluid d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center">
+                    <button class="btn btn-sm btn-toggle-sidebar me-3" data-widget="pushmenu">
+                        <i class="fas fa-bars"></i>
+                    </button>
+
                     <div class="image" style="margin-right: 20px;">
                         <img src="@Url.Content("~/images/logo/cvcimage.jpg")" class="img-circle elevation-2" alt="Logo" style="width: 40px; height: 40px;" />
                     </div>
@@ -191,7 +218,7 @@
 
                 <div class="d-flex align-items-center ms-auto mt-2 mt-sm-0">
                     <h5 class="mb-0 me-3">
-                        <i class="fas fa-user me-2"></i> Welcome, <span class="text-success font-weight-bold p-2">@username</span>
+                        <i class="fas fa-user me-2"></i> Welcome, <span class="text-dark font-weight-bold p-2">@username</span>
                     </h5>
                     <div class="dropdown">
                         <button class="dropbtn">Account <i class="fas fa-caret-down"></i></button>

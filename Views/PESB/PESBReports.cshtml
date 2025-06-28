@@ -1,4 +1,4 @@
-﻿@model VigilanceClearance.Models.ViewModel.PESBViewModel
+﻿@model VigilanceClearance.Models.ViewModel.PESB.Reports_VM
 
 @{
     Layout = "~/Views/Shared/_PESBLayout.cshtml";
@@ -17,56 +17,10 @@
 
 
 @* 1st card "New Reference" *@
-<div class="container-fluid">
-    <div class="row justify-content-center">
-        <div class="col-md-12">
-            <div class="card card-primary card-outline mb-4">
-                <div class="card-header bg-info text-white">
-                    <div class="card-title">New Reference</div>
-                </div>
 
-                <form asp-action="PESBReports" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-                    <div class="card-body">
-                        <div class="row align-items-end">
-                            <div class="col-md-3 mb-3">
-                                <label>Post Description</label>
-                                @Html.DropDownListFor(model => model.PostCode, Model.PostDescriptionList,
-                                "-- Select Post --",
-                                new { @class = "form-control", id = "PostCode", tabindex = "-1", @aria_label = "-- Post dropdown --" })
-                                <span asp-validation-for="PostCode" class="text-danger"></span>
-                            </div>
-
-                            <div class="col-md-3 mb-3">
-                                <label>Sub Post Description</label>
-                                @Html.DropDownListFor(model => model.SubPostCode, Model.SubPostDescriptionList,
-                                "-- Select Sub Post --",
-                                new {
-                                @class = "form-control", id = "SubPostCode", tabindex = "-1", @aria_label = "-- Sub Post dropdown --", disabled = "disabled" })
-                                <span asp-validation-for="SubPostCode" class="text-danger"></span>
-                            </div>
-
-                            <div class="col-md-3 mb-3" id="OtherSubPostDiv" style="display: none;">
-                                <label>Other Post</label>
-                                <input type="text" id="OtherSubPost" name="OtherSubPost" class="form-control"
-                                       placeholder="Enter other sub post" value="@Model.OtherSubPost" />
-                                <span asp-validation-for="OtherSubPost" class="text-danger"></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card-footer d-flex justify-content-end">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </div>
-                </form>
-
-            </div>
-        </div>
-    </div>
-</div>
-
+ 
 @* 2nd card "Details of the officer" *@
-<div class="container-fluid">
+@* <div class="container-fluid">
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="card card-primary card-outline mb-4">
@@ -151,10 +105,10 @@
             </div>
         </div>
     </div>
-</div>
+</div> *@
 
 @* 3rd card "Positions Held" *@
-<div class="container-fluid">
+@* <div class="container-fluid">
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="card card-primary card-outline mb-4">
@@ -197,10 +151,10 @@
             </div>
         </div>
     </div>
-</div>
+</div> *@
 
 @* Modal *@
-<div class="modal" id="positionHeldModal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="positionHeldModalLabel" aria-hidden="true">
+@* <div class="modal" id="positionHeldModal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="positionHeldModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header bg-primary">
@@ -256,14 +210,14 @@
             </div>
         </div>
     </div>
-</div>
+</div> *@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 
 @* 1st Card Script *@
-<script>
+@* <script>
     $(document).ready(function () {
         function toggleOtherField() {
             var subPostVal = $('#SubPostCode').val();
@@ -324,19 +278,19 @@
         // Initial load check for 'Other'
         toggleOtherField();
     });
-</script>
+</script> *@
 
 @* 2nd Card script (date picker)  *@
-<script>
+@* <script>
     flatpickr(".datepicker", {
         dateFormat: "Y-m-d",
         allowInput: true,
         altInput: false
     });
-</script>
+</script> *@
 
 @* 2nd Card script *@
-<script>
+@* <script>
     $(document).ready(function () {
         // (Other Service text field show, When we select "other" option in Service Dropdown)
         function toggleOtherServiceField() {
@@ -377,10 +331,10 @@
             toggleCadreDropdown();
         });
     });
-</script>
+</script> *@
 
 @* 3rd Card Script *@
-<script>
+@* <script>
     $(function () {
         let rowIndex = 0;
 
@@ -460,10 +414,10 @@
             $('#positionHeldModal').modal('show');
         });
     });
-</script>
+</script> *@
 
 @* 3rd Card Script (moveable modal) *@
-<script>
+@* <script>
     $(document).ready(function () {
         $('#positionHeldModal').on('shown.bs.modal', function () {
             $('.modal-dialog').draggable({
@@ -471,4 +425,4 @@
             });
         });
     });
-</script>
+</script> *@
