@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace VigilanceClearance.Models.Entities;
+namespace VigilanceClearance.Infrastructure.Infrastructure.Persistence.Models;
 
 public partial class AspNetUser
 {

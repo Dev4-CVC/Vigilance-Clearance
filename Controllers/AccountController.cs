@@ -4,13 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using System.Collections.Generic;
 using System.Security.Claims;
-using VigilanceClearance.Models.Entities;
 using Microsoft.AspNetCore.Http;
 using CVOIS.Services;
 using VigilanceClearance.Services;
-
-using VigilanceClearance.Models.ViewModel.Account;
-
 using VigilanceClearance.Models.ViewModel;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -20,6 +16,9 @@ using Microsoft.AspNetCore.Mvc.ViewEngines;
 using VigilanceClearance.Interface.PESB;
 using VigilanceClearance.Models.DTOs;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
+using VigilanceClearance.Interface.Account;
+using VigilanceClearance.Models.Modal_Properties.Account;
 
 namespace VigilanceClearance.Controllers
 {
@@ -27,13 +26,13 @@ namespace VigilanceClearance.Controllers
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly CaptchaService _captchaService;
-        private readonly HttpClient _httpClient;
+        private readonly IAuthService _authService;
 
-        public AccountController(IHttpContextAccessor httpContextAccessor, CaptchaService captchaService, HttpClient httpClient)
+        public AccountController(IHttpContextAccessor httpContextAccessor, CaptchaService captchaService, IAuthService authService)
         {
-            _httpContextAccessor = httpContextAccessor;
-            _captchaService = captchaService;
-            _httpClient = httpClient;
+            this._httpContextAccessor = httpContextAccessor;
+            this._captchaService = captchaService;
+            this._authService = authService;
         }
 
 
@@ -57,37 +56,24 @@ namespace VigilanceClearance.Controllers
                     Password = model.Password
                 };
 
-                var response = await _httpClient.PostAsJsonAsync("http://10.25.34.185:88/api/Auth/login", loginDto);
+                var tokenResponse = await _authService.LoginAsync(loginDto);
 
-                if (!response.IsSuccessStatusCode)
+                if (tokenResponse?.Token == null)
                 {
                     ModelState.AddModelError(string.Empty, "Invalid login attempt. Please check your credentials.");
                     return View(model);
                 }
 
-                var content = await response.Content.ReadAsStringAsync();
-                var tokenResponse = JsonConvert.DeserializeObject<TokenResponse>(content);
-
-                if (tokenResponse?.Token == null)
-                {
-                    ModelState.AddModelError(string.Empty, "Failed to retrieve token. Please try again.");
-                    return View(model);
-                }
-
                 HttpContext.Session.SetString("AccessToken", tokenResponse.Token);
+                HttpContext.Session.SetString("Username", model.Username);
                 return RedirectToAction("PESB_Dashboard", "PESB");                
+
             }
-            catch (Exception ex)
+            catch
             {
                 ModelState.AddModelError(string.Empty, "An unexpected error occurred. Please try again later.");
                 return View(model);
             }
-        }
-
-        public class TokenResponse
-        {
-            [JsonProperty("token")]
-            public string Token { get; set; }
         }
 
 
