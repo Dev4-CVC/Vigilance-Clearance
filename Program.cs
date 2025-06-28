@@ -1,3 +1,7 @@
+using VigilanceClearance.Data.Account;
+using VigilanceClearance.Data.PESB_Service;
+using VigilanceClearance.Interface.Account;
+using VigilanceClearance.Interface.PESB;
 using VigilanceClearance.Services;
 
 var time = 30;
@@ -20,6 +24,12 @@ builder.Services.AddSession(options =>
 });
 
 
+builder.Services.AddSession();
+builder.Services.AddHttpContextAccessor();
+
+//interface services
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IPESB, PESB_Services>();
 
 
 

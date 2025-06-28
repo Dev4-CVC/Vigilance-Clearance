@@ -1,4 +1,4 @@
-﻿@model VigilanceClearance.Models.ViewModel.PESB.PESB_Add_New_Reference_ViewModel
+﻿@model VigilanceClearance.Models.ViewModel.PESB.AddNewReference_VM
 
 @{
     Layout = "~/Views/Shared/_PESBLayout.cshtml";
@@ -6,6 +6,18 @@
 
 @* Ensure Bootstrap CSS is linked *@
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
 
 @* 1st card "New Reference" *@
 <div class="container-fluid">
@@ -22,37 +34,78 @@
                         <div class="row align-items-end">
                             <div class="col-md-3 mb-3">
                                 <label>Reference</label>
-                                @Html.DropDownListFor(model => model.ReferenceCode,
-                                new SelectList(Model.ReferenceDescList, "Value", "Text", Model.ReferenceCode),
+                                @Html.DropDownListFor(model => model.referenceReceivedFor,
+                                new SelectList(Model.referenceReceivedFor_List, "Value", "Text", Model.referenceReceivedFor),
                                 "-- Select Reference --",
-                                new { @class = "form-control", id = "ReferenceCode", tabindex = "-1", @aria_label = "-- Reference dropdown --", disabled = "disabled" })
-                                <span asp-validation-for="ReferenceCode" class="text-danger"></span>
-                            </div>
+                                new { @class = "form-control", id = "referenceReceivedFor", tabindex = "-1", @readonly = "read only" })
+                                <span asp-validation-for="referenceReceivedFor" class="text-danger"></span>
 
+                            </div>
 
                             <div class="col-md-3 mb-3">
                                 <label>Post Description</label>
-                                @Html.DropDownListFor(model => model.PostCode, Model.PostDescriptionList,
+                                @Html.DropDownListFor(model => model.selectionForThePostCategory, Model.selectionForThePostCategory_List,
                                 "-- Select Post --",
-                                new { @class = "form-control", id = "PostCode", tabindex = "-1", @aria_label = "-- Post dropdown --" })
-                                <span asp-validation-for="PostCode" class="text-danger"></span>
+                                new { @class = "form-control", id = "selectionForThePostCategory", tabindex = "-1" })
+                                <span asp-validation-for="selectionForThePostCategory" class="text-danger"></span>
                             </div>
 
                             <div class="col-md-3 mb-3">
                                 <label>Sub Post Description</label>
-                                @Html.DropDownListFor(model => model.SubPostCode, Model.SubPostDescriptionList,
+                                @Html.DropDownListFor(model => model.selectionForThePostSubCategory, Model.selectionForThePostSubCategory_List,
                                 "-- Select Sub Post --",
                                 new {
-                                @class = "form-control", id = "SubPostCode", tabindex = "-1", @aria_label = "-- Sub Post dropdown --", disabled = "disabled" })
-                                <span asp-validation-for="SubPostCode" class="text-danger"></span>
+                                @class = "form-control", id = "selectionForThePostSubCategory", tabindex = "-1", disabled = "disabled" })
+                                <span asp-validation-for="selectionForThePostSubCategory" class="text-danger"></span>
                             </div>
 
-                            <div class="col-md-3 mb-3" id="OtherSubPostDiv" style="display:none;">
+                            @* <div class="col-md-3 mb-3" id="OtherSubPostDiv" style="display:none;">
                                 <label>Other Sub Post Description</label>
-                                <input type="text" id="OtherSubPost" name="OtherSubPost" class="form-control" placeholder="Enter other sub post" />
+                                <input asp-for="OtherSubPost" class="form-control" placeholder="Enter other sub post" />
                                 <span asp-validation-for="OtherSubPost" class="text-danger"></span>
+                            </div> *@
+
+                        </div>
+
+                        <div class="row align-items-end">
+                            <div class="col-md-3 mb-3">
+                                <label>Organization</label>
+                                @Html.DropDownListFor(model => model.orgCode, Model.orgName_List, "-- Select Organization --",
+                                new { @class = "form-control", id = "orgCode", tabindex = "-1" })
+                                <span asp-validation-for="orgCode" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label>Ministry</label>
+                                @Html.DropDownListFor(model => model.minCode, Model.minDesc_List, "-- Select Ministry --",
+                                new { @class = "form-control", id = "minCode", tabindex = "-1"})
+                                <span asp-validation-for="minCode" class="text-danger"></span>
                             </div>
                         </div>
+
+                        <div class="row align-items-end">
+                            <div class="col-md-3 mb-3" id="div_ReferenceNo_FileNo">
+                                <label>ReferenceNo_FileNo</label>
+                                <input asp-for="referenceNoFileNo" class="form-control" placeholder="File No." />
+                                <span asp-validation-for="referenceNoFileNo" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-3 mb-3" id="div_ReferenceOrSubmissionToCvcDate">
+                                <label>ReferenceOrSubmissionToCvcDate</label>
+                                <input asp-for="referenceOrSubmissionToCvcDate" type="date" class="form-control datepicker" placeholder="yyyy-mm-dd" />
+                                <span asp-validation-for="referenceOrSubmissionToCvcDate" class="text-danger"></span>
+                            </div>
+
+
+
+                            <div class="col-md-3 mb-3" id="div_CVC_ReferenceID_FileNo">
+                                <label>CVC_ReferenceID_FileNo</label>
+                                <input asp-for="cvcReferenceIdFileNo" class="form-control" placeholder="CVC Reference ID / File No." />
+                                <span asp-validation-for="cvcReferenceIdFileNo" class="text-danger"></span>
+                            </div>
+
+                        </div>
+
                     </div>
 
                     <div class="card-footer d-flex justify-content-end">
@@ -67,74 +120,146 @@
 
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-@* 1st Card Script *@
+@* Post and SubPost Script *@
 <script>
     $(document).ready(function () {
 
+        // Function to toggle visibility of "Other Sub Post" field
         function toggleOtherField() {
-            var subPostVal = $('#SubPostCode').val();
+            var subPostVal = $('#selectionForThePostSubCategory').val();  // Make sure to use the correct ID for SubPost dropdown
             if (subPostVal === 'Other') {
-                $('#OtherSubPostDiv').show();
+                $('#OtherSubPostDiv').show();  // Show the "Other Sub Post" field
             } else {
-                $('#OtherSubPostDiv').hide();
-                $('#OtherSubPost').val('');
+                $('#OtherSubPostDiv').hide();  // Hide the "Other Sub Post" field
+                $('#OtherSubPost').val('');  // Clear the input field when hidden
             }
         }
 
-        $('#PostCode').change(function () {            
-            var selectedPost = $(this).val();
-            var subPostSelect = $('#SubPostCode');
+        // Event listener for when Post Category is changed (dropdown selection)
+        $('#selectionForThePostCategory').change(function () {
+            var selectedPost = $(this).val();  // Get selected Post Category value
+            var subPostSelect = $('#selectionForThePostSubCategory');  // Get the Sub Post dropdown element
 
-            // Clear subpost dropdown
+            // Clear subpost dropdown and reset values
             subPostSelect.empty();
+            subPostSelect.prop('disabled', true);  // Disable the Sub Post dropdown initially
+            subPostSelect.append($('<option>').val('').text('-- Select Sub Post --'));  // Add a default "Select Sub Post" option
+
+            $('#OtherSubPostDiv').hide();  // Hide the "Other Sub Post" field
+            $('#OtherSubPost').val('');  // Clear "other" input field if hidden
+
             if (!selectedPost) {
-                subPostSelect.prop('disabled', true)
-                    .append($('<option>').val('').text('-- Select Sub Post --'));
-                $('#OtherSubPostDiv').hide();
-                $('#OtherSubPost').val('');
-                return;
+                return;  // Exit if no Post Category is selected
             }
 
+            // Make AJAX request to get sub-posts based on selected Post Category
             $.ajax({
-                url: '@Url.Action("GetSubPostsByPostCode", "PESB")',
+                url: '@Url.Action("GetSubPostsByPostCode", "PESB")',  // URL for getting sub-posts
                 type: 'GET',
-                data: { postCode: selectedPost },
-                datatype: "json",
-                success: function (data) {                    
-                    subPostSelect.empty();
-                    if (!data || data.length === 0 || (data.length === 1 && !data[0].Value)) {
-                        subPostSelect.prop('disabled', true)
-                            .append($('<option>').val('').text('-- No Sub Posts Available --'));
-                        $('#OtherSubPostDiv').hide();
-                        return;
+                data: { postCode: selectedPost },  // Pass selected Post Category code
+                dataType: "json",
+                success: function (data) {
+                    if (!data || data.length === 0) {
+                        // If no sub-posts available, disable dropdown and show a message
+                        subPostSelect.append($('<option>').val('').text('-- No Sub Posts Available --'));
+                        subPostSelect.prop('disabled', true);
+                        $('#OtherSubPostDiv').hide();  // Hide "Other" field
+                    } else {
+                        // Populate the sub-post dropdown with available sub-posts
+                        subPostSelect.append($('<option>').val('').text('-- Select Sub Post --'));  // Default option
+                        $.each(data, function (i, item) {
+                            subPostSelect.append($('<option>').val(item.value).text(item.text));  // Add each sub-post
+                        });
+                        subPostSelect.prop('disabled', false);  // Enable the dropdown
+
+                        toggleOtherField();  // Check if the "Other" option needs to be shown
                     }
-
-                    // Default option
-                    subPostSelect.append($('<option>').val('').text('-- Select Sub Post --'));
-
-                    // Populate options
-                    $.each(data, function (i, item) {
-                        subPostSelect.append($('<option>').val(item.value).text(item.text));
-                    });
-
-                    subPostSelect.prop('disabled', false);
-                    toggleOtherField();
                 },
                 error: function (xhr) {
-                    alert("Error loading sub posts: " + xhr.statusText);
+                    alert("Error loading sub posts: " + xhr.statusText);  // Handle AJAX errors
                 }
             });
         });
 
+        // Event listener for when Sub Post Category is changed (dropdown selection)
+        $('#selectionForThePostSubCategory').change(toggleOtherField);  // Check if "Other" field should be shown
 
-        $('#SubPostCode').change(toggleOtherField);
-
-        // On page load
+        // On page load, check if "Other" sub post should be shown
         toggleOtherField();
+
     });
 </script>
 
+@* date picker *@
+<script>
+    $(document).ready(function () {
+        flatpickr(".datepicker", {
+            dateFormat: "Y-m-d",
+            allowInput: true
+        });
+    });
+</script>
 
+@* Org and Ministry Script *@
+<script>
+    $(document).ready(function () {
+        // Listen for changes on the "Organization" dropdown
+        $('#orgCode').change(function () {
+            var orgCode = $(this).val(); // Get selected organization code
+            var ministryDropdown = $('#minCode'); // Ministry dropdown element
+
+            // Clear the ministry dropdown
+            ministryDropdown.empty();
+
+            // Disable dropdown and set default option if no organization is selected
+            if (!orgCode) {
+                ministryDropdown.prop('disabled', true)
+                    .append($('<option>').val('').text('-- Select Ministry --'));
+                return;
+            }
+
+            console.log("Sending AJAX for orgCode: " + orgCode); // Debug log for selected organization code
+
+            // Send AJAX request to fetch ministries by organization code
+            $.ajax({
+                url: '@Url.Action("GetMinistryByOrgCode", "PESB")', // Adjust the controller/action as necessary
+                type: 'GET',
+                data: { id: orgCode }, // Pass organization code to server
+                dataType: "json",
+                success: function (data) {
+                    ministryDropdown.empty(); // Clear current options
+
+                    // Check if no data or invalid data
+                    if (!data || data.length === 0 || (data.length === 1 && !data[0].Value && !data[0].value)) {
+                        ministryDropdown.prop('disabled', true)
+                            .append($('<option>').val('').text('-- No Ministry Available --'));
+                        return;
+                    }
+
+                    // Add default "Select Ministry" option
+                    ministryDropdown.append($('<option>').val('').text('-- Select Ministry --'));
+
+                    // Populate the ministry dropdown with received data
+                    $.each(data, function (i, item) {
+                        var val = item.Value || item.value; // Check both possible key names
+                        var txt = item.Text || item.text;   // Check both possible key names
+                        ministryDropdown.append($('<option>').val(val).text(txt));
+                    });
+
+                    // Enable dropdown after options are added
+                    ministryDropdown.prop('disabled', false);
+                },
+                error: function (xhr) {
+                    alert("Error loading ministries: " + xhr.statusText); // Display error on failure
+                }
+            });
+        });
+    });
+
+</script>
 
