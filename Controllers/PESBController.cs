@@ -350,6 +350,25 @@ namespace VigilanceClearance.Controllers
         }
 
 
+
+        [HttpPost]
+        public async Task<IActionResult> PESB_Add_New_Reference(PESB_Add_New_Reference_ViewModel model)
+        {
+            ViewBag.title = " ";
+            try
+            {
+                
+                return RedirectToAction();
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = "An unexpected error occurred. Please try again.";
+                model.PostDescriptionList = await GetPostDescriptionsDropDownAsync("APPOINTMENT");
+                model.SubPostDescriptionList = await GetSubPostsByPostCodeInternal("");
+                return View(model);
+            }
+        }
+
     }
 }
 

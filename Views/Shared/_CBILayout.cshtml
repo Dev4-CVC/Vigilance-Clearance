@@ -37,6 +37,10 @@
         .ml-custom-header {
             margin-left: 250px;
             border-bottom: 1px solid black;
+            background: linear-gradient(to right, #0d6efd, #20c997); /* Two colors */
+            /* Optional padding or height for visibility */
+            padding: 10px;
+            color: white; /* For contrast */
         }
 
         .content-header {
@@ -47,17 +51,10 @@
             margin-bottom: 12px
         }
 
-        .content {
-            min-height: 608px;
-        }
-
-
-
         .hover-link:hover {
             background-color: #20B2AA !important;
             color: #fff !important;
         }
-
 
         .nav-treeview .nav-link:hover {
             background-color: #ADD8E6 !important;
@@ -178,9 +175,9 @@
     </style>
 </head>
 @{
-    var username = Context.Session.GetString("Username");
-    var FullName = Context.Session.GetString("Fullname");
-    int? userId = Context.Session.GetInt32("UserId");
+            var username = Context.Session.GetString("Username");
+            var FullName = Context.Session.GetString("Fullname");
+            int? userId = Context.Session.GetInt32("UserId");
 }
 <body class="hold-transition sidebar-mini">
     <div class="wrapper">
@@ -228,7 +225,7 @@
                     <div class="image">
                         <img src="@Url.Content("~/images/logo/cvcimage.jpg")" class="img-circle elevation-2" alt="User Image" />
                     </div>
-                    <div class="info"> <span class="d-block text-white">PESB</span></div>
+                    <div class="info"> <span class="d-block text-white">CBI Dashboard</span></div>
                 </div>
 
                 @* Sidebar Menu *@
@@ -240,39 +237,32 @@
                         </li>
 
                         <li class="nav-item">
-                            <a href="@Url.Content("~/PESB/PESB_Dashboard")" class="nav-link hover-link">
+                            <a href="@Url.Content("~/CBI_Main/Index")" class="nav-link hover-link">
                                 <i class="nav-icon fas fa-home"></i><p>Home</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="@Url.Content("")" class="nav-link hover-link">
-                                <i class="nav-icon fas fa-users"></i><p>Add New Reference</p>
+                            <a href="@Url.Content("#")" class="nav-link hover-link">
+                                <i class="nav-icon fas fa-edit"></i><p>Reference Received From CVC</p>
+                            </a>
+                        </li>
+                       @*  <li class="nav-item">
+                            <a href="@Url.Content("~/SuperAdmin/MasterUser")" class="nav-link hover-link">
+                                <i class="nav-icon fas fa-users"></i><p>New Reference to CVC</p>
+                            </a>
+                        </li> *@
+                        <li class="nav-item">
+                            <a href="@Url.Content("#")" class="nav-link hover-link">
+                                <i class="nav-icon fas fa-users"></i><p>Search</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="@Url.Content("#")" class="nav-link hover-link">
+                                <i class="far fa-circle nav-icon"></i><p>All Vigilance clearance </p>
                             </a>
                         </li>
 
-                        @*  <li class="nav-item has-treeview">
-                        <a href="#" class="nav-link hover-link">
-                        <i class="nav-icon fas fa-edit"></i>
-                        <p>Add/Update Records<i class="right fas fa-angle-left"></i></p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                        <a asp-controller="SuperAdmin" asp-action="Ministry" class="nav-link">
-                        <i class="far fa-circle nav-icon"></i><p>Manage Ministry</p>
-                        </a>
-                        </li>
-                        <li class="nav-item">
-                        <a asp-controller="SuperAdmin" asp-action="Department" class="nav-link">
-                        <i class="far fa-circle nav-icon"></i><p>Manage Department</p>
-                        </a>
-                        </li>
-                        <li class="nav-item">
-                        <a asp-controller="SuperAdmin" asp-action="Organization" class="nav-link">
-                        <i class="far fa-circle nav-icon"></i><p>Manage Organization</p>
-                        </a>
-                        </li>
-                        </ul>
-                        </li> *@
+
                     </ul>
                 </nav>
             </div>

@@ -75,7 +75,9 @@ namespace VigilanceClearance.Controllers
                 }
 
                 HttpContext.Session.SetString("AccessToken", tokenResponse.Token);
-                return RedirectToAction("PESB_Dashboard", "PESB");                
+                //return RedirectToAction("PESB_Dashboard", "PESB");
+
+                return RedirectToAction("Index", "Ministry_Department");
             }
             catch (Exception ex)
             {
