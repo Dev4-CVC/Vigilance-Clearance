@@ -1,0 +1,105 @@
+﻿@using VigilanceClearance.Models.ViewModel
+@using VigilanceClearance.Models.ViewModel.Ministry
+@model List<OfficerListModel>
+@{
+    ViewData["Title"] = "ViewOfficerListForGivenProposal";
+    Layout = "~/Views/Shared/_MinistryLayout.cshtml";
+}
+
+
+<style>
+    .table-responsive {
+        max-height: 500px;
+        overflow-x: auto;
+        overflow-y: auto;
+    }
+
+    .table thead th {
+        position: sticky;
+        top: 0;
+        background-color: #f8f9fa;
+        z-index: 1;
+    }
+</style>
+
+
+<section>
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title mb-0">View Reference Received CVC</h3>
+        </div>
+        <div class="card-body p-2">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover table-sm">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Action</th>
+                            <th>Sr.No.</th>
+                            <th>Master Reference ID</th>
+                            <th>selection For The PostCategory</th>
+                            <th>selectionForThePostSubCategory</th>
+                            <th>ReferenceReceivedFor</th>
+                            <th>othersRemarks</th>
+                            <th>orgCode</th>
+                            <th>Officer_Name</th>
+                            <th>Officer_FatherName</th>
+                            <th>Officer_DateOfBirth</th>
+                            <th>Officer_RetirementDate</th>
+
+                            <th>Officer_ServiceEntryDate</th>
+                            <th>Officer_Service</th>
+                            <th>Officer_Batch_Year</th>
+
+                            <th>Officer_Cadre</th>
+                            <th>IntegrityAgreedOrDoubtful_8</th>
+                            <th>AllegationOfMisconductExamined_9</th>
+                            <th>PunishmentAwarded_10</th>
+
+                            <th>DisciplinaryCriminalProceedings_11</th>
+                            <th>ActionContemplatedAgainstTheOfficerAsOnDate_12</th>
+                            <th>ComplaintWithVigilanceAnglePending_13</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @foreach (var item in Model)
+                        {
+
+                            int sno = 1;
+                            <tr>
+                                <td>
+                                    <a asp-action="ViewOfficerListForGivenProposal" asp-route-id="@item.Id" class="btn btn-info btn-sm">View</a>
+                                    <a asp-action="UpdateReferenceReceivedCVC" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Update</a>
+                                </td>
+                                <td>@sno</td>
+                                <td>@item.MasterReferenceID</td>
+                                <td>@item.selectionForThePostCategory</td>
+                                <td>@item.ReferenceReceivedFor</td>
+                                <td>@item.selectionForThePostCategory</td>
+                                <td>@item.othersRemarks</td>
+                                <td>@item.orgCode</td>
+                                <td>@item.Officer_Name</td>
+                                <td>@item.Officer_FatherName</td>
+                                <td>@item.Officer_DateOfBirth</td>
+                                <td>@item.Officer_RetirementDate</td>
+
+                                <td>@item.Officer_ServiceEntryDate</td>
+                                <td>@item.Officer_Service</td>
+                                <td>@item.Officer_Batch_Year</td>
+                                <td>@item.Officer_Cadre</td>
+                                <td>@item.IntegrityAgreedOrDoubtful_8</td>
+                                <td>@item.AllegationOfMisconductExamined_9</td>
+                                <td>@item.PunishmentAwarded_10</td>
+                                <td>@item.DisciplinaryCriminalProceedings_11</td>
+                                <td>@item.ActionContemplatedAgainstTheOfficerAsOnDate_12</td>
+                                <td>@item.ComplaintWithVigilanceAnglePending_13</td>
+                            </tr>
+                            sno++;
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
