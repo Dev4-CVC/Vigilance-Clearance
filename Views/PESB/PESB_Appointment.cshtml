@@ -1,6 +1,4 @@
-﻿@* @model PESB_Add_New_Reference_ViewModel *@
-@* @model PESB_Add_New_Reference_ViewModel *@
-
+﻿@model VigilanceClearance.Models.Modal_Properties.PESB.VcReferenceReceivedForGetById_Model
 @{
     ViewBag.Title = "PESB Appointment";
     Layout = "~/Views/Shared/_PESBLayout.cshtml";
@@ -12,22 +10,57 @@
     </a>
 </div>
 
-@* <div class="container mt-4">
-    <h4 class="mb-3">Submitted Reference Details</h4>
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th>Reference Code</th>
-                <th>Post Code</th>
-                <th>Sub Post Code</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr> *@
-                @*     <td>@Model.ReferenceReceivedFromCode</td>
-                <td>@Model.selectionForThePostCategory</td>
-                <td>@Model.selectionForThePostSubCategory</td> *@
-   @*          </tr>
-        </tbody>
-    </table>
-</div> *@
+@if (Model.data_List != null && Model.data_List.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Sr. No.</th>
+                    <th>ReferenceReceivedFor</th>
+                    <th>ReferenceReceivedFrom</th>
+                    <th>ReferenceReceivedFromCode</th>
+                    <th>selectionForThePostCategory</th>
+                    <th>selectionForThePostSubCategory</th>
+                    <th>OrgCode</th>
+                    <th>MinCode</th>
+                    <th>ReferenceNo_FileNo</th>
+                    <th>ReferenceOrSubmissionToCvcDate</th>
+                    <th>CVC_ReferenceID_FileNo</th>
+                    <th>CreatedBy</th>
+                    <th>PendingWith</th>
+                    <th>UID</th>
+                    <th>ReferenceID</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.data_List.Count; i++)
+                {
+                    var item = Model.data_List[i];
+                    <tr>
+                        <td>@(i + 1)</td>
+                        <td>@item.ReferenceReceivedFor</td>
+                        <td>@item.ReferenceReceivedFrom</td>
+                        <td>@item.ReferenceReceivedFromCode</td>
+                        <td>@item.selectionForThePostCategory</td>
+                        <td>@item.selectionForThePostSubCategory</td>
+                        <td>@item.OrgCode</td>
+                        <td>@item.MinCode</td>
+                        <td>@item.ReferenceNo_FileNo</td>
+                        <td>@item.ReferenceOrSubmissionToCvcDate</td>
+                        <td>@item.CVC_ReferenceID_FileNo</td>
+                        <td>@item.CreatedBy</td>
+                        <td>@item.PendingWith</td>
+                        <td>@item.UID</td>
+                        <td>@item.ReferenceID</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning">No records found.</div>
+}
+

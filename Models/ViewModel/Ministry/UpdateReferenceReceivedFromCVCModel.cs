@@ -81,9 +81,5 @@ namespace VigilanceClearance.Models.ViewModel.Ministry
         public DateTime ComplaintwithVigilanceAnglePresentstatusasondate { get; set; }
 
 
-        public TestModel testmodel { get; set; }
-
-        public List<TestModel> testmodel1 { get; set; }
-
     }
 }
