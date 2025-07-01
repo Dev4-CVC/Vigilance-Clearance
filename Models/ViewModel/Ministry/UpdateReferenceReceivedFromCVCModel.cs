@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
-namespace VigilanceClearance.Models.ViewModel
+namespace VigilanceClearance.Models.ViewModel.Ministry
 {
     public class UpdateReferenceReceivedFromCVCModel
     {
@@ -30,9 +30,8 @@ namespace VigilanceClearance.Models.ViewModel
 
         public List<SelectListItem>? CountryList { get; set; }
 
-//7
+//7 PostionHeld
         public string? Organization { get; set; }
-
         public List<SelectListItem> OrganizationList { get; set; } = new();
         public string? Ministry { get; set; }
         public List<SelectListItem> MinistryList { get; set; } = new();
@@ -40,7 +39,7 @@ namespace VigilanceClearance.Models.ViewModel
         public DateTime TenureFrom { get; set; }
         public DateTime TenureTo { get; set; }
 
-//8
+//8 
 
         public bool? IsAgreed { get; set; }
         public DateTime YearFrom { get; set; }

@@ -1,11 +1,11 @@
-﻿@model VigilanceClearance.Models.ViewModel.UpdateReferenceReceivedFromCVCModel;
+﻿@using VigilanceClearance.Models.OfficerDetailModel
+@* @model UpdateReferenceReceivedFromCVCModel; *@
+@model OfficerDetailMainModel
 
 @{
     ViewData["Title"] = "UpdateReferenceReceivedCVC";
     Layout = "~/Views/Shared/_MinistryLayout.cshtml";
 }
-
-
 
 <section style="width: 100%; height: 500px; overflow: auto; border: 1px solid #ccc;">
     <div class="card">
@@ -17,32 +17,32 @@
             <div class="form-group">
                 <div class="row mt-1">
                     <div class="col-md-4">
-                        @Html.LabelFor(m => m.Officer_Name)
-                        @Html.TextBoxFor(m => m.Officer_Name, new { @class = "form-control", disabled = "disabled" })
+                        @Html.LabelFor(m => m.officerPersonalDetailModel.Officer_Name)
+                        @Html.TextBoxFor(m => m.officerPersonalDetailModel.Officer_Name, new { @class = "form-control", disabled = "disabled" })
                     </div>
                     <div class="col-md-4">
-                        @Html.LabelFor(m => m.Officer_FatherName)
-                        @Html.TextBoxFor(m => m.Officer_FatherName, new { @class = "form-control", disabled = "disabled" })
+                        @Html.LabelFor(m => m.officerPersonalDetailModel.Officer_FatherName)
+                        @Html.TextBoxFor(m => m.officerPersonalDetailModel.Officer_FatherName, new { @class = "form-control", disabled = "disabled" })
                     </div>
                     <div class="col-md-4">
-                        @Html.LabelFor(m => m.Officer_DateOfBirth)
-                        @Html.TextBoxFor(m => m.Officer_DateOfBirth, new { @class = "form-control", disabled = "disabled" })
+                        @Html.LabelFor(m => m.officerPersonalDetailModel.Officer_DateOfBirth)
+                        @Html.TextBoxFor(m => m.officerPersonalDetailModel.Officer_DateOfBirth, new { @class = "form-control", disabled = "disabled" })
                     </div>
 
                 </div>
 
                 <div class="row mt-1">
                     <div class="col-md-4">
-                        @Html.LabelFor(m => m.Officer_RetirementDate)
-                        @Html.TextBoxFor(m => m.Officer_RetirementDate, new { @class = "form-control", disabled = "disabled" })
+                        @Html.LabelFor(m => m.officerPersonalDetailModel.Officer_RetirementDate)
+                        @Html.TextBoxFor(m => m.officerPersonalDetailModel.Officer_RetirementDate, new { @class = "form-control", disabled = "disabled" })
                     </div>
                     <div class="col-md-4">
-                        @Html.LabelFor(m => m.Officer_ServiceEntryDate)
-                        @Html.TextBoxFor(m => m.Officer_ServiceEntryDate, new { @class = "form-control", disabled = "disabled" })
+                        @Html.LabelFor(m => m.officerPersonalDetailModel.Officer_ServiceEntryDate)
+                        @Html.TextBoxFor(m => m.officerPersonalDetailModel.Officer_ServiceEntryDate, new { @class = "form-control", disabled = "disabled" })
                     </div>
                     <div class="col-md-4">
-                        @Html.LabelFor(m => m.Officer_Service)
-                        @Html.TextBoxFor(m => m.Officer_Service, new { @class = "form-control", disabled = "disabled" })
+                        @Html.LabelFor(m => m.officerPersonalDetailModel.Officer_Service)
+                        @Html.TextBoxFor(m => m.officerPersonalDetailModel.Officer_Service, new { @class = "form-control", disabled = "disabled" })
                         @* @Html.DropDownListFor(m => m.SelectedCountry, Model.CountryList, "Choose...", new { @class = "form-control form-select" }) *@
                     </div>
 
@@ -50,18 +50,13 @@
 
                 <div class="row mt-1">
                     <div class="col-md-4">
-                        @Html.LabelFor(m => m.Officer_Batch_Year)
-                        @Html.TextBoxFor(m => m.Officer_Batch_Year, new { @class = "form-control", disabled = "disabled" })
+                        @Html.LabelFor(m => m.officerPersonalDetailModel.Officer_Batch_Year)
+                        @Html.TextBoxFor(m => m.officerPersonalDetailModel.Officer_Batch_Year, new { @class = "form-control", disabled = "disabled" })
                     </div>
                     <div class="col-md-4">
-                        @Html.LabelFor(m => m.Cadre)
-                        @Html.TextBoxFor(m => m.Cadre, new { @class = "form-control", disabled = "disabled" })
+                        @Html.LabelFor(m => m.officerPersonalDetailModel.Cadre)
+                        @Html.TextBoxFor(m => m.officerPersonalDetailModel.Cadre, new { @class = "form-control", disabled = "disabled" })
                     </div>
-                    @* <div class="col-md-4">
-                        @Html.LabelFor(m => m.Officer_Service)
-                        @Html.DropDownListFor(m => m.SelectedCountry, Model.CountryList, "Choose...", new { @class = "form-control form-select" })
-                    </div> *@
-
                 </div>
 
                 <hr />
@@ -96,8 +91,7 @@
                                             </thead>
                                             <tbody>
                                                 <!-- Dynamic rows will be added here -->
-
-                                           @*  <td>1</td>
+                                                @*  <td>1</td>
                                             <td>@Model.testmodel.postCode</td>
                                             <td>@Model.testmodel.postDescription</td>
                                             <td>@Model.testmodel.createdBy</td>
@@ -123,57 +117,52 @@
                 <div class="modal" id="positionHeldModal" tabindex="-1" role="dialog" aria-labelledby="positionHeldModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-lg" role="document">
                         <div class="modal-content">
-                            <div class="modal-header bg-primary">
-                                <h5 class="modal-title">Add New Details</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span>&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="form-group">
-                                    @Html.LabelFor(m => m.Organization)
-                                   @*  @Html.DropDownListFor(model => model.Organization,
-                                    new List<SelectListItem> { new SelectListItem { Text = "ABC", Value = "ABC" },
-                                                                        new SelectListItem { Text = "Test", Value = "Test" },
-                                                                        new SelectListItem { Text = "XYZ", Value = "XYZ" }
-                                                                        },"-- Select --", new { @class = "form-control" }) *@
+                            <form asp-action="AddOfficerPostingDetails" asp-controller="Ministry_Department" method="post">
+                                <div class="modal-header bg-primary">
+                                    <h5 class="modal-title">Add New Details</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span>&times;</span>
+                                    </button>
+                                </div>
 
-                                    @Html.DropDownListFor(model => model.Organization, Model.OrganizationList,
-                                                                        "-- Select Organization --",  new { @class = "form-control", id = "ddlorg"  })
+                                <div class="modal-body">
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.officerPostingDetail7.Organization)
+                                        @Html.DropDownListFor(model => model.officerPostingDetail7.Organization, Model.officerPostingDetail7.OrganizationList,
+                                        "-- Select Organization --",  new { @class = "form-control", id = "ddlorg" })
+                                    </div>
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.officerPostingDetail7.Ministry)
+                                        @Html.DropDownListFor(model => model.officerPostingDetail7.Ministry, Model.officerPostingDetail7.MinistryList,
+                                                                                "-- Select Ministry --",  new { @class = "form-control", id = "ddlMinistry", disabled = "disabled" })
+
+                                    </div>
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.officerPostingDetail7.Designation)
+                                        @Html.TextBoxFor(m => m.officerPostingDetail7.Designation, new { @class = "form-control" })
+                                    </div>
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.officerPostingDetail7.TenureFrom)
+                                        @Html.TextBoxFor(m => m.officerPostingDetail7.TenureFrom, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy" })
+                                    </div>
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.officerPostingDetail7.TenureTo)
+                                        @Html.TextBoxFor(m => m.officerPostingDetail7.TenureTo, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy" })
+                                    </div>
 
                                 </div>
 
-                                <div class="form-group">
-                                    @Html.LabelFor(m => m.Ministry)
-                                    @Html.DropDownListFor(model => model.Ministry,
-                                                                        new List<SelectListItem> { new SelectListItem { Text = "ABC", Value = "ABC" },
-                                                                        new SelectListItem { Text = "Test", Value = "Test" },
-                                                                        new SelectListItem { Text = "XYZ", Value = "XYZ" }
-                                                                        },"-- Select --", new { @class = "form-control" })
-
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                    @* <button type="button" id="addPositionBtn" class="btn btn-primary">Add</button> *@
+                                    @* <a asp-action="AddOfficerPostingDetails" asp-controller="Ministry_Department" class="btn btn-primary">Add</a> *@
+                                    <button type="submit" class="btn btn-primary">Save</button>
                                 </div>
-
-                                <div class="form-group">
-                                    @Html.LabelFor(m => m.Designation)
-                                    @Html.TextBoxFor(m => m.Designation, new { @class = "form-control" })
-                                </div>
-
-                                <div class="form-group">
-                                    @Html.LabelFor(m => m.TenureFrom)
-                                    @Html.TextBoxFor(m => m.TenureFrom, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy" })
-                                </div>
-
-                                <div class="form-group">
-                                    @Html.LabelFor(m => m.TenureTo)
-                                    @Html.TextBoxFor(m => m.TenureTo, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy" })
-                                </div>
-
-                            </div>
-
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                <button type="button" id="addPositionBtn" class="btn btn-primary">Add</button>
-                            </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -198,11 +187,11 @@
                             </div>
                             <div class="row d-flex" style="margin-left:26px;">
                                 <div class="col-md-1">
-                                    @Html.LabelFor(m => m.IsAgreed)
+                                    @Html.LabelFor(m => m.officerIntegrityAgreedOrDoubtful_8.IsAgreed)
                                 </div>
                                 <div class="col-md-4">
                                     <div class="d-flex align-items-center">
-                                        @Html.DropDownListFor(model => model.IsAgreed,
+                                        @Html.DropDownListFor(model => model.officerIntegrityAgreedOrDoubtful_8.IsAgreed,
                                                                                 new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "true" },
                                                                                 new SelectListItem { Text = "No", Value = "false" }
                                                                                 },"-- Select --", new { @class = "form-control agreed-dropdown", @id = "IsAgreedDropdown1" })
@@ -241,7 +230,7 @@
                                     </div>
 
 
-                                   @*  // this btn add on the list *@
+                                    @*  // this btn add on the list *@
                                     <button type="button" class="btn btn-primary mt-3 mb-3" data-toggle="modal" data-target="#AgreedlistRemovedModal">
                                         Remove From Agreed List
                                     </button>
@@ -256,11 +245,11 @@
 
                             <div class="row d-flex" style="margin-left:26px;">
                                 <div class="col-md-1">
-                                    @Html.LabelFor(m => m.IsAgreed)
+                                    @Html.LabelFor(m => m.officerIntegrityAgreedOrDoubtful_8.IsAgreed)
                                 </div>
                                 <div class="col-md-4">
                                     <div class="d-flex align-items-center">
-                                        @Html.DropDownListFor(model => model.IsAgreed,
+                                        @Html.DropDownListFor(model => model.officerIntegrityAgreedOrDoubtful_8.IsAgreed,
                                                                                 new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "true" },
                                                                                 new SelectListItem { Text = "No", Value = "false" }
                                                                                 },"-- Select --", new { @class = "form-control agreed-dropdown", @id = "IsAgreedDropdown2" })
@@ -334,13 +323,13 @@
                                 </div> *@
 
                                 <div class="form-group">
-                                    @Html.LabelFor(m => m.YearFrom)
-                                    @Html.TextBoxFor(m => m.YearFrom, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy" })
+                                    @Html.LabelFor(m => m.officerIntegrityAgreedOrDoubtful_8.YearFrom)
+                                    @Html.TextBoxFor(m => m.officerIntegrityAgreedOrDoubtful_8.YearFrom, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy" })
                                 </div>
 
                                 <div class="form-group">
-                                    @Html.LabelFor(m => m.YearTo)
-                                    @Html.TextBoxFor(m => m.YearTo, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy", })
+                                    @Html.LabelFor(m => m.officerIntegrityAgreedOrDoubtful_8.YearTo)
+                                    @Html.TextBoxFor(m => m.officerIntegrityAgreedOrDoubtful_8.YearTo, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy", })
                                 </div>
                             </div>
 
@@ -364,15 +353,15 @@
                             </div>
                             <div class="modal-body">
                                 <div class="form-group">
-                                    @Html.LabelFor(m => m.IsAgreed)
-                                    @Html.DropDownListFor(model => model.IsAgreed,
+                                    @Html.LabelFor(m => m.officerIntegrityAgreedOrDoubtful_8.IsAgreed)
+                                    @Html.DropDownListFor(model => model.officerIntegrityAgreedOrDoubtful_8.IsAgreed,
                                                                         new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "true" }
                                                                         },"-- Select --", new { @class = "form-control" })
                                 </div>
 
                                 <div class="form-group">
-                                    @Html.LabelFor(m => m.RemovedFromAgreedlistDate)
-                                    @Html.TextBoxFor(m => m.RemovedFromAgreedlistDate, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy" })
+                                    @Html.LabelFor(m => m.officerIntegrityAgreedOrDoubtful_8.RemovedFromAgreedlistDate)
+                                    @Html.TextBoxFor(m => m.officerIntegrityAgreedOrDoubtful_8.RemovedFromAgreedlistDate, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy" })
                                 </div>
                             </div>
 
@@ -404,10 +393,10 @@
 
                             <div class="row d-flex mt-2" style="margin-left:26px;">
                                 <div class="col-sm-2">
-                                    @Html.LabelFor(m => m.AllegationMisconduct)
+                                    @Html.LabelFor(m => m.officerAllegationOfMisconductExamined_9.AllegationMisconduct)
                                 </div>
                                 <div class="col-sm-4">
-                                    @Html.DropDownListFor(model => model.AllegationMisconduct,
+                                    @Html.DropDownListFor(model => model.officerAllegationOfMisconductExamined_9.AllegationMisconduct,
                                                                         new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "true" },
                                                                         new SelectListItem { Text = "No", Value = "false" }
                                                                         },"-- Select --", new { @class = "form-control agreed-dropdown", @id = "IsAgreedDropdown3" })
@@ -439,7 +428,7 @@
                                         </table>
                                     </div>
 
-                                   @*  <button type="button" class="btn btn-primary mt-3 mb-3" data-toggle="modal" data-target="#allegationofmisconduct" >
+                                    @*  <button type="button" class="btn btn-primary mt-3 mb-3" data-toggle="modal" data-target="#allegationofmisconduct" >
                                         Add New
                                     </button> *@
                                 </div>
@@ -467,14 +456,14 @@
                                                                         },"-- Select --", new { @class = "form-control" })
                                 </div> *@
                                 <div class="form-group">
-                                    @Html.LabelFor(m => m.Casedetails)
-                                    @Html.TextBoxFor(m => m.Casedetails, new { @class = "form-control" })
+                                    @Html.LabelFor(m => m.officerAllegationOfMisconductExamined_9.Casedetails)
+                                    @Html.TextBoxFor(m => m.officerAllegationOfMisconductExamined_9.Casedetails, new { @class = "form-control" })
 
                                 </div>
 
                                 <div class="form-group">
-                                    @Html.LabelFor(m => m.Presentstatusasondate)
-                                    @Html.TextBoxFor(m => m.Presentstatusasondate, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy" })
+                                    @Html.LabelFor(m => m.officerAllegationOfMisconductExamined_9.Presentstatusasondate)
+                                    @Html.TextBoxFor(m => m.officerAllegationOfMisconductExamined_9.Presentstatusasondate, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy" })
                                 </div>
 
                             </div>
@@ -503,10 +492,10 @@
 
                             <div class="row d-flex mt-2" style="margin-left:26px;">
                                 <div class="col-sm-2">
-                                    @Html.LabelFor(m => m.PunishmentAwarded)
+                                    @Html.LabelFor(m => m.officerPunishmentAwarded_10.PunishmentAwarded)
                                 </div>
                                 <div class="col-sm-4">
-                                    @Html.DropDownListFor(model => model.PunishmentAwarded,
+                                    @Html.DropDownListFor(model => model.officerPunishmentAwarded_10.PunishmentAwarded,
                                                                         new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "true" },
                                                                         new SelectListItem { Text = "No", Value = "false" }
                                                                         },"-- Select --", new { @class = "form-control agreed-dropdown", @id = "IsAgreedDropdown4" })
@@ -562,7 +551,7 @@
                                 </button>
                             </div>
                             <div class="modal-body">
-                               @*  <div class="form-group">
+                                @*  <div class="form-group">
                                     @Html.LabelFor(m => m.PunishmentAwarded)
                                     @Html.DropDownListFor(model => model.PunishmentAwarded,
                                                                         new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "true" },
@@ -570,18 +559,18 @@
                                                                         },"-- Select --", new { @class = "form-control" })
                                 </div> *@
                                 <div class="form-group">
-                                    @Html.LabelFor(m => m.Penaltydetails)
-                                    @Html.TextBoxFor(m => m.Penaltydetails, new { @class = "form-control" })
+                                    @Html.LabelFor(m => m.officerPunishmentAwarded_10.Penaltydetails)
+                                    @Html.TextBoxFor(m => m.officerPunishmentAwarded_10.Penaltydetails, new { @class = "form-control" })
 
                                 </div>
                                 <div class="form-group">
-                                    @Html.LabelFor(m => m.CurrencyofpenaltyFrom)
-                                    @Html.TextBoxFor(m => m.CurrencyofpenaltyFrom, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy" })
+                                    @Html.LabelFor(m => m.officerPunishmentAwarded_10.CurrencyofpenaltyFrom)
+                                    @Html.TextBoxFor(m => m.officerPunishmentAwarded_10.CurrencyofpenaltyFrom, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy" })
                                 </div>
 
                                 <div class="form-group">
-                                    @Html.LabelFor(m => m.CurrencyofpenaltyTo)
-                                    @Html.TextBoxFor(m => m.CurrencyofpenaltyTo, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy", })
+                                    @Html.LabelFor(m => m.officerPunishmentAwarded_10.CurrencyofpenaltyTo)
+                                    @Html.TextBoxFor(m => m.officerPunishmentAwarded_10.CurrencyofpenaltyTo, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy", })
                                 </div>
 
 
@@ -610,10 +599,10 @@
 
                             <div class="row d-flex mt-2" style="margin-left:26px;">
                                 <div class="col-sm-2">
-                                    @Html.LabelFor(m => m.DisciplinaryProceeding)
+                                    @Html.LabelFor(m => m.officerDisciplinaryCriminalProceedings_11.DisciplinaryProceeding)
                                 </div>
                                 <div class="col-sm-4">
-                                    @Html.DropDownListFor(model => model.DisciplinaryProceeding,
+                                    @Html.DropDownListFor(model => model.officerDisciplinaryCriminalProceedings_11.DisciplinaryProceeding,
                                                                         new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "true" },
                                                                         new SelectListItem { Text = "No", Value = "false" }
                                                                         },"-- Select --", new { @class = "form-control agreed-dropdown", @id = "IsAgreedDropdown5" })
@@ -678,20 +667,20 @@
                                 </div> *@
 
                                 <div class="form-group">
-                                    @Html.LabelFor(m => m.SuspensionDate)
-                                    @Html.TextBoxFor(m => m.SuspensionDate, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy" })
+                                    @Html.LabelFor(m => m.officerDisciplinaryCriminalProceedings_11.SuspensionDate)
+                                    @Html.TextBoxFor(m => m.officerDisciplinaryCriminalProceedings_11.SuspensionDate, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy" })
                                 </div>
                                 <div class="form-group">
-                                    @Html.LabelFor(m => m.WhetherRevoked)
-                                    @Html.DropDownListFor(model => model.WhetherRevoked,
+                                    @Html.LabelFor(m => m.officerDisciplinaryCriminalProceedings_11.WhetherRevoked)
+                                    @Html.DropDownListFor(model => model.officerDisciplinaryCriminalProceedings_11.WhetherRevoked,
                                                                         new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "true" },
                                                                         new SelectListItem { Text = "No", Value = "false" }
                                                                         },"-- Select --", new { @class = "form-control" })
                                 </div>
 
                                 <div class="form-group">
-                                    @Html.LabelFor(m => m.DateofRevocation)
-                                    @Html.TextBoxFor(m => m.DateofRevocation, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy", })
+                                    @Html.LabelFor(m => m.officerDisciplinaryCriminalProceedings_11.DateofRevocation)
+                                    @Html.TextBoxFor(m => m.officerDisciplinaryCriminalProceedings_11.DateofRevocation, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy", })
                                 </div>
 
 
@@ -719,10 +708,10 @@
 
                             <div class="row d-flex mt-2" style="margin-left:26px;">
                                 <div class="col-sm-2">
-                                    @Html.LabelFor(m => m.ContemplatedAgainst)
+                                    @Html.LabelFor(m => m.officerActionContemplatedAgainstTheOfficerAsOnDate_12.ContemplatedAgainst)
                                 </div>
                                 <div class="col-sm-4">
-                                    @Html.DropDownListFor(model => model.ContemplatedAgainst,
+                                    @Html.DropDownListFor(model => model.officerActionContemplatedAgainstTheOfficerAsOnDate_12.ContemplatedAgainst,
                                                                         new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "true" },
                                                                         new SelectListItem { Text = "No", Value = "false" }
                                                                         },"-- Select --", new { @class = "form-control agreed-dropdown", @id = "IsAgreedDropdown6" })
@@ -787,18 +776,18 @@
                                 </div> *@
 
                                 <div class="form-group">
-                                    @Html.LabelFor(m => m.ContemplatedAgainstCaseDetail)
-                                    @Html.TextBoxFor(m => m.ContemplatedAgainstCaseDetail, new { @class = "form-control" })
+                                    @Html.LabelFor(m => m.officerActionContemplatedAgainstTheOfficerAsOnDate_12.ContemplatedAgainstCaseDetail)
+                                    @Html.TextBoxFor(m => m.officerActionContemplatedAgainstTheOfficerAsOnDate_12.ContemplatedAgainstCaseDetail, new { @class = "form-control" })
 
                                 </div>
                                 <div class="form-group">
-                                    @Html.LabelFor(m => m.ContemplatedAgainstCasestatus)
-                                    @Html.TextBoxFor(m => m.ContemplatedAgainstCasestatus, new { @class = "form-control" })
+                                    @Html.LabelFor(m => m.officerActionContemplatedAgainstTheOfficerAsOnDate_12.ContemplatedAgainstCasestatus)
+                                    @Html.TextBoxFor(m => m.officerActionContemplatedAgainstTheOfficerAsOnDate_12.ContemplatedAgainstCasestatus, new { @class = "form-control" })
 
                                 </div>
                                 <div class="form-group">
-                                    @Html.LabelFor(m => m.ContemplatedAgainstStatusasondate)
-                                    @Html.TextBoxFor(m => m.ContemplatedAgainstStatusasondate, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy" })
+                                    @Html.LabelFor(m => m.officerActionContemplatedAgainstTheOfficerAsOnDate_12.ContemplatedAgainstStatusasondate)
+                                    @Html.TextBoxFor(m => m.officerActionContemplatedAgainstTheOfficerAsOnDate_12.ContemplatedAgainstStatusasondate, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy" })
                                 </div>
                             </div>
 
@@ -825,10 +814,10 @@
 
                             <div class="row d-flex mt-2" style="margin-left:26px;">
                                 <div class="col-sm-3">
-                                    @Html.LabelFor(m => m.ComplaintwithVigilanceAngle)
+                                    @Html.LabelFor(m => m.officerComplaintWithVigilanceAnglePending_13.ComplaintwithVigilanceAngle)
                                 </div>
                                 <div class="col-sm-4">
-                                    @Html.DropDownListFor(model => model.ComplaintwithVigilanceAngle,
+                                    @Html.DropDownListFor(model => model.officerComplaintWithVigilanceAnglePending_13.ComplaintwithVigilanceAngle,
                                                                         new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "true" },
                                                                         new SelectListItem { Text = "No", Value = "false" }
                                                                         },"-- Select --", new { @class = "form-control agreed-dropdown", @id = "IsAgreedDropdown7" })
@@ -861,7 +850,7 @@
                                         </table>
                                     </div>
 
-                                   @*  <button type="button" class="btn btn-primary mt-3 mb-3" data-toggle="modal" data-target="#ComplaintwithVigilanceAngleModal">
+                                    @*  <button type="button" class="btn btn-primary mt-3 mb-3" data-toggle="modal" data-target="#ComplaintwithVigilanceAngleModal">
                                         Add New
                                     </button> *@
 
@@ -882,7 +871,7 @@
                                 </button>
                             </div>
                             <div class="modal-body">
-                              @*   <div class="form-group">
+                                @*   <div class="form-group">
                                     @Html.LabelFor(m => m.ComplaintwithVigilanceAngle)
                                     @Html.DropDownListFor(model => model.ComplaintwithVigilanceAngle,
                                                                         new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "true" },
@@ -891,18 +880,18 @@
                                 </div> *@
 
                                 <div class="form-group">
-                                    @Html.LabelFor(m => m.ComplaintwithVigilanceAngleCaseDetail)
-                                    @Html.TextBoxFor(m => m.ComplaintwithVigilanceAngleCaseDetail, new { @class = "form-control" })
+                                    @Html.LabelFor(m => m.officerComplaintWithVigilanceAnglePending_13.ComplaintwithVigilanceAngleCaseDetail)
+                                    @Html.TextBoxFor(m => m.officerComplaintWithVigilanceAnglePending_13.ComplaintwithVigilanceAngleCaseDetail, new { @class = "form-control" })
 
                                 </div>
                                 <div class="form-group">
-                                    @Html.LabelFor(m => m.ComplaintwithVigilanceAnglePresentstatus)
-                                    @Html.TextBoxFor(m => m.ComplaintwithVigilanceAnglePresentstatus, new { @class = "form-control" })
+                                    @Html.LabelFor(m => m.officerComplaintWithVigilanceAnglePending_13.ComplaintwithVigilanceAnglePresentstatus)
+                                    @Html.TextBoxFor(m => m.officerComplaintWithVigilanceAnglePending_13.ComplaintwithVigilanceAnglePresentstatus, new { @class = "form-control" })
 
                                 </div>
                                 <div class="form-group">
-                                    @Html.LabelFor(m => m.ComplaintwithVigilanceAnglePresentstatusasondate)
-                                    @Html.TextBoxFor(m => m.ComplaintwithVigilanceAnglePresentstatusasondate, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy" })
+                                    @Html.LabelFor(m => m.officerComplaintWithVigilanceAnglePending_13.ComplaintwithVigilanceAnglePresentstatusasondate)
+                                    @Html.TextBoxFor(m => m.officerComplaintWithVigilanceAnglePending_13.ComplaintwithVigilanceAnglePresentstatusasondate, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy" })
                                 </div>
                             </div>
 
@@ -928,30 +917,8 @@
     </div>
 
 </section>
-
-@* // Bind Dropdown  *@
-
-
-@* <script>
-    document.getElementById('IsAgreedDropdown').addEventListener('change', function () {
-        if (this.value === 'true') {
-            var modal = new bootstrap.Modal(document.getElementById('AgreedlistModal'));
-            modal.show();
-        }
-    });
-</script>
- *@
-@* <script>
-    document.getElementById('IsAgreedDropdown').addEventListener('change', function () {
-        var btn = document.getElementById('btnAddAgreedList');
-        if (this.value === 'true') {
-            btn.disabled = false; // Enable the button
-        } else {
-            btn.disabled = true;  // Disable the button
-        }
-    });
-</script>
- *@
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 
 <script>
     document.querySelectorAll('.agreed-dropdown').forEach(function (dropdown) {
@@ -968,3 +935,109 @@
         });
     });
 </script>
+
+
+@* // Bind Dropdown  *@
+@* <script>
+    document.getElementById('ddlorg').addEventListener('change', function () {
+        var orgId = this.value;
+        var ddlMinistry = document.getElementById('ddlMinistry');
+        ddlMinistry.innerHTML = '<option>Loading...</option>';
+
+        if (orgId) {
+            fetch(`/Ministry_Department/GetMinistryDropDownAsync?orgcode=${orgId}`)
+                .then(response => response.json())
+                .then(data => {
+                    ddlMinistry.innerHTML = '<option value="">-- Select Ministry --</option>';
+                    data.forEach(ministry => {
+                        ddlMinistry.innerHTML += `<option value="${ministry.id}">${ministry.name}</option>`;
+                    });
+                });
+        } else {
+            ddlMinistry.innerHTML = '<option value="">-- Select Ministry --</option>';
+        }
+    });
+</script>
+ *@
+
+@* <script>
+    document.getElementById('ddlorg').addEventListener('change', async function () {
+        var orgId = this.value;
+        alert("Org ID: " + orgId); // To check if event is firing
+       
+        var ddlMinistry = document.getElementById('ddlMinistry');
+
+        if (orgId) {
+            try {
+               
+                const response = await fetch(`GetMinistryDropDownAsync?orgcode=${encodeURIComponent(orgId)}`);
+                alert(response);
+
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const data = await response.json();
+                alert(data;
+
+                ddlMinistry.innerHTML = '<option value="">-- Select Ministry --</option>';
+                data.forEach(item => {
+                    ddlMinistry.innerHTML += `<option value="${item.value}">${item.text}</option>`;
+                });
+
+            } catch (err) {
+                console.error('Fetch error:', err);
+                ddlMinistry.innerHTML = '<option value="">-- Error loading ministries --</option>';
+            }
+        } else {
+            ddlMinistry.innerHTML = '<option value="">-- Select Ministry --</option>';
+        }
+    });
+</script> *@
+
+<script>
+    $(document).ready(function () {
+        $('#ddlorg').change(function () {
+            var selectedOrg = $(this).val();
+            var MinistrySelect = $('#ddlMinistry');
+            // Clear subpost dropdown
+            MinistrySelect.empty();
+            if (!selectedOrg) {
+                MinistrySelect.prop('disabled', true)
+                    .append($('<option>').val('').text('-- Select Ministry --'));
+
+                return;
+            }
+            $.ajax({
+                url: '@Url.Action("GetMinistryDropDown", "Ministry_Department")',
+                type: 'GET',
+                data: { orgcode: selectedOrg },
+                datatype: "json",
+                success: function (data) {
+                    MinistrySelect.empty();
+                    // Default option
+                    if(data===null || !data ){
+                           MinistrySelect.append($('<option>').val('').text('-- No Ministry Available --'));
+                           return;
+                    }
+
+
+                    $.each(data, function (i, item) {
+                        //alert(item.value);
+                        MinistrySelect.append($('<option>').val(item.value).text(item.text));
+                    });
+
+                    MinistrySelect.prop('disabled', true);
+                    // toggleOtherField();
+                },
+                error: function (xhr) {
+                    alert("Error loading Ministry: " + xhr.statusText);
+                    //alert('@Url.Action("GetMinistryDropDownAsync", "Ministry_Department")');
+                }
+            });
+        });
+    });
+</script>
+
+
