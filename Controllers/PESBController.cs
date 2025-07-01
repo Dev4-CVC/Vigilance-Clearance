@@ -80,22 +80,24 @@ namespace VigilanceClearance.Controllers
             }
         }
 
-
-        public async Task<IActionResult> PESB_Appointment()
+        [HttpGet]
+        public async Task<IActionResult> PESB_Appointment(int id)
         {
             try
             {
                 ViewBag.title = "PESB Appointment";
 
-                var data = new PESB_Add_New_Reference_Model
+                string username = HttpContext.Session.GetString("Username");
+                if (string.IsNullOrEmpty(username))
                 {
-                    //ReferenceCode = TempData["ReferenceCode"]?.ToString(),
-                    //PostCode = TempData["PostCode"]?.ToString(),
-                    //SubPostCode = TempData["SubPostCode"]?.ToString(),
-                    //OtherSubPost = TempData["OtherSubPost"]?.ToString()
-                };
+                    return RedirectToAction("Login", "Account");
+                }
 
-                return View(data);
+                var model = new VcReferenceReceivedForGetById_Model
+                {
+                    data_List = await _pesb.Get_VC_ReferenceReceivedFor_List_GetByIdAsync(id, username)
+                };
+                return View(model);
             }
             catch (Exception)
             {
@@ -103,8 +105,6 @@ namespace VigilanceClearance.Controllers
                 return View();
             }
         }
-
-
 
 
 
@@ -192,7 +192,6 @@ namespace VigilanceClearance.Controllers
                     model.referenceReceivedFor = "APPOINTMENT";
                     return View(model);
                 }
-
                 else
                 {
                     //if (model.selectionForThePostSubCategory == "Other" && string.IsNullOrWhiteSpace(model.OtherSubPost))
@@ -218,13 +217,13 @@ namespace VigilanceClearance.Controllers
 
                     objmodel.createdBy = HttpContext.Session.GetString("Username");
                     objmodel.createdOn = DateTime.Now;
-                    objmodel.createdBySessionId = HttpContext.Session.GetString("Username");
+                    objmodel.createdBySessionId = HttpContext.Session.Id;
                     objmodel.createdByIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
 
-                    objmodel.updateBy = HttpContext.Session.GetString("Username");
-                    objmodel.updatedOn = DateTime.Now;
-                    objmodel.updatedBySessionId = HttpContext.Session.GetString("Username");
-                    objmodel.updatedByIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+                    objmodel.updateBy = null;
+                    objmodel.updatedOn = null;
+                    objmodel.updatedBySessionId = null;
+                    objmodel.updatedByIp = null;
 
                     objmodel.pendingWith = "CVC";
                     objmodel.uid = null;
@@ -243,6 +242,7 @@ namespace VigilanceClearance.Controllers
                     }
                     else
                     {
+                        TempData["FormAction"] = "submit"; // or "forward"
                         TempData["SuccessMessage"] = "Reference added successfully!";
                         return RedirectToAction("PESB_Add_New_Reference");
                     }

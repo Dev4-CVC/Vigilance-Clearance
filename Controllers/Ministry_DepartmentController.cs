@@ -34,7 +34,7 @@ namespace VigilanceClearance.Controllers
             {
                 // iski jagah dusri API Call Karni As per requrement
                 var client = _clientFactory.CreateClient();
-                var countries = await client.GetFromJsonAsync<List<CountryModel>>("https://restcountries.com/v3.1/all?fields=name,cca2");
+                //var countries = await client.GetFromJsonAsync<List<CountryModel>>("https://restcountries.com/v3.1/all?fields=name,cca2");
                 // iski jagah dusri API Call Karni As per requrement
             }
             catch (Exception ex)
@@ -51,14 +51,15 @@ namespace VigilanceClearance.Controllers
             {
                 // iski jagah dusri API Call Karni As per requrement
                 var client = _clientFactory.CreateClient();
-                var countries = await client.GetFromJsonAsync<List<CountryModel>>("https://restcountries.com/v3.1/all?fields=name,cca2");
+                //var countries = await client.GetFromJsonAsync<List<CountryModel>>("https://restcountries.com/v3.1/all?fields=name,cca2");
 
                 // iski jagah dusri API Call Karni As per requrement
             }
             catch (HttpRequestException ex)
             {
                 ModelState.AddModelError(string.Empty, "Failed to load country list.");
-                return View(new CountryViewModel { CountryList = new List<SelectListItem>() });
+                //return View( { CountryList = new List<SelectListItem>() });
+                return View();
 
             }
             return View();

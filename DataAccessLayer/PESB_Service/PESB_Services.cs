@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 using System.Data;
 using System.Net.Http.Headers;
@@ -7,6 +8,7 @@ using System.Text.Json;
 using VigilanceClearance.Interface.PESB;
 using VigilanceClearance.Models;
 using VigilanceClearance.Models.Modal_Properties.PESB;
+using VigilanceClearance.Models.ViewModel.PESB;
 
 namespace VigilanceClearance.Data.PESB_Service
 {
@@ -24,6 +26,7 @@ namespace VigilanceClearance.Data.PESB_Service
         }
 
         //db table name: tbl_Master_Vc_Reference
+        //Action Method: PESB_Add_New_Reference
         public async Task<List<SelectListItem>> GetReferenceDropDownAsync()
         {
             var accessToken = _httpContextAccessor.HttpContext?.Session.GetString("AccessToken");
@@ -57,6 +60,7 @@ namespace VigilanceClearance.Data.PESB_Service
 
 
         //db table name: tbl_Master_Vc_Post
+        //Action Method: PESB_Add_New_Reference
         public async Task<List<SelectListItem>> GetPostDescriptionsDropDownAsync(string ReferenceCode)
         {
             var accessToken = _httpContextAccessor.HttpContext?.Session.GetString("AccessToken");
@@ -91,6 +95,7 @@ namespace VigilanceClearance.Data.PESB_Service
 
 
         //db table name: tbl_Master_Vc_Post_SubCategory
+        //Action Method: PESB_Add_New_Reference
         public async Task<List<SelectListItem>> GetSubPostsByPostCodeInternal(string postCode)
         {
             if (string.IsNullOrWhiteSpace(postCode)) return new List<SelectListItem>();
@@ -129,6 +134,7 @@ namespace VigilanceClearance.Data.PESB_Service
 
 
         //db table name: tbl_Master_Vc_MinistryNew
+        //Action Method: PESB_Add_New_Reference
         public async Task<List<SelectListItem>> GetOrganizationDropDownAsync(string id = "0")
         {
             if (string.IsNullOrWhiteSpace(id)) return new List<SelectListItem>();
@@ -166,6 +172,7 @@ namespace VigilanceClearance.Data.PESB_Service
 
 
         //db table name: tbl_Master_Vc_MinistryNew
+        //Action Method: PESB_Add_New_Reference
         public async Task<List<SelectListItem>> GetMinistryByPostCodeInternal(string id)
         {
             if (string.IsNullOrWhiteSpace(id)) return new List<SelectListItem>();
@@ -203,8 +210,7 @@ namespace VigilanceClearance.Data.PESB_Service
         }
 
 
-
-
+        //db table name: tbl_Master_Vc_ReferenceReceivedFor
         public async Task<int> InsertAddNewReferenceAsync(PESB_Add_New_Reference_Model objmodel)
         {
             try
@@ -251,6 +257,43 @@ namespace VigilanceClearance.Data.PESB_Service
         }
 
 
+        //db table name: tbl_Master_Vc_ReferenceReceivedFor
+        //Action Method: PESB Appointment
+        public async Task<List<VcReferenceReceivedFor_ViewModel>> Get_VC_ReferenceReceivedFor_List_GetByIdAsync(int id, string username)
+        {
+            if (string.IsNullOrWhiteSpace(username)) return new List<VcReferenceReceivedFor_ViewModel>();
+
+            var accessToken = _httpContextAccessor.HttpContext?.Session.GetString("AccessToken");
+            if (string.IsNullOrEmpty(accessToken)) return new List<VcReferenceReceivedFor_ViewModel>();
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+            var requestUrl = $"{APIURL}VcReferenceReceivedFor/VcReferenceReceivedForGetById?id={id}&UserName={Uri.EscapeDataString(username)}";
+
+            try
+            {
+                var response = await _httpClient.GetAsync(requestUrl);
+                if (!response.IsSuccessStatusCode)
+                {
+                    return new List<VcReferenceReceivedFor_ViewModel>();
+                }
+
+                var jsonContent = await response.Content.ReadAsStringAsync();
+
+                var apiResponse = JsonConvert.DeserializeObject<ApiResponseWrapper<VcReferenceReceivedFor_ViewModel>>(jsonContent);
+
+                if (apiResponse != null && apiResponse.isSuccess && apiResponse.data != null)
+                {
+                    return new List<VcReferenceReceivedFor_ViewModel> { apiResponse.data };
+                }
+
+                return new List<VcReferenceReceivedFor_ViewModel>();
+            }
+            catch (Exception)
+            {
+                return new List<VcReferenceReceivedFor_ViewModel>();
+            }
+        }
 
 
 

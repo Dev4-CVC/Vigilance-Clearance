@@ -8,15 +8,6 @@
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
 <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
 
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @TempData["SuccessMessage"]
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-}
 
 
 @* 1st card "New Reference" *@
@@ -108,11 +99,13 @@
 
                     </div>
 
-                    <div class="card-footer d-flex justify-content-end">
-                        <button type="submit" class="btn btn-primary">Submit</button>
+                    <div class="card-footer d-flex justify-content-end" style="gap: 0.5rem;">
+                        <button type="submit" name="actionType" value="submit" class="btn btn-success">Submit</button>
+                        <button type="submit" name="actionType" value="forward" class="btn btn-primary">Forward to CVC</button>
                     </div>
-                </form>
 
+                </form>
+                
             </div>
         </div>
     </div>
@@ -263,3 +256,52 @@
 
 </script>
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const actionType = "@TempData["FormAction"]";
+            const submitBtn = document.querySelector('button[name="actionType"][value="submit"]');
+            const forwardBtn = document.querySelector('button[name="actionType"][value="forward"]');
+
+            if (actionType === "submit" && submitBtn) {
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerText = "Submitted";
+                }
+                if (forwardBtn) {
+                    forwardBtn.disabled = false;
+                    forwardBtn.innerText = "Forward to CVC";
+                }
+            }
+            else if (actionType === "forward") {
+                if (forwardBtn) {
+                    forwardBtn.disabled = true;
+                    forwardBtn.innerText = "Forwarded";
+                }
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = "Submit";
+                }
+            }
+            else {
+                // If no actionType or unrecognized, ensure both buttons enabled and normal text
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = "Submit";
+                }
+                if (forwardBtn) {
+                    forwardBtn.disabled = false;
+                    forwardBtn.innerText = "Forward to CVC";
+                }
+            }
+        });
+    </script>
+}
