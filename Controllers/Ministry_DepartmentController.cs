@@ -54,6 +54,11 @@ namespace VigilanceClearance.Controllers
 
             try
             {
+
+               
+                var client = _clientFactory.CreateClient();
+                //var countries = await client.GetFromJsonAsync<List<CountryModel>>("https://restcountries.com/v3.1/all?fields=name,cca2");
+                // iski jagah dusri API Call Karni As per requrement
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
                 var response = await _httpClient.GetAsync($"{BaseUrl}VcReferenceReceivedFor/VcReferenceReceivedForGetById?UserName={Uri.EscapeDataString(username)}");
@@ -79,6 +84,7 @@ namespace VigilanceClearance.Controllers
                 }
 
                 return View(new List<ReferenceReceivedFromCVCModel>()); // empty list fallback
+
             }
             catch (Exception ex)
             {
@@ -96,9 +102,23 @@ namespace VigilanceClearance.Controllers
 
             try
             {
+
+                // iski jagah dusri API Call Karni As per requrement
+                var client = _clientFactory.CreateClient();
+                //var countries = await client.GetFromJsonAsync<List<CountryModel>>("https://restcountries.com/v3.1/all?fields=name,cca2");
+                return View();
+                // iski jagah dusri API Call Karni As per requrement
+            }
+            catch (HttpRequestException ex)
+            {
+                ModelState.AddModelError(string.Empty, "Failed to load country list.");
+                //return View( { CountryList = new List<SelectListItem>() });
+                
+
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
                 var response = await _httpClient.GetAsync($"{BaseUrl}OfficerDetails/OfficerDetailsGetByMasterReferenceID?id={Uri.EscapeDataString(id)}");
+
 
                 if (!response.IsSuccessStatusCode)
                     return StatusCode((int)response.StatusCode, "Failed to fetch data from external API.");
