@@ -7,6 +7,21 @@
     Layout = "~/Views/Shared/_MinistryLayout.cshtml";
 }
 
+
+@* @if (TempData.Peek("successmsg") != null)
+{
+    <div class="alert alert-success">
+        @TempData.Peek("successmsg")
+    </div>
+} *@
+
+@if (TempData["successmsg"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["successmsg"]
+    </div>
+}
+
 <section style="width: 100%; height: 500px; overflow: auto; border: 1px solid #ccc;">
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-end" style="background-color: #007bff; color: white;">
@@ -136,12 +151,18 @@
                                         @Html.LabelFor(m => m.officerPostingDetail7.Ministry)
                                         @Html.DropDownListFor(model => model.officerPostingDetail7.Ministry, Model.officerPostingDetail7.MinistryList,
                                                                                 "-- Select Ministry --",  new { @class = "form-control", id = "ddlMinistry", disabled = "disabled" })
+                                        @Html.HiddenFor(model => model.officerPostingDetail7.Ministry)
+
 
                                     </div>
 
                                     <div class="form-group">
                                         @Html.LabelFor(m => m.officerPostingDetail7.Designation)
                                         @Html.TextBoxFor(m => m.officerPostingDetail7.Designation, new { @class = "form-control" })
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.officerPostingDetail7.PlaceOfPosting)
+                                        @Html.TextBoxFor(m => m.officerPostingDetail7.PlaceOfPosting, new { @class = "form-control" })
                                     </div>
 
                                     <div class="form-group">
@@ -1000,6 +1021,7 @@
     $(document).ready(function () {
         $('#ddlorg').change(function () {
             var selectedOrg = $(this).val();
+            // var MinistrySelect = $('#ddlMinistry');
             var MinistrySelect = $('#ddlMinistry');
             // Clear subpost dropdown
             MinistrySelect.empty();
@@ -1019,6 +1041,7 @@
                     // Default option
                     if(data===null || !data ){
                            MinistrySelect.append($('<option>').val('').text('-- No Ministry Available --'));
+                           $('input[name="officerPostingDetail7.Ministry"]').val('');
                            return;
                     }
 
@@ -1028,8 +1051,13 @@
                         MinistrySelect.append($('<option>').val(item.value).text(item.text));
                     });
 
+                     var firstValue = MinistrySelect.find('option:eq(0)').val();
+                          MinistrySelect.val(firstValue);
+                     $('input[name="officerPostingDetail7.Ministry"]').val(firstValue);
+
                     MinistrySelect.prop('disabled', true);
                     // toggleOtherField();
+
                 },
                 error: function (xhr) {
                     alert("Error loading Ministry: " + xhr.statusText);
