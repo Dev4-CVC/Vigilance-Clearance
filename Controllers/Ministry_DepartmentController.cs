@@ -1,12 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using VigilanceClearance.Interface.Ministry;
 using VigilanceClearance.Interface.PESB;
 using VigilanceClearance.Models;
+using VigilanceClearance.Models.DTOs;
 using VigilanceClearance.Models.OfficerDetailModel;
 using VigilanceClearance.Models.ViewModel;
 using VigilanceClearance.Models.ViewModel.Ministry;
@@ -21,13 +25,15 @@ namespace VigilanceClearance.Controllers
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
         private readonly string BaseUrl;
+        private readonly IMinistry _ministry;
 
-        public Ministry_DepartmentController(IHttpClientFactory clientFactory, HttpClient httpClient, IConfiguration configuration)
+        public Ministry_DepartmentController(IHttpClientFactory clientFactory, HttpClient httpClient, IConfiguration configuration, IMinistry ministry)
         {
             this._clientFactory = clientFactory;
             _httpClient = httpClient;
             _configuration = configuration;
             BaseUrl = _configuration["BaseUrl"]!;
+            this._ministry = ministry;
         }
 
         public IActionResult Index()
@@ -103,7 +109,12 @@ namespace VigilanceClearance.Controllers
 
                 if (apiResponse != null && apiResponse.data != null)
                 {
+                    List<OfficerListModel> obj = apiResponse.data;
+                    HttpContext.Session.SetString("apiResponse", JsonConvert.SerializeObject(obj));
+
                     return View(apiResponse.data); //  Send list directly to view
+
+                   
                 }
 
                 return View(new List<OfficerListModel>());
@@ -117,24 +128,47 @@ namespace VigilanceClearance.Controllers
         }
       
 
-        [HttpGet]
-        public async Task<IActionResult> UpdateReferenceReceivedCVC()
+        [HttpPost]
+        public async Task<IActionResult> UpdateReferenceReceivedCVC([FromBody] OfficerListModel data)
         {
             try
             {
-                string orgcode = string.Empty;
-                //var model = new UpdateReferenceReceivedFromCVCModel
+                //List<OfficerListModel> result = new List<OfficerListModel>();
+
+                //var json = HttpContext.Session.GetString("apiResponse");
+                //if (json != null)
                 //{
-                //    OrganizationList = await GetOrganizationDropDownAsync("0"),
-                //};
+                //    result = JsonConvert.DeserializeObject<List<OfficerListModel>>(json);
+                //}
+
+                //var newdata = result.Find(x => x.Id == int.Parse(id));
+               
                 
+                string orgcode = string.Empty;
+               
+                //var data = await ViewOfficerListForGivenProposal(id);
+
                 var model = new OfficerDetailMainModel
                 {
                     officerPostingDetail7 = new OfficerPostingDetails
                     {
-                        OrganizationList = await GetOrganizationDropDownAsync("0"),
+                        /* OrganizationList = await GetOrganizationDropDownAsync("0")*/
+                        OrganizationList = await _ministry.GetOrganizationDropDownAsync("0"),
                         Organization = null // or default
-                    }
+                    },
+
+                    //officerPersonalDetailModel = new OfficerPersonalDetailModel
+                    //{
+                    //    Officer_Name = newdata.Officer_Name,
+                    //    Officer_FatherName = newdata.Officer_FatherName,
+                    //    Officer_DateOfBirth = newdata.Officer_DateOfBirth.ToString("dd-MM-yyyy"),
+                    //    Officer_RetirementDate = newdata.Officer_RetirementDate.ToString("dd-MM-yyyy"),
+                    //    Officer_ServiceEntryDate= newdata.Officer_ServiceEntryDate.ToString("dd-MM-yyyy"),
+                    //    Officer_Service = newdata.Officer_Service,
+                    //    Officer_Batch_Year = newdata.Officer_Batch_Year.ToString(),
+                    //    Cadre = newdata.Officer_Cadre
+
+                    //}
                 };
 
                 return View(model);
@@ -147,36 +181,36 @@ namespace VigilanceClearance.Controllers
             }
         }
 
-        private async Task<List<SelectListItem>> GetOrganizationDropDownAsync(string section)
-        {
-            var accessToken = HttpContext.Session.GetString("AccessToken");
-            if (string.IsNullOrEmpty(accessToken)) return new List<SelectListItem>();
+        //private async Task<List<SelectListItem>> GetOrganizationDropDownAsync(string section)
+        //{
+        //    var accessToken = HttpContext.Session.GetString("AccessToken");
+        //    if (string.IsNullOrEmpty(accessToken)) return new List<SelectListItem>();
 
-            try
-            {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+        //    try
+        //    {
+        //        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
-                var response = await _httpClient.GetAsync($"{BaseUrl}DropDown/MinistryNewGetBySection?section={Uri.EscapeDataString(section)}");
+        //        var response = await _httpClient.GetAsync($"{BaseUrl}DropDown/MinistryNewGetBySection?section={Uri.EscapeDataString(section)}");
 
-                if (!response.IsSuccessStatusCode)
-                {
-                    return new List<SelectListItem>();
-                }
+        //        if (!response.IsSuccessStatusCode)
+        //        {
+        //            return new List<SelectListItem>();
+        //        }
 
-                var json = await response.Content.ReadAsStringAsync();
-                var items = JsonConvert.DeserializeObject<List<DropDownResponseModel>>(json) ?? new();
+        //        var json = await response.Content.ReadAsStringAsync();
+        //        var items = JsonConvert.DeserializeObject<List<DropDownResponseModel>>(json) ?? new();
 
-                return items.Select(item => new SelectListItem
-                {
-                    Value = item.Value,
-                    Text = item.Text
-                }).ToList();
-            }
-            catch (Exception ex)
-            {
-                return new List<SelectListItem>();
-            }
-        }
+        //        return items.Select(item => new SelectListItem
+        //        {
+        //            Value = item.Value,
+        //            Text = item.Text
+        //        }).ToList();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new List<SelectListItem>();
+        //    }
+        //}
 
 
 
@@ -185,7 +219,8 @@ namespace VigilanceClearance.Controllers
         {
             try
             {
-                var item = await GetMinistryDropDownbycodeAsync(orgcode);
+                //var item = await GetMinistryDropDownbycodeAsync(orgcode);
+                var item = await _ministry.GetMinistryDropDownbycodeAsync(orgcode);
                 return Json(item);
             }
             catch
@@ -194,36 +229,36 @@ namespace VigilanceClearance.Controllers
             }
         }
 
-        private async Task<List<SelectListItem>> GetMinistryDropDownbycodeAsync(string orgcode)
-        {
-            var accessToken = HttpContext.Session.GetString("AccessToken");
-            if (string.IsNullOrEmpty(accessToken)) return new List<SelectListItem>();
+        //private async Task<List<SelectListItem>> GetMinistryDropDownbycodeAsync(string orgcode)
+        //{
+        //    var accessToken = HttpContext.Session.GetString("AccessToken");
+        //    if (string.IsNullOrEmpty(accessToken)) return new List<SelectListItem>();
 
-            try
-            {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+        //    try
+        //    {
+        //        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
-                var response = await _httpClient.GetAsync($"{BaseUrl}DropDown/GetMinistryByOrgCode?orgcode={Uri.EscapeDataString(orgcode)}");
+        //        var response = await _httpClient.GetAsync($"{BaseUrl}DropDown/GetMinistryByOrgCode?orgcode={Uri.EscapeDataString(orgcode)}");
 
-                if (!response.IsSuccessStatusCode)
-                {
-                    return new List<SelectListItem>();
-                }
+        //        if (!response.IsSuccessStatusCode)
+        //        {
+        //            return new List<SelectListItem>();
+        //        }
 
-                var json = await response.Content.ReadAsStringAsync();
-                var items = JsonConvert.DeserializeObject<List<DropDownResponseModel>>(json) ?? new();
+        //        var json = await response.Content.ReadAsStringAsync();
+        //        var items = JsonConvert.DeserializeObject<List<DropDownResponseModel>>(json) ?? new();
 
-                return items.Select(item => new SelectListItem
-                {
-                    Value = item.Value,
-                    Text = item.Text
-                }).ToList();
-            }
-            catch (Exception ex)
-            {
-                return new List<SelectListItem>();
-            }
-        }
+        //        return items.Select(item => new SelectListItem
+        //        {
+        //            Value = item.Value,
+        //            Text = item.Text
+        //        }).ToList();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new List<SelectListItem>();
+        //    }
+        //}
 
 
 
@@ -238,36 +273,48 @@ namespace VigilanceClearance.Controllers
 
             try
             {
-                insertOfficerDetailsModel.orgCode = model.officerPostingDetail7.Organization;
-                insertOfficerDetailsModel.orgMinistry = model.officerPostingDetail7.Ministry;
-                insertOfficerDetailsModel.designation = model.officerPostingDetail7.Designation;
-                insertOfficerDetailsModel.placeOfPosting = "Testing";
-                insertOfficerDetailsModel.fromDate = model.officerPostingDetail7.TenureFrom;
-                insertOfficerDetailsModel.toDate = model.officerPostingDetail7.TenureTo;
-                insertOfficerDetailsModel.createdBy = HttpContext.Session.GetString("Username");
-                insertOfficerDetailsModel.createdOn = DateTime.Now;
-                insertOfficerDetailsModel.createdBySessionId = HttpContext.Session.Id;
-                insertOfficerDetailsModel.createdByIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
-
-                if (ModelState.IsValid)
+                ModelState.Clear();  // Wipe the tree
+                if (TryValidateModel(model.officerPostingDetail7, nameof(model.officerPostingDetail7)))
                 {
-                    int num = await InsertOfficerPostingDetails(insertOfficerDetailsModel);
+                    // Submodel is valid!
+                    insertOfficerDetailsModel.OrgCode = model.officerPostingDetail7.Organization;
+                    insertOfficerDetailsModel.OrgMinistry = model.officerPostingDetail7.Ministry;
+                    insertOfficerDetailsModel.Designation = model.officerPostingDetail7.Designation;
+                    insertOfficerDetailsModel.PlaceOfPosting = model.officerPostingDetail7.PlaceOfPosting;
+                    insertOfficerDetailsModel.VcOfficerId = 212;
+                    string fromDate = DateTime.Parse(model.officerPostingDetail7.TenureFrom.ToString()).ToString("dd/MM/yyyy");
+                    string toDate = DateTime.Parse(model.officerPostingDetail7.TenureTo.ToString()).ToString("dd/MM/yyyy");
 
-                    if(num > 0)
+                    insertOfficerDetailsModel.FromDate = fromDate;
+                    insertOfficerDetailsModel.ToDate = toDate;
+                    insertOfficerDetailsModel.CreatedBy = HttpContext.Session.GetString("Username");
+
+                    insertOfficerDetailsModel.CreatedBySessionId = HttpContext.Session.Id;
+                    insertOfficerDetailsModel.CreatedByIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+                    
+                    int num = await _ministry.InsertOfficerPostingDetail(insertOfficerDetailsModel);                  
+
+                    if (num > 0)
                     {
                         TempData["successmsg"] = "Data Submitted Successfuly";
-
-                        return RedirectToAction("UpdateReferenceReceivedCVC"); // Send the update page
+                        TempData.Keep("successmsg");
                     }
+                    else
+                    {
+                        TempData["successmsg"] = "Data Not Submitted";
+                    }
+
+               
+                    return RedirectToAction("UpdateReferenceReceivedCVC"); // Send the update page
                 }
-                //else
-                //{
-                    TempData["successmsg"] = "Data Not Submitted";
 
+                else
+                {
+                    TempData["successmsg"] = "Error: Something Went Wrong in model state";
+                    TempData.Keep("successmsg");
                     return RedirectToAction("UpdateReferenceReceivedCVC");
-                //}
-
-
+                }
+                   
             }
             catch (Exception ex)
             {
@@ -275,59 +322,7 @@ namespace VigilanceClearance.Controllers
                 return View();
             }
 
-            
-            //return View(model);
-
         }
-
-
-
-        public async Task<int> InsertOfficerPostingDetails(InsertOfficerDetailsModel objmodel)
-        {
-            try
-            {
-                //var accessToken = _httpContextAccessor.HttpContext?.Session.GetString("AccessToken");
-                var accessToken = HttpContext.Session.GetString("AccessToken");
-                if (string.IsNullOrEmpty(accessToken))
-                    throw new UnauthorizedAccessException("Access token is missing.");
-
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-
-                var requestUrl = $"{BaseUrl}OfficerPostingDetails/addOfficerPostingDetails";
-
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                    PropertyNameCaseInsensitive = true
-                };
-
-                var json = System.Text.Json.JsonSerializer.Serialize(objmodel, options);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                var response = await _httpClient.PostAsync(requestUrl, content);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"API Error: {response.StatusCode} - {errorContent}");
-                    return 0;
-                }
-
-                var responseJson = await response.Content.ReadAsStringAsync();
-
-                if (int.TryParse(responseJson, out int result))
-                    return result;
-
-                // Optionally handle more structured API response if needed
-                return 1;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Exception: {ex.Message}");
-                return 0;
-            }
-        }
-
 
     }
 }

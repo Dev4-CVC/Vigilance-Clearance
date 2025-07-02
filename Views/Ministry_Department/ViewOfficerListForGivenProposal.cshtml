@@ -30,7 +30,7 @@
         </div>
         <div class="card-body p-2">
             <div class="table-responsive">
-                <table class="table table-bordered table-hover table-sm">
+                <table class="table table-bordered table-hover table-sm" id="ministryTable">
                     <thead class="thead-light">
                         <tr>
                             <th>Action</th>
@@ -61,40 +61,41 @@
                         </tr>
                     </thead>
                     <tbody>
-
-                        @foreach (var item in Model)
-                        {
-
+                        @{
                             int sno = 1;
-                            <tr>
-                                <td>
-                                    <a asp-action="ViewOfficerListForGivenProposal" asp-route-id="@item.Id" class="btn btn-info btn-sm">View</a>
-                                    <a asp-action="UpdateReferenceReceivedCVC" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Update</a>
-                                </td>
-                                <td>@sno</td>
-                                <td>@item.MasterReferenceID</td>
-                                <td>@item.selectionForThePostCategory</td>
-                                <td>@item.ReferenceReceivedFor</td>
-                                <td>@item.selectionForThePostCategory</td>
-                                <td>@item.othersRemarks</td>
-                                <td>@item.orgCode</td>
-                                <td>@item.Officer_Name</td>
-                                <td>@item.Officer_FatherName</td>
-                                <td>@item.Officer_DateOfBirth</td>
-                                <td>@item.Officer_RetirementDate</td>
+                            @foreach (var item in Model)
+                            {
 
-                                <td>@item.Officer_ServiceEntryDate</td>
-                                <td>@item.Officer_Service</td>
-                                <td>@item.Officer_Batch_Year</td>
-                                <td>@item.Officer_Cadre</td>
-                                <td>@item.IntegrityAgreedOrDoubtful_8</td>
-                                <td>@item.AllegationOfMisconductExamined_9</td>
-                                <td>@item.PunishmentAwarded_10</td>
-                                <td>@item.DisciplinaryCriminalProceedings_11</td>
-                                <td>@item.ActionContemplatedAgainstTheOfficerAsOnDate_12</td>
-                                <td>@item.ComplaintWithVigilanceAnglePending_13</td>
-                            </tr>
-                            sno++;
+                                <tr>
+                                    <td>
+                                        <a asp-action="ViewOfficerListForGivenProposal" asp-route-id="@item.Id" class="btn btn-info btn-sm">View</a>
+                                        <a asp-action="UpdateReferenceReceivedCVC" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Update</a>
+                                        <button class="btnSubmitRow btn btn-sm btn-primary">Submit</button>
+                                    </td>
+                                    <td>@sno</td>
+                                    <td>@item.MasterReferenceID</td>
+                                    <td>@item.selectionForThePostCategory</td>
+                                    <td>@item.ReferenceReceivedFor</td>
+                                    <td>@item.selectionForThePostCategory</td>
+                                    <td>@item.othersRemarks</td>
+                                    <td>@item.orgCode</td>
+                                    <td>@item.Officer_Name</td>
+                                    <td>@item.Officer_FatherName</td>
+                                    <td>@item.Officer_DateOfBirth</td>
+                                    <td>@item.Officer_RetirementDate</td>
+                                    <td>@item.Officer_ServiceEntryDate</td>
+                                    <td>@item.Officer_Service</td>
+                                    <td>@item.Officer_Batch_Year</td>
+                                    <td>@item.Officer_Cadre</td>
+                                    <td>@item.IntegrityAgreedOrDoubtful_8</td>
+                                    <td>@item.AllegationOfMisconductExamined_9</td>
+                                    <td>@item.PunishmentAwarded_10</td>
+                                    <td>@item.DisciplinaryCriminalProceedings_11</td>
+                                    <td>@item.ActionContemplatedAgainstTheOfficerAsOnDate_12</td>
+                                    <td>@item.ComplaintWithVigilanceAnglePending_13</td>
+                                </tr>
+                                sno++;
+                            }
                         }
                     </tbody>
                 </table>
@@ -102,4 +103,87 @@
         </div>
     </div>
 </section>
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).on('click', '.btnSubmitRow', function () {
+        var row = $(this).closest('tr');
+
+        var rowData = {
+            Id: row.find('td:eq(1)').text().trim(),                    // Sr.No. (or real ID if in data attr)
+            MasterReferenceID: row.find('td:eq(2)').text().trim(),
+            selectionForThePostCategory: row.find('td:eq(3)').text().trim(),
+            selectionForThePostSubCategory: row.find('td:eq(4)').text().trim(),
+            ReferenceReceivedFor: row.find('td:eq(5)').text().trim(),
+            othersRemarks: row.find('td:eq(6)').text().trim(),
+            orgCode: row.find('td:eq(7)').text().trim(),
+            Officer_Name: row.find('td:eq(8)').text().trim(),
+            Officer_FatherName: row.find('td:eq(9)').text().trim(),
+            Officer_DateOfBirth: row.find('td:eq(10)').text().trim(),
+            Officer_RetirementDate: row.find('td:eq(11)').text().trim(),
+            Officer_ServiceEntryDate: row.find('td:eq(12)').text().trim(),
+            Officer_Service: row.find('td:eq(13)').text().trim(),
+            Officer_Batch_Year: row.find('td:eq(14)').text().trim(),
+            Officer_Cadre: row.find('td:eq(15)').text().trim(),
+            IntegrityAgreedOrDoubtful_8: row.find('td:eq(16)').text().trim(),
+            AllegationOfMisconductExamined_9: row.find('td:eq(17)').text().trim(),
+            PunishmentAwarded_10: row.find('td:eq(18)').text().trim(),
+            DisciplinaryCriminalProceedings_11: row.find('td:eq(19)').text().trim(),
+            ActionContemplatedAgainstTheOfficerAsOnDate_12: row.find('td:eq(20)').text().trim(),
+            ComplaintWithVigilanceAnglePending_13: row.find('td:eq(21)').text().trim()
+        };
+
+        console.log(rowData); // For debugging
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("UpdateReferenceReceivedCVC", "Ministry_Department")',
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(rowData),
+            success: function (response) {
+                alert("Row updated successfully!");
+            },
+            error: function () {
+                alert("Error occurred during submission.");
+            }
+        });
+    });
+</script>
+
+@* <script>
+       $('#updateBtn').click(function () {
+        var gridData = [];
+
+        $('#ministryTable tbody tr').each(function () {
+            var row = $(this).find('td');
+            var item = {
+                Id: parseInt(row.eq(0).text()),
+                MasterReferenceID: row.eq(1).text(),
+                selectionForThePostCategory: row.eq(2).text()
+            };
+            gridData.push(item);
+        });
+
+        $.ajax({
+            url: '/Ministry_Department/UpdateReferenceReceivedCVC',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(gridData),
+            success: function (response) {
+                alert(response.message);
+            },
+            error: function () {
+                alert("Error occurred");
+            }
+        });
+    });
+
+</script>
+ *@
+
+
+
+
 
