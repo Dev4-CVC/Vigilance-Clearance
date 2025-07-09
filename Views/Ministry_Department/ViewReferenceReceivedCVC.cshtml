@@ -47,29 +47,31 @@
                         </tr>
                     </thead>
                     <tbody>
-                       
-                        @foreach (var item in Model)
-                        {
-                           
+
+                        @{
                             int sno = 1;
-                            <tr>
-                                <td>
-                                    <a asp-action="ViewOfficerListForGivenProposal" asp-route-id="@item.id" class="btn btn-info btn-sm">View</a>
-                                    <a asp-action="UpdateReferenceReceivedCVC" asp-route-id="@item.id" class="btn btn-warning btn-sm">Update</a>
-                                </td>
-                                <td>@sno</td>
-                                <td>@item.ReferenceReceivedFor</td>
-                                <td>@item.ReferenceReceivedFrom</td>
-                                <td>@item.ReferenceReceivedFromCode</td>
-                                <td>@item.selectionForThePostCategory</td>
-                                <td>@item.selectionForThePostSubCategory</td>
-                                <td>@item.OrgName</td>
-                                <td>@item.MinDesc</td>
-                                <td>@item.ReferenceNo_FileNo</td>
-                                <td>@item.ReferenceOrSubmissionToCvcDate</td>
-                                <td>@item.CVC_ReferenceID_FileNo</td>
-                            </tr>
-                            sno++;
+                            foreach (var item in Model)
+                            {                               
+                               
+                                <tr>
+                                    <td>
+                                        <a asp-action="ViewOfficerListForGivenProposal" asp-route-id="@item.id" class="btn btn-info btn-sm">View</a>
+                                        @* <a asp-action="UpdateReferenceReceivedCVC" asp-route-id="@item.id" class="btn btn-warning btn-sm">Update</a> *@
+                                    </td>
+                                    <td>@sno</td>
+                                    <td>@item.ReferenceReceivedFor</td>
+                                    <td>@item.ReferenceReceivedFrom</td>
+                                    <td>@item.ReferenceReceivedFromCode</td>
+                                    <td>@item.selectionForThePostCategory</td>
+                                    <td>@item.selectionForThePostSubCategory</td>
+                                    <td>@item.OrgName</td>
+                                    <td>@item.MinDesc</td>
+                                    <td>@item.ReferenceNo_FileNo</td>
+                                    <td>@item.ReferenceOrSubmissionToCvcDate</td>
+                                    <td>@item.CVC_ReferenceID_FileNo</td>
+                                </tr>
+                                sno++;
+                            }
                         }
                     </tbody>
                 </table>
@@ -79,7 +81,7 @@
 </section>
 
 
-          @*   <div class="table-container">
+@*   <div class="table-container">
                 <table>
                     <thead>
                         <tr>
@@ -139,7 +141,7 @@
                     </tbody>
                 </table>
             </div> *@
-        @* </div>
+@* </div>
 
     </div>
 

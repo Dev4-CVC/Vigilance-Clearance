@@ -685,7 +685,7 @@ namespace VigilanceClearance.Controllers
                 }
 
                 return Json(new { success = true });
-                
+
             }
             catch (Exception ex)
             {

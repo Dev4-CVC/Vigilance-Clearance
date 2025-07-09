@@ -1,7 +1,10 @@
 using System.Globalization;
+using System.Text.Json;
 using VigilanceClearance.Data.Account;
-using VigilanceClearance.Data.PESB_Service;
+using VigilanceClearance.DataAccessLayer.PESB_Service;
+using VigilanceClearance.DataAccessLayer.Ministry_Service;
 using VigilanceClearance.Interface.Account;
+using VigilanceClearance.Interface.Ministry;
 using VigilanceClearance.Interface.PESB;
 using VigilanceClearance.Services;
 
@@ -31,15 +34,23 @@ builder.Services.AddHttpContextAccessor();
 //interface services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPESB, PESB_Services>();
+builder.Services.AddScoped<IMinistry, Ministry_Service>();
 
-
-var cultureInfo = new CultureInfo("en-GB"); // or "en-CA" for yyyy-MM-dd
+var cultureInfo = new CultureInfo("en-GB");
 cultureInfo.DateTimeFormat.ShortDatePattern = "yyyy-MM-dd";
 cultureInfo.DateTimeFormat.LongDatePattern = "yyyy-MM-dd";
 
 CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
 CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
+
+
+//Added as on date 30-06-2025
+builder.Services.AddControllers().AddJsonOptions(opts =>
+{
+    opts.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+});
+//Added as on date 30-06-2025
 
 
 var app = builder.Build();
