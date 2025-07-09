@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 
@@ -134,7 +134,7 @@ namespace VigilanceClearance.DataAccessLayer.Ministry_Service
                     throw new UnauthorizedAccessException("Access token is missing.");
 
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-               
+
                 var requestUrl = $"{BaseUrl}OfficerPostingDetails/addOfficerPostingDetails";
 
                 var options = new JsonSerializerOptions
@@ -180,7 +180,7 @@ namespace VigilanceClearance.DataAccessLayer.Ministry_Service
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
             var requestUrl = $"{BaseUrl}OfficerDetails/OfficerDetailsGetByMasterReferenceID?id={Uri.EscapeDataString(id)}";
-            
+
             try
             {
                 var response = await _httpClient.GetAsync(requestUrl);
@@ -206,20 +206,20 @@ namespace VigilanceClearance.DataAccessLayer.Ministry_Service
             }
         }
 
-  // Added code as on date 02_07_2025
+        // Added code as on date 02_07_2025
 
         // Added as on date 03_07_2025
 
-        public async Task<List<OfficerPostingDetailsViewModellist>> GetOfficerPostingList(string id)      
+        public async Task<List<OfficerPostingDetailsViewModellist>> GetOfficerPostingList(string id)
         {
-            
+
             var accessToken = _httpContextAccessor.HttpContext?.Session.GetString("AccessToken");
             if (string.IsNullOrEmpty(accessToken)) return new List<OfficerPostingDetailsViewModellist>();
 
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
             var requestUrl = $"{BaseUrl}OfficerPostingDetails/OfficerPostingDetailsGetByOfficerId?id={Uri.EscapeDataString(id)}";
-            
+
             try
             {
                 var response = await _httpClient.GetAsync(requestUrl);
@@ -384,8 +384,8 @@ namespace VigilanceClearance.DataAccessLayer.Ministry_Service
                 if (string.IsNullOrEmpty(accessToken))
                     throw new UnauthorizedAccessException("Access token is missing.");
 
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken); 
-                
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
                 var requestUrl = $"{BaseUrl}AllegationOfMisconductExamined_9/AddAllegationOfMisconductExamined";
 
                 var options = new JsonSerializerOptions

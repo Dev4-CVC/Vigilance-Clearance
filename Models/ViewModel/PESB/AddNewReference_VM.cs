@@ -36,7 +36,6 @@ namespace VigilanceClearance.Models.ViewModel.PESB
 
 
 
-        [Required(ErrorMessage = "Please select Ministry")]
         public string minCode { get; set; } = string.Empty;
 
         [ValidateNever]

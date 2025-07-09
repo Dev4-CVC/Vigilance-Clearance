@@ -10,7 +10,7 @@ namespace VigilanceClearance.Interface.Ministry
     public interface IMinistry
     {
         Task<List<SelectListItem>> GetOrganizationDropDownAsync(string section);
-        Task<List<SelectListItem>> GetMinistryDropDownbycodeAsync(string orgcode); 
+        Task<List<SelectListItem>> GetMinistryDropDownbycodeAsync(string orgcode);
         Task<int> InsertOfficerPostingDetail(InsertOfficerDetailsModel objmodel);
 
         #region Added As on date 08_07_2025
@@ -39,7 +39,7 @@ namespace VigilanceClearance.Interface.Ministry
         //9
         Task<List<AllegationOfMisconductExaminedModel>> GetAllegationOfMisconductExaminedList(string id);
         Task<int> InsertAllegationOfMisconductExamined(AllegationOfMisconductExaminedModel _insertAllegationOfMisconduct);
-        
+
         //10
         Task<int> InPunishmentAwarded(PunishmentAwardedModel _punishmentAwarded);
         Task<List<PunishmentAwardedModel>> GetPunishmentAwardedList(string id);
@@ -63,4 +63,3 @@ namespace VigilanceClearance.Interface.Ministry
 
     }
 }
- 

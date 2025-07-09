@@ -1,24 +1,43 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
-namespace VigilanceClearance.Models.Modal_Properties.PESB
+namespace VigilanceClearance.Models.PESB
 {
-    public class PESB_Add_New_Reference_Model
+    public class new_reference_model
     {
+        [Key]
         public int Id { get; set; }
+
+        [Required(ErrorMessage = "Reference Received For is required")]
+        [Display(Name = "Reference")]
         public string? referenceReceivedFor { get; set; }
         public string? referenceReceivedFrom { get; set; }
         public string? referenceReceivedFromCode { get; set; }
+
+        [Required(ErrorMessage = "Post is required")]
+        [Display(Name = "Post")]
         public string? selectionForThePostCategory { get; set; }
+
+        [Display(Name = "Sub Post")]
         public string? selectionForThePostSubCategory { get; set; }
 
+
+        [Display(Name = "Organization")]
         public string? orgCode { get; set; }
         public string? orgName { get; set; }
+
+        [Display(Name = "Ministry")]
         public string? minCode { get; set; }
         public string? minDesc { get; set; }
 
+
+        [Display(Name = "Reference No./ File No.")]
         public string? referenceNoFileNo { get; set; } = null;
+        
+        [Display(Name = "Submission to CVC Date")]
         public string? referenceOrSubmissionToCvcDate { get; set; }
+
+        [Display(Name = "Reference File No.")]
         public string? cvcReferenceIdFileNo { get; set; }
 
 

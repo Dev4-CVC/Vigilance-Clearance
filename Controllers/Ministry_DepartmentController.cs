@@ -48,7 +48,7 @@ namespace VigilanceClearance.Controllers
 
         [HttpGet]
         public async Task<IActionResult> ViewReferenceReceivedCVC()
-        {         
+        {
             try
             {
                 string _UserName = "minpower";
@@ -56,7 +56,7 @@ namespace VigilanceClearance.Controllers
                 List<ReferenceReceivedFromCVCModel> apiResponse = await _ministry.GetReferenceReceivedFromCVClist(_UserName);
 
                 if (apiResponse != null)
-                {                   
+                {
                     return View(apiResponse);
                 }
                 return View(new List<ReferenceReceivedFromCVCModel>());
@@ -64,7 +64,7 @@ namespace VigilanceClearance.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
-            }                      
+            }
         }
 
         [HttpGet]
@@ -75,7 +75,7 @@ namespace VigilanceClearance.Controllers
                 List<OfficerListModel> ApiResponse = await _ministry.GetOfficerListAsync(id);
 
                 if (ApiResponse != null)
-                {                    
+                {
                     return View(ApiResponse); //  Send list directly to view
                 }
 
@@ -84,9 +84,9 @@ namespace VigilanceClearance.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
-            }   
+            }
         }
-      
+
 
         [HttpGet]
         public async Task<IActionResult> UpdateReferenceReceivedCVC(string id)
@@ -94,24 +94,24 @@ namespace VigilanceClearance.Controllers
             try
             {
                 HttpContext.Session.SetString("vcofficerId", id);
-               
+
                 List<OfficerListModel> Response = await _ministry.GetOfficerListAsync(id);
 
                 OfficerListModel firstOfficer = Response.FirstOrDefault();
-//7
+                //7
                 List<OfficerPostingDetailsViewModellist> Postinglist = await _ministry.GetOfficerPostingList(id);
-//8
+                //8
                 List<InsertIntegrityAgreedOrDoubtfulModel> IntegrityAgreedlist = await _ministry.GetInsertIntegrityAgreedOrDoubtfulList(id);
 
-               
-//9           
+
+                //9           
                 List<AllegationOfMisconductExaminedModel> AllegationOfMisconductlist = await _ministry.GetAllegationOfMisconductExaminedList(id);
 
                 //10
                 List<PunishmentAwardedModel> PunishmentAwardedlist = await _ministry.GetPunishmentAwardedList(id);
 
                 //11 
-                List<DisciplinaryCriminalProceedingsModel> DisciplinaryCriminalProceedingsModellist =  await _ministry.GetDisciplinaryCriminalProceedingsModelList(id);
+                List<DisciplinaryCriminalProceedingsModel> DisciplinaryCriminalProceedingsModellist = await _ministry.GetDisciplinaryCriminalProceedingsModelList(id);
 
                 //12
                 List<ActionContemplatedAgainstTheOfficerModel> ActionContemplatedAgainstTheOfficerlist = await _ministry.GetActionContemplatedAgainstTheOfficerlList(id);
@@ -119,7 +119,7 @@ namespace VigilanceClearance.Controllers
                 //13
                 List<ComplaintWithVigilanceAnglePendingModel> ComplaintWithVigilanceAnglePendingModellist = await _ministry.GetComplaintWithVigilanceAnglePendingList(id);
 
-                
+
 
                 string orgcode = string.Empty;
 
@@ -147,7 +147,7 @@ namespace VigilanceClearance.Controllers
                     insertIntegrityAgreedOrDoubtfulModellist = IntegrityAgreedlist,
                     AllegationOfMisconductExaminedModellist = AllegationOfMisconductlist,
                     PunishmentAwardedModellist = PunishmentAwardedlist,
-                    DisciplinaryCriminalProceedingsModellist= DisciplinaryCriminalProceedingsModellist,
+                    DisciplinaryCriminalProceedingsModellist = DisciplinaryCriminalProceedingsModellist,
                     ActionContemplatedAgainstTheOfficerModellist = ActionContemplatedAgainstTheOfficerlist,
                     ComplaintWithVigilanceAnglePendingModellist = ComplaintWithVigilanceAnglePendingModellist,
                 };
@@ -162,7 +162,7 @@ namespace VigilanceClearance.Controllers
             }
         }
 
-      
+
         [HttpGet]
         public async Task<IActionResult> GetMinistryDropDown(string orgcode)
         {
@@ -178,7 +178,7 @@ namespace VigilanceClearance.Controllers
             }
         }
 
-     
+
         [HttpPost]
         public async Task<IActionResult> AddOfficerPostingDetails(OfficerDetailMainModel model)
         {
@@ -207,8 +207,8 @@ namespace VigilanceClearance.Controllers
                     insertOfficerDetailsModel.actionBy = HttpContext.Session.GetString("Username");
                     insertOfficerDetailsModel.actionBy_SessionId = HttpContext.Session.Id;
                     insertOfficerDetailsModel.actionBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
-                    
-                    int num = await _ministry.InsertOfficerPostingDetail(insertOfficerDetailsModel);                  
+
+                    int num = await _ministry.InsertOfficerPostingDetail(insertOfficerDetailsModel);
 
                     if (num > 0)
                     {
@@ -257,7 +257,7 @@ namespace VigilanceClearance.Controllers
                 if (TryValidateModel(model.officerIntegrityAgreedOrDoubtful_8, nameof(model.officerIntegrityAgreedOrDoubtful_8)))
                 {
 
-                    _insertIntegritymodel.officerId =int.Parse(Id);
+                    _insertIntegritymodel.officerId = int.Parse(Id);
                     _insertIntegritymodel.enteredInTheList = model.officerIntegrityAgreedOrDoubtful_8.IsAgreed.ToString();
                     _insertIntegritymodel.dateOfEntryInTheList = DateTime.Now;
                     _insertIntegritymodel.removedFromTheList = string.Empty;
@@ -279,7 +279,7 @@ namespace VigilanceClearance.Controllers
                         TempData["successmsg"] = "Data Not Submitted";
                     }
 
-                   // return RedirectToAction("UpdateReferenceReceivedCVC", Id); // Send the update page
+                    // return RedirectToAction("UpdateReferenceReceivedCVC", Id); // Send the update page
                     return RedirectToAction("UpdateReferenceReceivedCVC", new { id = Id });
                 }
                 else
@@ -304,12 +304,12 @@ namespace VigilanceClearance.Controllers
         public async Task<IActionResult> AddAllegationOfMisconductExamined(OfficerDetailMainModel model)
         {
             string Id = HttpContext.Session.GetString("vcofficerId");
-           
+
             AllegationOfMisconductExaminedModel _insertAllegationOfMisconduct = new AllegationOfMisconductExaminedModel();
 
             try
             {
-                
+
                 ModelState.Remove("officerAllegationOfMisconductExamined_9.vigilanceAngleExamined");
 
                 ModelState.Clear();  // Wipe the tree
@@ -399,7 +399,7 @@ namespace VigilanceClearance.Controllers
                     {
                         TempData["successmsg"] = "Data Not Submitted";
                     }
-                  
+
                     return RedirectToAction("UpdateReferenceReceivedCVC", new { id = Id });
                 }
                 else
