@@ -9,9 +9,9 @@ namespace VigilanceClearance.Models.ViewModel.Ministry
         //public System.LocalDataStoreSlot data { get; set; }
         //public List<List<List<object>>> data { get; set; }
         //public List<ReferenceReceivedFromCVCModel> data { get; set; } // if it's an array
-        public ReferenceReceivedFromCVCModel data { get; set; } // not a List
+        //public ReferenceReceivedFromCVCModel data { get; set; } // not a List
 
-        //public OfficerListModel data1 { get; set; } // not a List
+        public List<ReferenceReceivedFromCVCModel> data { get; set; }
 
     }
 }

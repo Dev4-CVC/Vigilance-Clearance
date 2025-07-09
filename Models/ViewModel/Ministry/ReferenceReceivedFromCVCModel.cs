@@ -26,5 +26,7 @@
         public string PendingWith { get; set; }
         public string UID { get; set; }
         public string ReferenceID { get; set; }
+
+        public ReferenceReceivedFromCVCModel data { get; set; }
     }
 }

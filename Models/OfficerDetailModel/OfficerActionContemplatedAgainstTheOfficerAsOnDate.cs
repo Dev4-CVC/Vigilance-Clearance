@@ -1,10 +1,13 @@
-﻿namespace VigilanceClearance.Models.OfficerDetailModel
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace VigilanceClearance.Models.OfficerDetailModel
 {
     public class OfficerActionContemplatedAgainstTheOfficerAsOnDate
     {
-        public string? ContemplatedAgainst { get; set; }
-        public string? ContemplatedAgainstCaseDetail { get; set; }
-        public string? ContemplatedAgainstCasestatus { get; set; }
-        public DateTime ContemplatedAgainstStatusasondate { get; set; }
+        [Display(Name = "Case Contemplated")]
+        public string? whether_CaseContemplated { get; set; }
+        public string? detailsOfTheCase { get; set; }
+        public string? presentStatusOftheCase { get; set; }
+        //public DateTime ContemplatedAgainstStatusasondate { get; set; }
     }
 }

@@ -1,8 +1,11 @@
-﻿namespace VigilanceClearance.Models.OfficerDetailModel
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace VigilanceClearance.Models.OfficerDetailModel
 {
     public class OfficerIntegrityAgreedOrDoubtful
     {
-        public bool? IsAgreed { get; set; }
+        [Display(Name = "Entered In The List")]
+        public string? IsAgreed { get; set; }
         public DateTime YearFrom { get; set; }
         public DateTime YearTo { get; set; }
         public DateTime RemovedFromAgreedlistDate { get; set; }

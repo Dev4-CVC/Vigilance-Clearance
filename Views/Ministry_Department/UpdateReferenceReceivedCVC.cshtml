@@ -7,6 +7,21 @@
     Layout = "~/Views/Shared/_MinistryLayout.cshtml";
 }
 
+
+@* @if (TempData.Peek("successmsg") != null)
+{
+    <div class="alert alert-success">
+        @TempData.Peek("successmsg")
+    </div>
+} *@
+
+@if (TempData["successmsg"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["successmsg"]
+    </div>
+}
+
 <section style="width: 100%; height: 500px; overflow: auto; border: 1px solid #ccc;">
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-end" style="background-color: #007bff; color: white;">
@@ -74,7 +89,6 @@
 
                             <form asp-action="UpdateReferenceReceivedCVC" method="post">
                                 <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-
                                 <div class="card-body">
                                     <div class="table-responsive">
                                         <table class="table table-bordered" id="positionsTable">
@@ -84,21 +98,27 @@
                                                     <th>Organization</th>
                                                     <th>Ministry</th>
                                                     <th>Designation </th>
+                                                    <th>Place of Posting </th>
                                                     <th>TenureFrom</th>
                                                     <th>TenureTo</th>
-
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <!-- Dynamic rows will be added here -->
-                                                @*  <td>1</td>
-                                            <td>@Model.testmodel.postCode</td>
-                                            <td>@Model.testmodel.postDescription</td>
-                                            <td>@Model.testmodel.createdBy</td>
-                                            <td>@Model.testmodel.createdOn?.ToString("dd-MM-yyyy")</td>
-                                            <td>@Model.testmodel.updatedOn?.ToString("dd-MM-yyyy")</td> *@
-
-
+                                                @{
+                                                    int sno = 1;
+                                                    foreach (var item in Model.officerPostingDetailsList)
+                                                    {
+                                                        <tr>
+                                                            <td>@(sno++)</td>
+                                                            <td>@item.orgCode </td>
+                                                            <td>@item.orgMinistry</td>
+                                                            <td>@item.designation</td>
+                                                            <td>@item.placeOfPosting </td>
+                                                            <td>@(item.fromDate?.ToString("dd-MM-yyyy") ?? "")</td>
+                                                            <td>@(item.toDate?.ToString("dd-MM-yyyy") ?? "")</td>
+                                                        </tr>
+                                                    }
+                                                }
                                             </tbody>
                                         </table>
                                     </div>
@@ -126,22 +146,26 @@
                                 </div>
 
                                 <div class="modal-body">
+                                   
                                     <div class="form-group">
                                         @Html.LabelFor(m => m.officerPostingDetail7.Organization)
                                         @Html.DropDownListFor(model => model.officerPostingDetail7.Organization, Model.officerPostingDetail7.OrganizationList,
                                         "-- Select Organization --",  new { @class = "form-control", id = "ddlorg" })
                                     </div>
-
                                     <div class="form-group">
                                         @Html.LabelFor(m => m.officerPostingDetail7.Ministry)
                                         @Html.DropDownListFor(model => model.officerPostingDetail7.Ministry, Model.officerPostingDetail7.MinistryList,
                                                                                 "-- Select Ministry --",  new { @class = "form-control", id = "ddlMinistry", disabled = "disabled" })
-
+                                        @Html.HiddenFor(model => model.officerPostingDetail7.Ministry)
                                     </div>
 
                                     <div class="form-group">
                                         @Html.LabelFor(m => m.officerPostingDetail7.Designation)
                                         @Html.TextBoxFor(m => m.officerPostingDetail7.Designation, new { @class = "form-control" })
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.officerPostingDetail7.PlaceOfPosting)
+                                        @Html.TextBoxFor(m => m.officerPostingDetail7.PlaceOfPosting, new { @class = "form-control" })
                                     </div>
 
                                     <div class="form-group">
@@ -158,8 +182,6 @@
 
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                    @* <button type="button" id="addPositionBtn" class="btn btn-primary">Add</button> *@
-                                    @* <a asp-action="AddOfficerPostingDetails" asp-controller="Ministry_Department" class="btn btn-primary">Add</a> *@
                                     <button type="submit" class="btn btn-primary">Save</button>
                                 </div>
                             </form>
@@ -185,26 +207,32 @@
                             <div class="mt-1">
                                 <h5>AGREED LIST </h5>
                             </div>
-                            <div class="row d-flex" style="margin-left:26px;">
-                                <div class="col-md-1">
-                                    @Html.LabelFor(m => m.officerIntegrityAgreedOrDoubtful_8.IsAgreed)
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="d-flex align-items-center">
-                                        @Html.DropDownListFor(model => model.officerIntegrityAgreedOrDoubtful_8.IsAgreed,
-                                                                                new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "true" },
-                                                                                new SelectListItem { Text = "No", Value = "false" }
-                                                                                },"-- Select --", new { @class = "form-control agreed-dropdown", @id = "IsAgreedDropdown1" })
+
+                            <form asp-action="AddIntegrityAgreedOrDoubtful" asp-controller="Ministry_Department" method="post">
+
+                                <div class="row d-flex" style="margin-left:26px;">
+                                    <div class="col-md-2">
+                                        @*  @Html.LabelFor(m => m.officerIntegrityAgreedOrDoubtful_8.IsAgreed) *@
+                                        <label>Entered In The List</label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="d-flex align-items-center">
+                                            @Html.DropDownListFor(model => model.officerIntegrityAgreedOrDoubtful_8.IsAgreed,
+                                                                                        new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "Yes" },
+                                                                                        new SelectListItem { Text = "No", Value = "No" }
+                                                                                        },"-- Select --", new { @class = "form-control agreed-dropdown", @id = "IsAgreedDropdown1" })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 mt-0">
+                                        <div class="d-flex align-items-center">
+                                            @* <button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#AgreedlistModal" disabled="disabled" id="btnAddAgreedList1">
+                                                Add New
+                                            </button> *@
+                                            <button type="submit" class="btn btn-primary" id="btnAddAgreedList1" disabled>Add New</button>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-md-2 mt-0">
-                                    <div class="d-flex align-items-center">
-                                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#AgreedlistModal" disabled="disabled" id="btnAddAgreedList1">
-                                            Add New
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                            </form>
 
                             <form asp-action="UpdateReferenceReceivedCVC" method="post">
                                 <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
@@ -215,25 +243,33 @@
                                             <thead class="thead-light">
                                                 <tr>
                                                     <th style="width: 5%;">S.No.</th>
-                                                    <th>IsAgreed</th>
-                                                    <th>YearFrom </th>
-                                                    <th>YearTo</th>
-                                                    <th>Removed From Agreed List </th>
-                                                    <th>Removed From Agreed List Date</th>
+                                                    <th>Entered In The List</th>
+                                                    <th>Entry Date</th>
+                                                    <th>Removed From The List</th>
+                                                    <th>Removal Date </th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <!-- Dynamic rows will be added here -->
+                                                @{
+                                                    int sno = 1;
+                                                    foreach (var item in Model.insertIntegrityAgreedOrDoubtfulModellist)
+                                                    {
+                                                        <tr>
+                                                            <td>@(sno++)</td>
+                                                            <td>@item.enteredInTheList </td>
+                                                            <td>@(item.dateOfEntryInTheList.ToString("dd-MM-yyyy") ?? "")</td>
+                                                            <td>@item.removedFromTheList</td>
+                                                            <td>@item.dateOfRemovalFromTheList</td>
+                                                            <td>
+                                                                <a asp-action="#" asp-route-id="@item.id" class="btn btn-info btn-sm">Remove From List</a>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
                                             </tbody>
                                         </table>
                                     </div>
-
-
-                                    @*  // this btn add on the list *@
-                                    <button type="button" class="btn btn-primary mt-3 mb-3" data-toggle="modal" data-target="#AgreedlistRemovedModal">
-                                        Remove From Agreed List
-                                    </button>
                                 </div>
                             </form>
 
@@ -244,13 +280,13 @@
                             </div>
 
                             <div class="row d-flex" style="margin-left:26px;">
-                                <div class="col-md-1">
+                                <div class="col-md-2">
                                     @Html.LabelFor(m => m.officerIntegrityAgreedOrDoubtful_8.IsAgreed)
                                 </div>
                                 <div class="col-md-4">
                                     <div class="d-flex align-items-center">
                                         @Html.DropDownListFor(model => model.officerIntegrityAgreedOrDoubtful_8.IsAgreed,
-                                                                                new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "true" },
+                                        new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "true" },
                                                                                 new SelectListItem { Text = "No", Value = "false" }
                                                                                 },"-- Select --", new { @class = "form-control agreed-dropdown", @id = "IsAgreedDropdown2" })
                                     </div>
@@ -392,13 +428,14 @@
                             </div>
 
                             <div class="row d-flex mt-2" style="margin-left:26px;">
-                                <div class="col-sm-2">
-                                    @Html.LabelFor(m => m.officerAllegationOfMisconductExamined_9.AllegationMisconduct)
+                                <div class="col-sm-3">
+                                    @Html.LabelFor(m => m.officerAllegationOfMisconductExamined_9.vigilanceAngleExamined)
+                                    @*  <label>Vigilance Angle Examined</label> *@
                                 </div>
                                 <div class="col-sm-4">
-                                    @Html.DropDownListFor(model => model.officerAllegationOfMisconductExamined_9.AllegationMisconduct,
-                                                                        new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "true" },
-                                                                        new SelectListItem { Text = "No", Value = "false" }
+                                    @Html.DropDownListFor(model => model.officerAllegationOfMisconductExamined_9.vigilanceAngleExamined,
+                                                                        new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "Yes" },
+                                                                        new SelectListItem { Text = "No", Value = "No" }
                                                                         },"-- Select --", new { @class = "form-control agreed-dropdown", @id = "IsAgreedDropdown3" })
                                 </div>
                                 <div class="col-sm-2">
@@ -417,13 +454,30 @@
                                         <table class="table table-bordered" id="positionsTable">
                                             <thead class="thead-light">
                                                 <tr>
-                                                    <th style="width: 5%;">S.No</th>
+                                                    <th>S.No</th>
+                                                    <th>Vigilance Angle Examined</th>
                                                     <th>Case details</th>
-                                                    <th>Present status as on date </th>
+                                                    <th>Present Status </th>
+                                                    <th>Action Recommended </th>
+                                                    <th>Action Recommended Details </th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <!-- Dynamic rows will be added here -->
+                                                @{
+                                                    int sno = 1;
+                                                    foreach (var item in Model.AllegationOfMisconductExaminedModellist)
+                                                    {
+                                                        <tr>
+                                                            <td>@(sno++)</td>
+                                                            <td>@item.vigilanceAngleExamined</td>
+                                                            <td>@item.caseDetails</td>
+                                                            <td>@item.presentStatusOfTheCase</td>
+                                                            <td>@item.actionrecommendedOptions</td>
+                                                            <td>@item.actionRecommendedDetails</td>
+                                                            <td></td>
+                                                        </tr>
+                                                    }
+                                                }
                                             </tbody>
                                         </table>
                                     </div>
@@ -441,37 +495,45 @@
                 <div class="modal" id="allegationofmisconduct" tabindex="-1" role="dialog" aria-labelledby="allegationofmisconductModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-lg" role="document">
                         <div class="modal-content">
-                            <div class="modal-header bg-primary">
-                                <h5 class="modal-title">Add New Details</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span>&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                @* <div class="form-group">
-                                    @Html.LabelFor(m => m.AllegationMisconduct)
-                                    @Html.DropDownListFor(model => model.AllegationMisconduct,
-                                                                        new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "true" },
-                                                                        new SelectListItem { Text = "No", Value = "false" }
-                                                                        },"-- Select --", new { @class = "form-control" })
-                                </div> *@
-                                <div class="form-group">
-                                    @Html.LabelFor(m => m.officerAllegationOfMisconductExamined_9.Casedetails)
-                                    @Html.TextBoxFor(m => m.officerAllegationOfMisconductExamined_9.Casedetails, new { @class = "form-control" })
+                            <form asp-action="AddAllegationOfMisconductExamined" asp-controller="Ministry_Department" method="post">
 
+                                <div class="modal-header bg-primary">
+                                    <h5 class="modal-title">Add New Details</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span>&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+
+                                    @*  <div class="form-group">
+                                        @Html.LabelFor(m => m.officerAllegationOfMisconductExamined_9.vigilanceAngleExamined)
+                                        @Html.TextBoxFor(m => m.officerAllegationOfMisconductExamined_9.vigilanceAngleExamined, new { @class = "form-control" })
+                                    </div> *@
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.officerAllegationOfMisconductExamined_9.caseDetails)
+                                        @Html.TextBoxFor(m => m.officerAllegationOfMisconductExamined_9.caseDetails, new { @class = "form-control" })
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.officerAllegationOfMisconductExamined_9.presentStatusOfTheCase)
+                                        @Html.TextBoxFor(m => m.officerAllegationOfMisconductExamined_9.presentStatusOfTheCase, new { @class = "form-control" })
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.officerAllegationOfMisconductExamined_9.actionrecommendedOptions)
+                                        @Html.TextBoxFor(m => m.officerAllegationOfMisconductExamined_9.actionrecommendedOptions, new { @class = "form-control" })
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.officerAllegationOfMisconductExamined_9.actionRecommendedDetails)
+                                        @Html.TextBoxFor(m => m.officerAllegationOfMisconductExamined_9.actionRecommendedDetails, new { @class = "form-control" })
+                                    </div>
                                 </div>
 
-                                <div class="form-group">
-                                    @Html.LabelFor(m => m.officerAllegationOfMisconductExamined_9.Presentstatusasondate)
-                                    @Html.TextBoxFor(m => m.officerAllegationOfMisconductExamined_9.Presentstatusasondate, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy" })
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                    @* <button type="button" id="addPositionBtn" class="btn btn-primary">Add</button> *@
+                                    <button type="submit" class="btn btn-primary">Save</button>
                                 </div>
 
-                            </div>
-
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                <button type="button" id="addPositionBtn" class="btn btn-primary">Add</button>
-                            </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -492,11 +554,11 @@
 
                             <div class="row d-flex mt-2" style="margin-left:26px;">
                                 <div class="col-sm-2">
-                                    @Html.LabelFor(m => m.officerPunishmentAwarded_10.PunishmentAwarded)
+                                    @Html.LabelFor(m => m.officerPunishmentAwarded_10.punishmentAwarded)
                                 </div>
                                 <div class="col-sm-4">
-                                    @Html.DropDownListFor(model => model.officerPunishmentAwarded_10.PunishmentAwarded,
-                                                                        new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "true" },
+                                    @Html.DropDownListFor(model => model.officerPunishmentAwarded_10.punishmentAwarded,
+                                    new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "true" },
                                                                         new SelectListItem { Text = "No", Value = "false" }
                                                                         },"-- Select --", new { @class = "form-control agreed-dropdown", @id = "IsAgreedDropdown4" })
                                 </div>
@@ -517,15 +579,33 @@
                                             <thead class="thead-light">
                                                 <tr>
                                                     <th style="width: 5%;">S.No</th>
-                                                    <th>Penalty Details</th>
-                                                    <th>Currency Of Penalty</th>
-                                                    <th>TenureFrom</th>
-                                                    <th>TenureTo</th>
+                                                    <th>Punishment Awarded</th>
+                                                    <th>Punishment Details</th>
+                                                    <th>Punishment FromDate</th>
+                                                    <th>Punishment ToDate</th>
+                                                    <th>CheckName FromDate</th>
+                                                    <th>CheckName ToDate</th>
+                                                    <th>Additional Remarks_IfAny</th>
 
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <!-- Dynamic rows will be added here -->
+                                                @{
+                                                    int sno = 1;
+                                                    foreach (var item in Model.PunishmentAwardedModellist)
+                                                    {
+                                                        <tr>
+                                                            <td>@(sno++)</td>
+                                                            <td>@item.punishmentAwarded</td>
+                                                            <td>@item.punishmentDetails</td>
+                                                            <td>@item.punishmentFromDate.ToString("dd-MM-yyyy")</td>
+                                                            <td>@item.punishmentToDate.ToString("dd-MM-yyyy")</td>
+                                                            <td>@item.checkName_FromDate.ToString("dd-MM-yyyy")</td>
+                                                            <td>@item.checkName_ToDate.ToString("dd-MM-yyyy")</td>
+                                                            <td>@item.additionalRemarks_IfAny</td>
+                                                        </tr>
+                                                    }
+                                                }
                                             </tbody>
                                         </table>
                                     </div>
@@ -544,42 +624,51 @@
                 <div class="modal" id="punishmentawardedModal" tabindex="-1" role="dialog" aria-labelledby="punishmentawardedModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-lg" role="document">
                         <div class="modal-content">
-                            <div class="modal-header bg-primary">
-                                <h5 class="modal-title">Add New Details</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span>&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                @*  <div class="form-group">
-                                    @Html.LabelFor(m => m.PunishmentAwarded)
-                                    @Html.DropDownListFor(model => model.PunishmentAwarded,
-                                                                        new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "true" },
-                                                                        new SelectListItem { Text = "No", Value = "false" }
-                                                                        },"-- Select --", new { @class = "form-control" })
-                                </div> *@
-                                <div class="form-group">
-                                    @Html.LabelFor(m => m.officerPunishmentAwarded_10.Penaltydetails)
-                                    @Html.TextBoxFor(m => m.officerPunishmentAwarded_10.Penaltydetails, new { @class = "form-control" })
+                            <form asp-action="AddPunishmentAwarded" asp-controller="Ministry_Department" method="post">
+                                <div class="modal-header bg-primary">
+                                    <h5 class="modal-title">Add New Details</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span>&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.officerPunishmentAwarded_10.punishmentDetails)
+                                        @Html.TextBoxFor(m => m.officerPunishmentAwarded_10.punishmentDetails, new { @class = "form-control" })
+
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.officerPunishmentAwarded_10.punishmentFromDate)
+                                        @Html.TextBoxFor(m => m.officerPunishmentAwarded_10.punishmentFromDate, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy" })
+                                    </div>
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.officerPunishmentAwarded_10.punishmentToDate)
+                                        @Html.TextBoxFor(m => m.officerPunishmentAwarded_10.punishmentToDate, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy", })
+                                    </div>
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.officerPunishmentAwarded_10.checkName_FromDate)
+                                        @Html.TextBoxFor(m => m.officerPunishmentAwarded_10.checkName_FromDate, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy", })
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.officerPunishmentAwarded_10.checkName_ToDate)
+                                        @Html.TextBoxFor(m => m.officerPunishmentAwarded_10.checkName_ToDate, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy", })
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.officerPunishmentAwarded_10.additionalRemarks_IfAny)
+                                        @Html.TextBoxFor(m => m.officerPunishmentAwarded_10.additionalRemarks_IfAny, new { @class = "form-control" })
+                                    </div>
 
                                 </div>
-                                <div class="form-group">
-                                    @Html.LabelFor(m => m.officerPunishmentAwarded_10.CurrencyofpenaltyFrom)
-                                    @Html.TextBoxFor(m => m.officerPunishmentAwarded_10.CurrencyofpenaltyFrom, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy" })
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Save</button>
                                 </div>
 
-                                <div class="form-group">
-                                    @Html.LabelFor(m => m.officerPunishmentAwarded_10.CurrencyofpenaltyTo)
-                                    @Html.TextBoxFor(m => m.officerPunishmentAwarded_10.CurrencyofpenaltyTo, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy", })
-                                </div>
-
-
-                            </div>
-
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                <button type="button" id="addPositionBtn" class="btn btn-primary">Add</button>
-                            </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -603,7 +692,7 @@
                                 </div>
                                 <div class="col-sm-4">
                                     @Html.DropDownListFor(model => model.officerDisciplinaryCriminalProceedings_11.DisciplinaryProceeding,
-                                                                        new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "true" },
+                                    new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "true" },
                                                                         new SelectListItem { Text = "No", Value = "false" }
                                                                         },"-- Select --", new { @class = "form-control agreed-dropdown", @id = "IsAgreedDropdown5" })
 
@@ -632,7 +721,22 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <!-- Dynamic rows will be added here -->
+                                                @{
+                                                    int sno = 1;
+                                                    foreach (var item in Model.DisciplinaryCriminalProceedingsModellist)
+                                                    {
+                                                        <tr>
+                                                            <td>@(sno++)</td>
+                                                            <td>@item.whether_DisciplinaryCriminalProceedingsPending</td>
+                                                            <td>@item.whether_Suspended</td>
+                                                            <td>@(item.suspensionDate?.ToString("dd-MM-yyyy") ?? "")</td>
+                                                            <td>@item.whetherRevoked</td>
+                                                            <td>@(item.revocationDate?.ToString("dd-MM-yyyy") ?? "")</td>
+                                                            <td>@item.detailsOf_Case</td>
+                                                            <td>@item.presentStatusOftheCase</td>
+                                                        </tr>
+                                                    }
+                                                }
                                             </tbody>
                                         </table>
                                     </div>
@@ -651,45 +755,57 @@
                 <div class="modal" id="DisciplinaryProceedingModal" tabindex="-1" role="dialog" aria-labelledby="DisciplinaryProceedingModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-lg" role="document">
                         <div class="modal-content">
-                            <div class="modal-header bg-primary">
-                                <h5 class="modal-title">Add New Details</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span>&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                @* <div class="form-group">
-                                    @Html.LabelFor(m => m.DisciplinaryProceeding)
-                                    @Html.DropDownListFor(model => model.DisciplinaryProceeding,
-                                                                        new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "true" },
-                                                                        new SelectListItem { Text = "No", Value = "false" }
-                                                                        },"-- Select --", new { @class = "form-control" })
-                                </div> *@
+                            <form asp-action="AddDisciplinaryCriminalProceedings" asp-controller="Ministry_Department" method="post">
 
-                                <div class="form-group">
-                                    @Html.LabelFor(m => m.officerDisciplinaryCriminalProceedings_11.SuspensionDate)
-                                    @Html.TextBoxFor(m => m.officerDisciplinaryCriminalProceedings_11.SuspensionDate, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy" })
+                                <div class="modal-header bg-primary">
+                                    <h5 class="modal-title">Add New Details</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span>&times;</span>
+                                    </button>
                                 </div>
-                                <div class="form-group">
-                                    @Html.LabelFor(m => m.officerDisciplinaryCriminalProceedings_11.WhetherRevoked)
-                                    @Html.DropDownListFor(model => model.officerDisciplinaryCriminalProceedings_11.WhetherRevoked,
-                                                                        new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "true" },
-                                                                        new SelectListItem { Text = "No", Value = "false" }
-                                                                        },"-- Select --", new { @class = "form-control" })
+                                <div class="modal-body">
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.officerDisciplinaryCriminalProceedings_11.whether_Suspended)
+                                        @Html.DropDownListFor(model => model.officerDisciplinaryCriminalProceedings_11.whether_Suspended,
+                                        new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "Yes" },
+                                                                                new SelectListItem { Text = "No", Value = "No" }
+                                                                                },"-- Select --", new { @class = "form-control" })
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.officerDisciplinaryCriminalProceedings_11.suspensionDate)
+                                        @Html.TextBoxFor(m => m.officerDisciplinaryCriminalProceedings_11.suspensionDate, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy" })
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.officerDisciplinaryCriminalProceedings_11.whetherRevoked)
+                                        @Html.DropDownListFor(model => model.officerDisciplinaryCriminalProceedings_11.whetherRevoked,
+                                                                                new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "Yes" },
+                                                                                new SelectListItem { Text = "No", Value = "No" }
+                                                                                },"-- Select --", new { @class = "form-control" })
+                                    </div>
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.officerDisciplinaryCriminalProceedings_11.revocationDate)
+                                        @Html.TextBoxFor(m => m.officerDisciplinaryCriminalProceedings_11.revocationDate, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy", })
+                                    </div>
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.officerDisciplinaryCriminalProceedings_11.detailsOf_Case)
+                                        @Html.TextBoxFor(m => m.officerDisciplinaryCriminalProceedings_11.detailsOf_Case, new { @class = "form-control" })
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.officerDisciplinaryCriminalProceedings_11.presentStatusOftheCase)
+                                        @Html.TextBoxFor(m => m.officerDisciplinaryCriminalProceedings_11.presentStatusOftheCase, new { @class = "form-control" })
+                                    </div>
+
                                 </div>
 
-                                <div class="form-group">
-                                    @Html.LabelFor(m => m.officerDisciplinaryCriminalProceedings_11.DateofRevocation)
-                                    @Html.TextBoxFor(m => m.officerDisciplinaryCriminalProceedings_11.DateofRevocation, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy", })
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                    @* <button type="button" id="addPositionBtn" class="btn btn-primary">Add</button> *@
+                                    <button type="submit" class="btn btn-primary">Save</button>
                                 </div>
-
-
-                            </div>
-
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                <button type="button" id="addPositionBtn" class="btn btn-primary">Add</button>
-                            </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -708,10 +824,10 @@
 
                             <div class="row d-flex mt-2" style="margin-left:26px;">
                                 <div class="col-sm-2">
-                                    @Html.LabelFor(m => m.officerActionContemplatedAgainstTheOfficerAsOnDate_12.ContemplatedAgainst)
+                                    @Html.LabelFor(m => m.officerActionContemplatedAgainstTheOfficerAsOnDate_12.whether_CaseContemplated)
                                 </div>
                                 <div class="col-sm-4">
-                                    @Html.DropDownListFor(model => model.officerActionContemplatedAgainstTheOfficerAsOnDate_12.ContemplatedAgainst,
+                                    @Html.DropDownListFor(model => model.officerActionContemplatedAgainstTheOfficerAsOnDate_12.whether_CaseContemplated,
                                                                         new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "true" },
                                                                         new SelectListItem { Text = "No", Value = "false" }
                                                                         },"-- Select --", new { @class = "form-control agreed-dropdown", @id = "IsAgreedDropdown6" })
@@ -734,14 +850,25 @@
                                             <thead class="thead-light">
                                                 <tr>
                                                     <th style="width: 5%;">S.No</th>
-                                                    <th>ContemplatedAgainst </th>
+                                                    <th>whether_CaseContemplated </th>
                                                     <th>Case Detail</th>
-                                                    <th>Status</th>
-                                                    <th>As on date</th>
+                                                    <th>Case Status</th>
+                                                    @* <th>As on date</th> *@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <!-- Dynamic rows will be added here -->
+                                                @{
+                                                    int sno = 1;
+                                                    foreach (var item in Model.ActionContemplatedAgainstTheOfficerModellist)
+                                                    {
+                                                        <tr>
+                                                            <td>@(sno++)</td>
+                                                            <td>@item.whether_CaseContemplated</td>
+                                                            <td>@item.detailsOfTheCase</td>
+                                                            <td>@item.presentStatusOftheCase</td>
+                                                        </tr>
+                                                    }
+                                                }
                                             </tbody>
                                         </table>
                                     </div>
@@ -760,41 +887,38 @@
                 <div class="modal" id="ContemplatedAgainstModal" tabindex="-1" role="dialog" aria-labelledby="ContemplatedAgainstModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-lg" role="document">
                         <div class="modal-content">
-                            <div class="modal-header bg-primary">
-                                <h5 class="modal-title">Add New Details</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span>&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                @* <div class="form-group">
-                                    @Html.LabelFor(m => m.ContemplatedAgainst)
-                                    @Html.DropDownListFor(model => model.ContemplatedAgainst,
-                                                                        new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "true" },
-                                                                        new SelectListItem { Text = "No", Value = "false" }
-                                                                        },"-- Select --", new { @class = "form-control" })
-                                </div> *@
+                            <form asp-action="AddActionContemplatedAgainstTheOfficer" asp-controller="Ministry_Department" method="post">
 
-                                <div class="form-group">
-                                    @Html.LabelFor(m => m.officerActionContemplatedAgainstTheOfficerAsOnDate_12.ContemplatedAgainstCaseDetail)
-                                    @Html.TextBoxFor(m => m.officerActionContemplatedAgainstTheOfficerAsOnDate_12.ContemplatedAgainstCaseDetail, new { @class = "form-control" })
 
+                                <div class="modal-header bg-primary">
+                                    <h5 class="modal-title">Add New Details</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span>&times;</span>
+                                    </button>
                                 </div>
-                                <div class="form-group">
-                                    @Html.LabelFor(m => m.officerActionContemplatedAgainstTheOfficerAsOnDate_12.ContemplatedAgainstCasestatus)
-                                    @Html.TextBoxFor(m => m.officerActionContemplatedAgainstTheOfficerAsOnDate_12.ContemplatedAgainstCasestatus, new { @class = "form-control" })
+                                <div class="modal-body">
 
-                                </div>
-                                <div class="form-group">
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.officerActionContemplatedAgainstTheOfficerAsOnDate_12.detailsOfTheCase)
+                                        @Html.TextBoxFor(m => m.officerActionContemplatedAgainstTheOfficerAsOnDate_12.detailsOfTheCase, new { @class = "form-control" })
+
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.officerActionContemplatedAgainstTheOfficerAsOnDate_12.presentStatusOftheCase)
+                                        @Html.TextBoxFor(m => m.officerActionContemplatedAgainstTheOfficerAsOnDate_12.presentStatusOftheCase, new { @class = "form-control" })
+
+                                    </div>
+                                    @*  <div class="form-group">
                                     @Html.LabelFor(m => m.officerActionContemplatedAgainstTheOfficerAsOnDate_12.ContemplatedAgainstStatusasondate)
                                     @Html.TextBoxFor(m => m.officerActionContemplatedAgainstTheOfficerAsOnDate_12.ContemplatedAgainstStatusasondate, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy" })
+                                </div> *@
                                 </div>
-                            </div>
 
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                <button type="button" id="addPositionBtn" class="btn btn-primary">Add</button>
-                            </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Save</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -814,11 +938,11 @@
 
                             <div class="row d-flex mt-2" style="margin-left:26px;">
                                 <div class="col-sm-3">
-                                    @Html.LabelFor(m => m.officerComplaintWithVigilanceAnglePending_13.ComplaintwithVigilanceAngle)
+                                    @Html.LabelFor(m => m.officerComplaintWithVigilanceAnglePending_13.whether_vigilanceAngelPending)
                                 </div>
                                 <div class="col-sm-4">
-                                    @Html.DropDownListFor(model => model.officerComplaintWithVigilanceAnglePending_13.ComplaintwithVigilanceAngle,
-                                                                        new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "true" },
+                                    @Html.DropDownListFor(model => model.officerComplaintWithVigilanceAnglePending_13.whether_vigilanceAngelPending,
+                                    new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "true" },
                                                                         new SelectListItem { Text = "No", Value = "false" }
                                                                         },"-- Select --", new { @class = "form-control agreed-dropdown", @id = "IsAgreedDropdown7" })
                                 </div>
@@ -838,14 +962,26 @@
                                             <thead class="thead-light">
                                                 <tr>
                                                     <th style="width: 5%;">S.No</th>
-                                                    <th>ComplaintwithVigilanceAngle </th>
+                                                    <th>Vigilance Angel Pending </th>
                                                     <th>Case Detail</th>
                                                     <th>Status</th>
-                                                    <th>As on date</th>
+                                                    <th>Addtional Remarks</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <!-- Dynamic rows will be added here -->
+                                                @{
+                                                    int sno = 1;
+                                                    foreach (var item in Model.ComplaintWithVigilanceAnglePendingModellist)
+                                                    {
+                                                        <tr>
+                                                            <td>@(sno++)</td>
+                                                            <td>@item.whether_vigilanceAngelPending</td>
+                                                            <td>@item.detailsOfTheCase</td>
+                                                            <td>@item.presentStatusOftheCase</td>
+                                                            <td>@item.addtionalRemarks</td>
+                                                        </tr>
+                                                    }
+                                                }
                                             </tbody>
                                         </table>
                                     </div>
@@ -864,41 +1000,35 @@
                 <div class="modal" id="ComplaintwithVigilanceAngleModal" tabindex="-1" role="dialog" aria-labelledby="ComplaintwithVigilanceAngleModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-lg" role="document">
                         <div class="modal-content">
-                            <div class="modal-header bg-primary">
-                                <h5 class="modal-title">Add New Details</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span>&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                @*   <div class="form-group">
-                                    @Html.LabelFor(m => m.ComplaintwithVigilanceAngle)
-                                    @Html.DropDownListFor(model => model.ComplaintwithVigilanceAngle,
-                                                                        new List<SelectListItem> { new SelectListItem { Text = "Yes", Value = "true" },
-                                                                        new SelectListItem { Text = "No", Value = "false" }
-                                                                        },"-- Select --", new { @class = "form-control" })
-                                </div> *@
-
-                                <div class="form-group">
-                                    @Html.LabelFor(m => m.officerComplaintWithVigilanceAnglePending_13.ComplaintwithVigilanceAngleCaseDetail)
-                                    @Html.TextBoxFor(m => m.officerComplaintWithVigilanceAnglePending_13.ComplaintwithVigilanceAngleCaseDetail, new { @class = "form-control" })
-
+                            <form asp-action="AddComplaintWithVigilanceAnglePending" asp-controller="Ministry_Department" method="post">
+                                <div class="modal-header bg-primary">
+                                    <h5 class="modal-title">Add New Details</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span>&times;</span>
+                                    </button>
                                 </div>
-                                <div class="form-group">
-                                    @Html.LabelFor(m => m.officerComplaintWithVigilanceAnglePending_13.ComplaintwithVigilanceAnglePresentstatus)
-                                    @Html.TextBoxFor(m => m.officerComplaintWithVigilanceAnglePending_13.ComplaintwithVigilanceAnglePresentstatus, new { @class = "form-control" })
+                                <div class="modal-body">
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.officerComplaintWithVigilanceAnglePending_13.detailsOfTheCase)
+                                        @Html.TextBoxFor(m => m.officerComplaintWithVigilanceAnglePending_13.detailsOfTheCase, new { @class = "form-control" })
 
-                                </div>
-                                <div class="form-group">
-                                    @Html.LabelFor(m => m.officerComplaintWithVigilanceAnglePending_13.ComplaintwithVigilanceAnglePresentstatusasondate)
-                                    @Html.TextBoxFor(m => m.officerComplaintWithVigilanceAnglePending_13.ComplaintwithVigilanceAnglePresentstatusasondate, new { @class = "form-control", type = "date", placeholder = "dd-MM-yyyy" })
-                                </div>
-                            </div>
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.officerComplaintWithVigilanceAnglePending_13.presentStatusOftheCase)
+                                        @Html.TextBoxFor(m => m.officerComplaintWithVigilanceAnglePending_13.presentStatusOftheCase, new { @class = "form-control" })
 
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                <button type="button" id="addPositionBtn" class="btn btn-primary">Add</button>
-                            </div>
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.officerComplaintWithVigilanceAnglePending_13.addtionalRemarks)
+                                        @Html.TextBoxFor(m => m.officerComplaintWithVigilanceAnglePending_13.addtionalRemarks, new { @class = "form-control" })
+                                    </div>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Save</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -927,7 +1057,7 @@
             var number = dropdownId.replace('IsAgreedDropdown', ''); // Get the suffix number
             var button = document.getElementById('btnAddAgreedList' + number);
 
-            if (this.value === 'true') {
+            if (this.value === 'true' || this.value==='Yes') {
                 button.disabled = false;
             } else {
                 button.disabled = true;
@@ -1000,6 +1130,7 @@
     $(document).ready(function () {
         $('#ddlorg').change(function () {
             var selectedOrg = $(this).val();
+            // var MinistrySelect = $('#ddlMinistry');
             var MinistrySelect = $('#ddlMinistry');
             // Clear subpost dropdown
             MinistrySelect.empty();
@@ -1019,17 +1150,22 @@
                     // Default option
                     if(data===null || !data ){
                            MinistrySelect.append($('<option>').val('').text('-- No Ministry Available --'));
+                           $('input[name="officerPostingDetail7.Ministry"]').val('');
                            return;
                     }
-
 
                     $.each(data, function (i, item) {
                         //alert(item.value);
                         MinistrySelect.append($('<option>').val(item.value).text(item.text));
                     });
 
+                     var firstValue = MinistrySelect.find('option:eq(0)').val();
+                          MinistrySelect.val(firstValue);
+                     $('input[name="officerPostingDetail7.Ministry"]').val(firstValue);
+
                     MinistrySelect.prop('disabled', true);
                     // toggleOtherField();
+
                 },
                 error: function (xhr) {
                     alert("Error loading Ministry: " + xhr.statusText);

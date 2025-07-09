@@ -8,7 +8,7 @@ using VigilanceClearance.Interface.PESB;
 using VigilanceClearance.Models;
 using VigilanceClearance.Models.Modal_Properties.PESB;
 
-namespace VigilanceClearance.Data.PESB_Service
+namespace VigilanceClearance.DataAccessLayer.PESB_Service
 {
     public class PESB_Services : IPESB
     {
