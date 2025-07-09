@@ -610,55 +610,6 @@ namespace VigilanceClearance.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Officer_Reports([FromBody] PESBViewModel objmodel)
-        {
-            try
-            {
-                var _service = objmodel.officer_details.officer_Service;
-                var Otherservice = string.Empty;
-                var _Cadre = string.Empty;
-
-                if (_service == "OTHERS")
-                    Otherservice = objmodel.officer_details.officer_other_Service;
-                else
-                    objmodel.officer_details.officer_other_Service = null;
-
-                if (_service == "IPS" || _service == "IAS" || _service == "IFoS")
-                    _Cadre = objmodel.officer_details.officer_Cadre;
-                else
-                    objmodel.officer_details.officer_Cadre = null;
-
-                // Assign values from model
-                objmodel.officer_details.masterReferenceID = 1;
-
-                objmodel.officer_details.officer_DateOfBirth = (DateTime)objmodel.officer_details.officer_DateOfBirth;
-                objmodel.officer_details.officer_RetirementDate = (DateTime)objmodel.officer_details.officer_RetirementDate;
-                objmodel.officer_details.officer_ServiceEntryDate = (DateTime)objmodel.officer_details.officer_ServiceEntryDate;
-
-                objmodel.officer_details.officer_Service = _service;
-                objmodel.officer_details.officer_other_Service = Otherservice;
-                objmodel.officer_details.officer_Cadre = _Cadre;
-                objmodel.officer_details.officer_Batch_Year = objmodel.officer_details.officer_Batch_Year;
-
-                objmodel.officer_details.createdBy = HttpContext.Session.GetString("Username");
-                objmodel.officer_details.createdBy_SessionId = HttpContext.Session.Id;
-                objmodel.officer_details.createdBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
-
-                int num = await _pesb.Insert_Officer_Details_Async(objmodel.officer_details);
-                if (num == 0)
-                {
-                    return Json(new { success = false, message = "Record not saved." });
-                }
-
-                return Json(new { success = true });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = "Unexpected error occurred." });
-            }
-        }
-
-        [HttpPost]
         public async Task<IActionResult> officer_posting_details([FromBody] PESBViewModel objmodel)
         {
             string id = "0";

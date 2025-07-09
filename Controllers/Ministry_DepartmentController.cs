@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
+using System.CodeDom;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -11,6 +13,7 @@ using VigilanceClearance.Interface.Ministry;
 using VigilanceClearance.Interface.PESB;
 using VigilanceClearance.Models;
 using VigilanceClearance.Models.DTOs;
+using VigilanceClearance.Models.Modal_Properties;
 using VigilanceClearance.Models.OfficerDetailModel;
 using VigilanceClearance.Models.ViewModel;
 using VigilanceClearance.Models.ViewModel.Ministry;
@@ -46,45 +49,17 @@ namespace VigilanceClearance.Controllers
         [HttpGet]
         public async Task<IActionResult> ViewReferenceReceivedCVC()
         {
-            string username = "minpower";
-            var accessToken = HttpContext.Session.GetString("AccessToken");
-
-            if (string.IsNullOrEmpty(accessToken))
-                return Unauthorized("Access token is missing.");
-
             try
             {
+                string _UserName = "minpower";
 
-               
-                var client = _clientFactory.CreateClient();
-                //var countries = await client.GetFromJsonAsync<List<CountryModel>>("https://restcountries.com/v3.1/all?fields=name,cca2");
-                // iski jagah dusri API Call Karni As per requrement
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                List<ReferenceReceivedFromCVCModel> apiResponse = await _ministry.GetReferenceReceivedFromCVClist(_UserName);
 
-                var response = await _httpClient.GetAsync($"{BaseUrl}VcReferenceReceivedFor/VcReferenceReceivedForGetById?UserName={Uri.EscapeDataString(username)}");
-
-                if (!response.IsSuccessStatusCode)
-                    return StatusCode((int)response.StatusCode, "Failed to fetch data from external API.");
-
-                var jsonResult = await response.Content.ReadAsStringAsync();
-
-                //var apiResponse = JsonConvert.DeserializeObject<ReferenceReceivedFromCVCAPIResponseModel>(jsonResult);
-
-                //if (apiResponse != null && apiResponse.data != null)
-                //{
-                //    return View(apiResponse.data); // Pass the list directly to the View
-                //}
-
-                var apiResponse = JsonConvert.DeserializeObject<ReferenceReceivedFromCVCAPIResponseModel>(jsonResult);
-
-                if (apiResponse != null && apiResponse.data != null)
+                if (apiResponse != null)
                 {
-                    var modelList = new List<ReferenceReceivedFromCVCModel> { apiResponse.data };
-                    return View(modelList); // pass as a list to View
+                    return View(apiResponse);
                 }
-
-                return View(new List<ReferenceReceivedFromCVCModel>()); // empty list fallback
-
+                return View(new List<ReferenceReceivedFromCVCModel>());
             }
             catch (Exception ex)
             {
@@ -95,100 +70,86 @@ namespace VigilanceClearance.Controllers
         [HttpGet]
         public async Task<IActionResult> ViewOfficerListForGivenProposal(string id)
         {
-            var accessToken = HttpContext.Session.GetString("AccessToken");
-
-            if (string.IsNullOrEmpty(accessToken))
-                return Unauthorized("Access token is missing.");
-
             try
             {
+                List<OfficerListModel> ApiResponse = await _ministry.GetOfficerListAsync(id);
 
-                // iski jagah dusri API Call Karni As per requrement
-                var client = _clientFactory.CreateClient();
-                //var countries = await client.GetFromJsonAsync<List<CountryModel>>("https://restcountries.com/v3.1/all?fields=name,cca2");
-                return View();
-                // iski jagah dusri API Call Karni As per requrement
-            }
-            catch (HttpRequestException ex)
-            {
-                ModelState.AddModelError(string.Empty, "Failed to load country list.");
-                //return View( { CountryList = new List<SelectListItem>() });
-                
-
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-
-                var response = await _httpClient.GetAsync($"{BaseUrl}OfficerDetails/OfficerDetailsGetByMasterReferenceID?id={Uri.EscapeDataString(id)}");
-
-
-                if (!response.IsSuccessStatusCode)
-                    return StatusCode((int)response.StatusCode, "Failed to fetch data from external API.");
-
-                var jsonResult = await response.Content.ReadAsStringAsync();
-                
-                var apiResponse = JsonConvert.DeserializeObject<OfficerListAPIModel>(jsonResult);
-
-                if (apiResponse != null && apiResponse.data != null)
+                if (ApiResponse != null)
                 {
-                    List<OfficerListModel> obj = apiResponse.data;
-                    HttpContext.Session.SetString("apiResponse", JsonConvert.SerializeObject(obj));
-
-                    return View(apiResponse.data); //  Send list directly to view
-
-                   
+                    return View(ApiResponse); //  Send list directly to view
                 }
 
                 return View(new List<OfficerListModel>());
-
-                //return View(new List<OfficerListModel>()); // empty list fallback
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-      
 
-        [HttpPost]
-        public async Task<IActionResult> UpdateReferenceReceivedCVC([FromBody] OfficerListModel data)
+
+        [HttpGet]
+        public async Task<IActionResult> UpdateReferenceReceivedCVC(string id)
         {
             try
             {
-                //List<OfficerListModel> result = new List<OfficerListModel>();
+                HttpContext.Session.SetString("vcofficerId", id);
 
-                //var json = HttpContext.Session.GetString("apiResponse");
-                //if (json != null)
-                //{
-                //    result = JsonConvert.DeserializeObject<List<OfficerListModel>>(json);
-                //}
+                List<OfficerListModel> Response = await _ministry.GetOfficerListAsync(id);
 
-                //var newdata = result.Find(x => x.Id == int.Parse(id));
-               
-                
+                OfficerListModel firstOfficer = Response.FirstOrDefault();
+                //7
+                List<OfficerPostingDetailsViewModellist> Postinglist = await _ministry.GetOfficerPostingList(id);
+                //8
+                List<InsertIntegrityAgreedOrDoubtfulModel> IntegrityAgreedlist = await _ministry.GetInsertIntegrityAgreedOrDoubtfulList(id);
+
+
+                //9           
+                List<AllegationOfMisconductExaminedModel> AllegationOfMisconductlist = await _ministry.GetAllegationOfMisconductExaminedList(id);
+
+                //10
+                List<PunishmentAwardedModel> PunishmentAwardedlist = await _ministry.GetPunishmentAwardedList(id);
+
+                //11 
+                List<DisciplinaryCriminalProceedingsModel> DisciplinaryCriminalProceedingsModellist = await _ministry.GetDisciplinaryCriminalProceedingsModelList(id);
+
+                //12
+                List<ActionContemplatedAgainstTheOfficerModel> ActionContemplatedAgainstTheOfficerlist = await _ministry.GetActionContemplatedAgainstTheOfficerlList(id);
+
+                //13
+                List<ComplaintWithVigilanceAnglePendingModel> ComplaintWithVigilanceAnglePendingModellist = await _ministry.GetComplaintWithVigilanceAnglePendingList(id);
+
+
+
                 string orgcode = string.Empty;
-               
-                //var data = await ViewOfficerListForGivenProposal(id);
 
                 var model = new OfficerDetailMainModel
                 {
                     officerPostingDetail7 = new OfficerPostingDetails
                     {
-                        /* OrganizationList = await GetOrganizationDropDownAsync("0")*/
                         OrganizationList = await _ministry.GetOrganizationDropDownAsync("0"),
                         Organization = null // or default
                     },
 
-                    //officerPersonalDetailModel = new OfficerPersonalDetailModel
-                    //{
-                    //    Officer_Name = newdata.Officer_Name,
-                    //    Officer_FatherName = newdata.Officer_FatherName,
-                    //    Officer_DateOfBirth = newdata.Officer_DateOfBirth.ToString("dd-MM-yyyy"),
-                    //    Officer_RetirementDate = newdata.Officer_RetirementDate.ToString("dd-MM-yyyy"),
-                    //    Officer_ServiceEntryDate= newdata.Officer_ServiceEntryDate.ToString("dd-MM-yyyy"),
-                    //    Officer_Service = newdata.Officer_Service,
-                    //    Officer_Batch_Year = newdata.Officer_Batch_Year.ToString(),
-                    //    Cadre = newdata.Officer_Cadre
+                    officerPersonalDetailModel = new OfficerPersonalDetailModel
+                    {
+                        Officer_Name = firstOfficer.Officer_Name,
+                        Officer_FatherName = firstOfficer.Officer_FatherName,
+                        Officer_DateOfBirth = firstOfficer.Officer_DateOfBirth.ToString("dd-MM-yyyy"),
+                        Officer_RetirementDate = firstOfficer.Officer_RetirementDate.ToString("dd-MM-yyyy"),
+                        Officer_ServiceEntryDate = firstOfficer.Officer_ServiceEntryDate.ToString("dd-MM-yyyy"),
+                        Officer_Service = firstOfficer.Officer_Service,
+                        Officer_Batch_Year = firstOfficer.Officer_Batch_Year.ToString(),
+                        Cadre = firstOfficer.Officer_Cadre
+                    },
 
-                    //}
+                    officerPostingDetailsList = Postinglist,
+                    insertIntegrityAgreedOrDoubtfulModellist = IntegrityAgreedlist,
+                    AllegationOfMisconductExaminedModellist = AllegationOfMisconductlist,
+                    PunishmentAwardedModellist = PunishmentAwardedlist,
+                    DisciplinaryCriminalProceedingsModellist = DisciplinaryCriminalProceedingsModellist,
+                    ActionContemplatedAgainstTheOfficerModellist = ActionContemplatedAgainstTheOfficerlist,
+                    ComplaintWithVigilanceAnglePendingModellist = ComplaintWithVigilanceAnglePendingModellist,
                 };
 
                 return View(model);
@@ -200,38 +161,6 @@ namespace VigilanceClearance.Controllers
                 return View();
             }
         }
-
-        //private async Task<List<SelectListItem>> GetOrganizationDropDownAsync(string section)
-        //{
-        //    var accessToken = HttpContext.Session.GetString("AccessToken");
-        //    if (string.IsNullOrEmpty(accessToken)) return new List<SelectListItem>();
-
-        //    try
-        //    {
-        //        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-
-        //        var response = await _httpClient.GetAsync($"{BaseUrl}DropDown/MinistryNewGetBySection?section={Uri.EscapeDataString(section)}");
-
-        //        if (!response.IsSuccessStatusCode)
-        //        {
-        //            return new List<SelectListItem>();
-        //        }
-
-        //        var json = await response.Content.ReadAsStringAsync();
-        //        var items = JsonConvert.DeserializeObject<List<DropDownResponseModel>>(json) ?? new();
-
-        //        return items.Select(item => new SelectListItem
-        //        {
-        //            Value = item.Value,
-        //            Text = item.Text
-        //        }).ToList();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return new List<SelectListItem>();
-        //    }
-        //}
-
 
 
         [HttpGet]
@@ -249,48 +178,12 @@ namespace VigilanceClearance.Controllers
             }
         }
 
-        //private async Task<List<SelectListItem>> GetMinistryDropDownbycodeAsync(string orgcode)
-        //{
-        //    var accessToken = HttpContext.Session.GetString("AccessToken");
-        //    if (string.IsNullOrEmpty(accessToken)) return new List<SelectListItem>();
-
-        //    try
-        //    {
-        //        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-
-        //        var response = await _httpClient.GetAsync($"{BaseUrl}DropDown/GetMinistryByOrgCode?orgcode={Uri.EscapeDataString(orgcode)}");
-
-        //        if (!response.IsSuccessStatusCode)
-        //        {
-        //            return new List<SelectListItem>();
-        //        }
-
-        //        var json = await response.Content.ReadAsStringAsync();
-        //        var items = JsonConvert.DeserializeObject<List<DropDownResponseModel>>(json) ?? new();
-
-        //        return items.Select(item => new SelectListItem
-        //        {
-        //            Value = item.Value,
-        //            Text = item.Text
-        //        }).ToList();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return new List<SelectListItem>();
-        //    }
-        //}
-
-
-
-
-        // Insert  API
-
 
         [HttpPost]
         public async Task<IActionResult> AddOfficerPostingDetails(OfficerDetailMainModel model)
         {
             InsertOfficerDetailsModel insertOfficerDetailsModel = new InsertOfficerDetailsModel();
-
+            string Id = HttpContext.Session.GetString("vcofficerId");
             try
             {
                 ModelState.Clear();  // Wipe the tree
@@ -301,18 +194,21 @@ namespace VigilanceClearance.Controllers
                     insertOfficerDetailsModel.OrgMinistry = model.officerPostingDetail7.Ministry;
                     insertOfficerDetailsModel.Designation = model.officerPostingDetail7.Designation;
                     insertOfficerDetailsModel.PlaceOfPosting = model.officerPostingDetail7.PlaceOfPosting;
-                    insertOfficerDetailsModel.VcOfficerId = 212;
-                    string fromDate = DateTime.Parse(model.officerPostingDetail7.TenureFrom.ToString()).ToString("dd/MM/yyyy");
-                    string toDate = DateTime.Parse(model.officerPostingDetail7.TenureTo.ToString()).ToString("dd/MM/yyyy");
+                    insertOfficerDetailsModel.VcOfficerId = int.Parse(Id);
+                    string fromDate = DateTime.Parse(model.officerPostingDetail7.TenureFrom.ToString()).ToString("yyyy-MM-dd");
+                    string toDate = DateTime.Parse(model.officerPostingDetail7.TenureTo.ToString()).ToString("yyyy-MM-dd");
 
-                    insertOfficerDetailsModel.FromDate = fromDate;
-                    insertOfficerDetailsModel.ToDate = toDate;
-                    insertOfficerDetailsModel.CreatedBy = HttpContext.Session.GetString("Username");
+                    insertOfficerDetailsModel.FromDate = DateTime.Parse(fromDate);
+                    insertOfficerDetailsModel.ToDate = DateTime.Parse(toDate);
 
-                    insertOfficerDetailsModel.CreatedBySessionId = HttpContext.Session.Id;
-                    insertOfficerDetailsModel.CreatedByIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
-                    
-                    int num = await _ministry.InsertOfficerPostingDetail(insertOfficerDetailsModel);                  
+                    //insertOfficerDetailsModel.FromDate = model.officerPostingDetail7.TenureFrom;
+                    //insertOfficerDetailsModel.ToDate = model.officerPostingDetail7.TenureTo;
+
+                    insertOfficerDetailsModel.actionBy = HttpContext.Session.GetString("Username");
+                    insertOfficerDetailsModel.actionBy_SessionId = HttpContext.Session.Id;
+                    insertOfficerDetailsModel.actionBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+
+                    int num = await _ministry.InsertOfficerPostingDetail(insertOfficerDetailsModel);
 
                     if (num > 0)
                     {
@@ -324,25 +220,374 @@ namespace VigilanceClearance.Controllers
                         TempData["successmsg"] = "Data Not Submitted";
                     }
 
-               
-                    return RedirectToAction("UpdateReferenceReceivedCVC"); // Send the update page
+                    return RedirectToAction("UpdateReferenceReceivedCVC", new { id = Id }); // Send the update page
                 }
-
                 else
                 {
                     TempData["successmsg"] = "Error: Something Went Wrong in model state";
                     TempData.Keep("successmsg");
-                    return RedirectToAction("UpdateReferenceReceivedCVC");
+                    return RedirectToAction("UpdateReferenceReceivedCVC", new { id = Id });
                 }
-                   
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, "Failed to load country list.");
                 return View();
             }
-
         }
+
+
+        #region Added as on date 03-07-2025
+
+
+        [HttpPost]
+        public async Task<IActionResult> AddIntegrityAgreedOrDoubtful(OfficerDetailMainModel model)
+        {
+            string Id = HttpContext.Session.GetString("vcofficerId");
+
+            InsertIntegrityAgreedOrDoubtfulModel _insertIntegritymodel = new InsertIntegrityAgreedOrDoubtfulModel();
+
+            try
+            {
+                ModelState.Remove("officerIntegrityAgreedOrDoubtful_8.YearFrom");
+                ModelState.Remove("officerIntegrityAgreedOrDoubtful_8.YearTo");
+                ModelState.Remove("officerIntegrityAgreedOrDoubtful_8.RemovedFromAgreedlistDate");
+
+                ModelState.Clear();  // Wipe the tree
+                if (TryValidateModel(model.officerIntegrityAgreedOrDoubtful_8, nameof(model.officerIntegrityAgreedOrDoubtful_8)))
+                {
+
+                    _insertIntegritymodel.officerId = int.Parse(Id);
+                    _insertIntegritymodel.enteredInTheList = model.officerIntegrityAgreedOrDoubtful_8.IsAgreed.ToString();
+                    _insertIntegritymodel.dateOfEntryInTheList = DateTime.Now;
+                    _insertIntegritymodel.removedFromTheList = string.Empty;
+                    _insertIntegritymodel.dateOfRemovalFromTheList = string.Empty;
+                    _insertIntegritymodel.actionBy = HttpContext.Session.GetString("Username");
+                    _insertIntegritymodel.actionOn = DateTime.Now;
+                    _insertIntegritymodel.actionBy_SessionId = HttpContext.Session.Id;
+                    _insertIntegritymodel.actionBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+
+                    int num = await _ministry.InsertIntegrityAgreedOrDoubtful(_insertIntegritymodel);
+
+                    if (num > 0)
+                    {
+                        TempData["successmsg"] = "Data Submitted Successfuly";
+                        TempData.Keep("successmsg");
+                    }
+                    else
+                    {
+                        TempData["successmsg"] = "Data Not Submitted";
+                    }
+
+                    // return RedirectToAction("UpdateReferenceReceivedCVC", Id); // Send the update page
+                    return RedirectToAction("UpdateReferenceReceivedCVC", new { id = Id });
+                }
+                else
+                {
+                    TempData["successmsg"] = "Error: Something Went Wrong in model state";
+                    TempData.Keep("successmsg");
+                    return RedirectToAction("UpdateReferenceReceivedCVC", new { id = Id });
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, "Failed to load country list.");
+                return View();
+            }
+        }
+
+        #endregion
+
+        #region Added as on date 04_07_2025
+
+        [HttpPost]
+        public async Task<IActionResult> AddAllegationOfMisconductExamined(OfficerDetailMainModel model)
+        {
+            string Id = HttpContext.Session.GetString("vcofficerId");
+
+            AllegationOfMisconductExaminedModel _insertAllegationOfMisconduct = new AllegationOfMisconductExaminedModel();
+
+            try
+            {
+
+                ModelState.Remove("officerAllegationOfMisconductExamined_9.vigilanceAngleExamined");
+
+                ModelState.Clear();  // Wipe the tree
+                if (TryValidateModel(model.officerAllegationOfMisconductExamined_9, nameof(model.officerAllegationOfMisconductExamined_9)))
+                {
+
+                    _insertAllegationOfMisconduct.officerId = int.Parse(Id);
+                    _insertAllegationOfMisconduct.vigilanceAngleExamined = "Yes";
+                    _insertAllegationOfMisconduct.caseDetails = model.officerAllegationOfMisconductExamined_9.caseDetails;
+                    _insertAllegationOfMisconduct.presentStatusOfTheCase = model.officerAllegationOfMisconductExamined_9.presentStatusOfTheCase;
+                    _insertAllegationOfMisconduct.actionrecommendedOptions = model.officerAllegationOfMisconductExamined_9.actionrecommendedOptions;
+                    _insertAllegationOfMisconduct.actionRecommendedDetails = model.officerAllegationOfMisconductExamined_9.actionRecommendedDetails;
+                    _insertAllegationOfMisconduct.actionBy = HttpContext.Session.GetString("Username");
+                    _insertAllegationOfMisconduct.actionOn = DateTime.Now;
+                    _insertAllegationOfMisconduct.actionBy_SessionId = HttpContext.Session.Id;
+                    _insertAllegationOfMisconduct.actionBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+
+                    int num = await _ministry.InsertAllegationOfMisconductExamined(_insertAllegationOfMisconduct);
+
+                    if (num > 0)
+                    {
+                        TempData["successmsg"] = "Data Submitted Successfuly";
+                        TempData.Keep("successmsg");
+                    }
+                    else
+                    {
+                        TempData["successmsg"] = "Data Not Submitted";
+                    }
+
+                    // return RedirectToAction("UpdateReferenceReceivedCVC", Id); // Send the update page
+                    return RedirectToAction("UpdateReferenceReceivedCVC", new { id = Id });
+                }
+                else
+                {
+                    TempData["successmsg"] = "Error: Something Went Wrong in model state";
+                    TempData.Keep("successmsg");
+                    return RedirectToAction("UpdateReferenceReceivedCVC", new { id = Id });
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, "Failed to load country list.");
+                return View();
+            }
+        }
+
+
+        //10.PunishmenetAwarded
+
+        [HttpPost]
+        public async Task<IActionResult> AddPunishmentAwarded(OfficerDetailMainModel model)
+        {
+            string Id = HttpContext.Session.GetString("vcofficerId");
+
+            PunishmentAwardedModel _punishmentAwarded = new PunishmentAwardedModel();
+
+            try
+            {
+
+                ModelState.Remove("officerPunishmentAwarded_10.punishmentAwarded");
+
+                ModelState.Clear();  // Wipe the tree
+                if (TryValidateModel(model.officerPunishmentAwarded_10, nameof(model.officerPunishmentAwarded_10)))
+                {
+
+                    _punishmentAwarded.officerId = int.Parse(Id);
+                    _punishmentAwarded.punishmentAwarded = "Yes";
+                    _punishmentAwarded.punishmentDetails = model.officerPunishmentAwarded_10.punishmentDetails;
+                    _punishmentAwarded.punishmentFromDate = model.officerPunishmentAwarded_10.punishmentFromDate;
+                    _punishmentAwarded.punishmentToDate = model.officerPunishmentAwarded_10.punishmentToDate;
+                    _punishmentAwarded.checkName_FromDate = model.officerPunishmentAwarded_10.checkName_FromDate;
+                    _punishmentAwarded.checkName_ToDate = model.officerPunishmentAwarded_10.checkName_ToDate;
+                    _punishmentAwarded.additionalRemarks_IfAny = model.officerPunishmentAwarded_10.additionalRemarks_IfAny;
+                    _punishmentAwarded.actionBy = HttpContext.Session.GetString("Username");
+                    //_punishmentAwarded.actionOn = DateTime.Now;
+                    _punishmentAwarded.actionBy_SessionId = HttpContext.Session.Id;
+                    _punishmentAwarded.actionBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+
+                    int num = await _ministry.InPunishmentAwarded(_punishmentAwarded);
+
+                    if (num > 0)
+                    {
+                        TempData["successmsg"] = "Data Submitted Successfuly";
+                        TempData.Keep("successmsg");
+                    }
+                    else
+                    {
+                        TempData["successmsg"] = "Data Not Submitted";
+                    }
+
+                    return RedirectToAction("UpdateReferenceReceivedCVC", new { id = Id });
+                }
+                else
+                {
+                    TempData["successmsg"] = "Error: Something Went Wrong in model state";
+                    TempData.Keep("successmsg");
+                    return RedirectToAction("UpdateReferenceReceivedCVC", new { id = Id });
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, "Failed to load country list.");
+                return View();
+            }
+        }
+
+        #endregion
+
+        // 11 DisciplinaryCriminalProceedings
+
+        #region Added as on date 07_07_2025
+        [HttpPost]
+        public async Task<IActionResult> AddDisciplinaryCriminalProceedings(OfficerDetailMainModel model)
+        {
+            string Id = HttpContext.Session.GetString("vcofficerId");
+
+            //PunishmentAwardedModel _punishmentAwarded = new PunishmentAwardedModel();
+
+            DisciplinaryCriminalProceedingsModel _disciplinaryCriminalProceedings = new DisciplinaryCriminalProceedingsModel();
+            try
+            {
+
+                ModelState.Remove("officerDisciplinaryCriminalProceedings_11.DisciplinaryProceeding");
+
+                ModelState.Clear();  // Wipe the tree
+                if (TryValidateModel(model.officerDisciplinaryCriminalProceedings_11, nameof(model.officerDisciplinaryCriminalProceedings_11)))
+                {
+
+                    _disciplinaryCriminalProceedings.officerId = int.Parse(Id);
+                    _disciplinaryCriminalProceedings.whether_DisciplinaryCriminalProceedingsPending = "Yes";
+                    _disciplinaryCriminalProceedings.whether_Suspended = model.officerDisciplinaryCriminalProceedings_11.whether_Suspended;
+                    _disciplinaryCriminalProceedings.suspensionDate = model.officerDisciplinaryCriminalProceedings_11.suspensionDate;
+                    _disciplinaryCriminalProceedings.whetherRevoked = model.officerDisciplinaryCriminalProceedings_11.whetherRevoked;
+                    _disciplinaryCriminalProceedings.revocationDate = model.officerDisciplinaryCriminalProceedings_11.revocationDate;
+                    _disciplinaryCriminalProceedings.detailsOf_Case = model.officerDisciplinaryCriminalProceedings_11.detailsOf_Case;
+                    _disciplinaryCriminalProceedings.presentStatusOftheCase = model.officerDisciplinaryCriminalProceedings_11.presentStatusOftheCase;
+                    _disciplinaryCriminalProceedings.actionBy = HttpContext.Session.GetString("Username");
+                    _disciplinaryCriminalProceedings.actionBy_SessionId = HttpContext.Session.Id;
+                    _disciplinaryCriminalProceedings.actionBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+
+                    int num = await _ministry.InsertDisciplinaryCriminalProceedings(_disciplinaryCriminalProceedings);
+
+                    if (num > 0)
+                    {
+                        TempData["successmsg"] = "Data Submitted Successfuly";
+                        TempData.Keep("successmsg");
+                    }
+                    else
+                    {
+                        TempData["successmsg"] = "Data Not Submitted";
+                    }
+
+                    return RedirectToAction("UpdateReferenceReceivedCVC", new { id = Id });
+                }
+                else
+                {
+                    TempData["successmsg"] = "Error: Something Went Wrong in model state";
+                    TempData.Keep("successmsg");
+                    return RedirectToAction("UpdateReferenceReceivedCVC", new { id = Id });
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, "Failed to load country list.");
+                return View();
+            }
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> AddActionContemplatedAgainstTheOfficer(OfficerDetailMainModel model)
+        {
+            string Id = HttpContext.Session.GetString("vcofficerId");
+
+            ActionContemplatedAgainstTheOfficerModel _actionContemplatedAgainstTheOfficerModel = new ActionContemplatedAgainstTheOfficerModel();
+
+            try
+            {
+                ModelState.Remove("officerActionContemplatedAgainstTheOfficerAsOnDate_12.whether_CaseContemplated");
+
+                ModelState.Clear();  // Wipe the tree
+                if (TryValidateModel(model.officerActionContemplatedAgainstTheOfficerAsOnDate_12, nameof(model.officerActionContemplatedAgainstTheOfficerAsOnDate_12)))
+                {
+
+                    _actionContemplatedAgainstTheOfficerModel.officerId = int.Parse(Id);
+                    _actionContemplatedAgainstTheOfficerModel.whether_CaseContemplated = "Yes";
+                    _actionContemplatedAgainstTheOfficerModel.detailsOfTheCase = model.officerActionContemplatedAgainstTheOfficerAsOnDate_12.detailsOfTheCase;
+                    _actionContemplatedAgainstTheOfficerModel.presentStatusOftheCase = model.officerActionContemplatedAgainstTheOfficerAsOnDate_12.presentStatusOftheCase;
+                    _actionContemplatedAgainstTheOfficerModel.actionBy = HttpContext.Session.GetString("Username");
+                    _actionContemplatedAgainstTheOfficerModel.actionBy_SessionId = HttpContext.Session.Id;
+                    _actionContemplatedAgainstTheOfficerModel.actionBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+
+                    int num = await _ministry.InsertActionContemplatedAgainstTheOfficer(_actionContemplatedAgainstTheOfficerModel);
+
+                    if (num > 0)
+                    {
+                        TempData["successmsg"] = "Data Submitted Successfuly";
+                        TempData.Keep("successmsg");
+                    }
+                    else
+                    {
+                        TempData["successmsg"] = "Data Not Submitted";
+                    }
+
+                    return RedirectToAction("UpdateReferenceReceivedCVC", new { id = Id });
+                }
+                else
+                {
+                    TempData["successmsg"] = "Error: Something Went Wrong in model state";
+                    TempData.Keep("successmsg");
+                    return RedirectToAction("UpdateReferenceReceivedCVC", new { id = Id });
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, "Failed to load country list.");
+                return View();
+            }
+        }
+
+        #endregion
+
+        #region Date 08_07_2025
+
+        [HttpPost]
+        public async Task<IActionResult> AddComplaintWithVigilanceAnglePending(OfficerDetailMainModel model)
+        {
+            string Id = HttpContext.Session.GetString("vcofficerId");
+
+            //ActionContemplatedAgainstTheOfficerModel _actionContemplatedAgainstTheOfficerModel = new ActionContemplatedAgainstTheOfficerModel();
+
+            ComplaintWithVigilanceAnglePendingModel _vigilanceAnglePendingModel = new ComplaintWithVigilanceAnglePendingModel();
+
+            try
+            {
+                ModelState.Remove("officerComplaintWithVigilanceAnglePending_13.whether_vigilanceAngelPending");
+
+                ModelState.Clear();  // Wipe the tree
+                if (TryValidateModel(model.officerComplaintWithVigilanceAnglePending_13, nameof(model.officerComplaintWithVigilanceAnglePending_13)))
+                {
+                    _vigilanceAnglePendingModel.officerId = int.Parse(Id);
+                    _vigilanceAnglePendingModel.whether_vigilanceAngelPending = "Yes";
+                    _vigilanceAnglePendingModel.detailsOfTheCase = model.officerComplaintWithVigilanceAnglePending_13.detailsOfTheCase;
+                    _vigilanceAnglePendingModel.presentStatusOftheCase = model.officerComplaintWithVigilanceAnglePending_13.presentStatusOftheCase;
+                    _vigilanceAnglePendingModel.addtionalRemarks = model.officerComplaintWithVigilanceAnglePending_13.addtionalRemarks;
+                    _vigilanceAnglePendingModel.actionBy = HttpContext.Session.GetString("Username");
+                    _vigilanceAnglePendingModel.actionBy_SessionId = HttpContext.Session.Id;
+                    _vigilanceAnglePendingModel.actionBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+
+                    int num = await _ministry.InsertComplaintWithVigilanceAnglePending(_vigilanceAnglePendingModel);
+
+                    if (num > 0)
+                    {
+                        TempData["successmsg"] = "Data Submitted Successfuly";
+                        TempData.Keep("successmsg");
+                    }
+                    else
+                    {
+                        TempData["successmsg"] = "Data Not Submitted";
+                    }
+
+                    return RedirectToAction("UpdateReferenceReceivedCVC", new { id = Id });
+                }
+                else
+                {
+                    TempData["successmsg"] = "Error: Something Went Wrong in model state";
+                    TempData.Keep("successmsg");
+                    return RedirectToAction("UpdateReferenceReceivedCVC", new { id = Id });
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, "Failed to load country list.");
+                return View();
+            }
+        }
+
+        #endregion 
 
     }
 }

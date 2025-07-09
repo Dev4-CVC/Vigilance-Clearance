@@ -68,9 +68,9 @@ namespace VigilanceClearance.Controllers
 
                
                 HttpContext.Session.SetString("Username", model.Username);
-                return RedirectToAction("PESB_Dashboard", "PESB");
+                //return RedirectToAction("PESB_Dashboard", "PESB");
 
-                //return RedirectToAction("Index", "Ministry_Department");
+                return RedirectToAction("Index", "Ministry_Department");
 
 
             }
