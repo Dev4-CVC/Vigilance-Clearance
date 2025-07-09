@@ -97,5 +97,14 @@ namespace VigilanceClearance.Controllers
             return sessionCaptcha != null && sessionCaptcha.Equals(userInput, StringComparison.OrdinalIgnoreCase);
         }
 
+
+        [HttpPost]
+        public JsonResult ValidateCaptchaAjax(string captcha)
+        {
+            bool isValid = ValidateCaptcha(captcha);
+            return Json(new { success = isValid });
+        }
+
+
     }
 }

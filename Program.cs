@@ -1,3 +1,4 @@
+using System.Globalization;
 using VigilanceClearance.Data.Account;
 using VigilanceClearance.Data.PESB_Service;
 using VigilanceClearance.Interface.Account;
@@ -30,6 +31,14 @@ builder.Services.AddHttpContextAccessor();
 //interface services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPESB, PESB_Services>();
+
+
+var cultureInfo = new CultureInfo("en-GB"); // or "en-CA" for yyyy-MM-dd
+cultureInfo.DateTimeFormat.ShortDatePattern = "yyyy-MM-dd";
+cultureInfo.DateTimeFormat.LongDatePattern = "yyyy-MM-dd";
+
+CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
 
 

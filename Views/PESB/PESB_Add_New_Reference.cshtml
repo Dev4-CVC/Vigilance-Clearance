@@ -8,7 +8,9 @@
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
 <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
 
-
+@{
+    var selectedValue = Model.referenceReceivedFor;
+}
 
 @* 1st card "New Reference" *@
 <div class="container-fluid">
@@ -26,11 +28,11 @@
                             <div class="col-md-3 mb-3">
                                 <label>Reference</label>
                                 @Html.DropDownListFor(model => model.referenceReceivedFor,
-                                new SelectList(Model.referenceReceivedFor_List, "Value", "Text", Model.referenceReceivedFor),
+                                new SelectList(Model.referenceReceivedFor_List, "Value", "Text", selectedValue),
                                 "-- Select Reference --",
-                                new { @class = "form-control", id = "referenceReceivedFor", tabindex = "-1", @readonly = "read only" })
+                                new { @class = "form-control", id = "referenceReceivedFor", @disabled = "disabled" })
+                                @Html.HiddenFor(model => model.referenceReceivedFor)
                                 <span asp-validation-for="referenceReceivedFor" class="text-danger"></span>
-
                             </div>
 
                             <div class="col-md-3 mb-3">
@@ -51,9 +53,9 @@
                             </div>
 
                             @* <div class="col-md-3 mb-3" id="OtherSubPostDiv" style="display:none;">
-                                <label>Other Sub Post Description</label>
-                                <input asp-for="OtherSubPost" class="form-control" placeholder="Enter other sub post" />
-                                <span asp-validation-for="OtherSubPost" class="text-danger"></span>
+                            <label>Other Sub Post Description</label>
+                            <input asp-for="OtherSubPost" class="form-control" placeholder="Enter other sub post" />
+                            <span asp-validation-for="OtherSubPost" class="text-danger"></span>
                             </div> *@
 
                         </div>
@@ -76,13 +78,13 @@
 
                         <div class="row align-items-end">
                             <div class="col-md-3 mb-3" id="div_ReferenceNo_FileNo">
-                                <label>ReferenceNo_FileNo</label>
+                                <label>Reference No / FileNo</label>
                                 <input asp-for="referenceNoFileNo" class="form-control" placeholder="File No." />
                                 <span asp-validation-for="referenceNoFileNo" class="text-danger"></span>
                             </div>
 
                             <div class="col-md-3 mb-3" id="div_ReferenceOrSubmissionToCvcDate">
-                                <label>ReferenceOrSubmissionToCvcDate</label>
+                                <label>Reference Or Submission To CvcDate</label>
                                 <input asp-for="referenceOrSubmissionToCvcDate" type="date" class="form-control datepicker" placeholder="yyyy-mm-dd" />
                                 <span asp-validation-for="referenceOrSubmissionToCvcDate" class="text-danger"></span>
                             </div>
@@ -90,7 +92,7 @@
 
 
                             <div class="col-md-3 mb-3" id="div_CVC_ReferenceID_FileNo">
-                                <label>CVC_ReferenceID_FileNo</label>
+                                <label>CVC_Reference ID File No.</label>
                                 <input asp-for="cvcReferenceIdFileNo" class="form-control" placeholder="CVC Reference ID / File No." />
                                 <span asp-validation-for="cvcReferenceIdFileNo" class="text-danger"></span>
                             </div>
@@ -101,11 +103,11 @@
 
                     <div class="card-footer d-flex justify-content-end" style="gap: 0.5rem;">
                         <button type="submit" name="actionType" value="submit" class="btn btn-success">Submit</button>
-                        <button type="submit" name="actionType" value="forward" class="btn btn-primary">Forward to CVC</button>
+                        <a asp-action="PESB_Appointment" asp-controller="PESB" class="btn btn-primary">Go to Details</a>
                     </div>
 
                 </form>
-                
+
             </div>
         </div>
     </div>
@@ -115,6 +117,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -141,7 +144,7 @@
             // Clear subpost dropdown and reset values
             subPostSelect.empty();
             subPostSelect.prop('disabled', true);  // Disable the Sub Post dropdown initially
-            subPostSelect.append($('<option>').val('').text('-- Select Sub Post --'));  // Add a default "Select Sub Post" option
+            // subPostSelect.append($('<option>').val('').text('-- Select Sub Post --'));  // Add a default "Select Sub Post" option
 
             $('#OtherSubPostDiv').hide();  // Hide the "Other Sub Post" field
             $('#OtherSubPost').val('');  // Clear "other" input field if hidden
@@ -193,7 +196,7 @@
     $(document).ready(function () {
         flatpickr(".datepicker", {
             dateFormat: "Y-m-d",
-            allowInput: true
+            allowInput: false
         });
     });
 </script>
@@ -201,10 +204,9 @@
 @* Org and Ministry Script *@
 <script>
     $(document).ready(function () {
-        // Listen for changes on the "Organization" dropdown
         $('#orgCode').change(function () {
-            var orgCode = $(this).val(); // Get selected organization code
-            var ministryDropdown = $('#minCode'); // Ministry dropdown element
+            var orgCode = $(this).val();
+            var ministryDropdown = $('#minCode');
 
             // Clear the ministry dropdown
             ministryDropdown.empty();
@@ -235,7 +237,7 @@
                     }
 
                     // Add default "Select Ministry" option
-                    ministryDropdown.append($('<option>').val('').text('-- Select Ministry --'));
+                    // ministryDropdown.append($('<option>').val('').text('-- Select Ministry --'));
 
                     // Populate the ministry dropdown with received data
                     $.each(data, function (i, item) {
@@ -258,50 +260,14 @@
 
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @TempData["SuccessMessage"]
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const actionType = "@TempData["FormAction"]";
-            const submitBtn = document.querySelector('button[name="actionType"][value="submit"]');
-            const forwardBtn = document.querySelector('button[name="actionType"][value="forward"]');
-
-            if (actionType === "submit" && submitBtn) {
-                if (submitBtn) {
-                    submitBtn.disabled = true;
-                    submitBtn.innerText = "Submitted";
-                }
-                if (forwardBtn) {
-                    forwardBtn.disabled = false;
-                    forwardBtn.innerText = "Forward to CVC";
-                }
-            }
-            else if (actionType === "forward") {
-                if (forwardBtn) {
-                    forwardBtn.disabled = true;
-                    forwardBtn.innerText = "Forwarded";
-                }
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerText = "Submit";
-                }
-            }
-            else {
-                // If no actionType or unrecognized, ensure both buttons enabled and normal text
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerText = "Submit";
-                }
-                if (forwardBtn) {
-                    forwardBtn.disabled = false;
-                    forwardBtn.innerText = "Forward to CVC";
-                }
-            }
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: '@TempData["SuccessMessage"]',
+            timerProgressBar: true,
+            showConfirmButton: false
         });
     </script>
+    TempData.Keep("SuccessMessage");
 }
