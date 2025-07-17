@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace VigilanceClearance.Models.Admin
-{
+{ 
     public class UsersRole_Model
     {
         [Key]

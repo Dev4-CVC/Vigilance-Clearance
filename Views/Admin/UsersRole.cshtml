@@ -1,0 +1,85 @@
+﻿@model VigilanceClearance.Models.Admin.UsersMain_Model
+
+@{
+    Layout = "~/Views/Shared/_Admin_Main_Layout.cshtml";
+}
+
+
+@if (Model.users_role_List != null && Model.users_role_List.Any())
+{
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="card-title">Users Role List</h1>
+                    <div class="d-flex justify-content-end mb-3">
+                        <a href="/Admin/AddUsersRole" class="btn btn-primary">
+                            Create New Role
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <table id="example1" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>S. No.</th>
+                                <th>User Role Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.users_role_List.Count; i++)
+                            {
+                                var user_role = Model.users_role_List[i];
+                                <tr>
+                                    <td>@(i + 1)</td>
+                                    <td>@user_role.RoleName</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning">No records found.</div>
+}
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    $(function () {
+        var successMessage = '@ViewBag.SuccessMessage';
+        if (successMessage) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: successMessage,
+                confirmButtonText: 'OK'
+            });
+        }
+    });
+</script>
+
+
+@* <div class="row">
+    <div class="col-md-4">
+        <form asp-action="UsersRole">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="users_role.RoleName" class="control-label"></label>
+                <input asp-for="users_role.RoleName" class="form-control" />
+                <span asp-validation-for="users_role.RoleName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div> *@
