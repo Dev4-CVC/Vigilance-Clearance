@@ -1,0 +1,142 @@
+﻿@model VigilanceClearance.Models.Admin.UsersMain_Model
+
+@{
+    Layout = "~/Views/Shared/_Admin_Main_Layout.cshtml";
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header text-center">
+                <h3>Create New User</h3>
+            </div>
+
+            <div class="card-body">
+                <form asp-action="AddUsers" method="post" onsubmit="return validateUserForm(event);">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="users.userName" class="control-label"></label>
+                        <input asp-for="users.userName" class="form-control" placeholder="Enter Username" required />
+                        <span asp-validation-for="users.userName" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="users.email" class="control-label"></label>
+                        <input asp-for="users.email" class="form-control" placeholder="Enter Email" required />
+                        <span asp-validation-for="users.email" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="users.password" class="control-label"></label>
+                        <input asp-for="users.password" class="form-control" placeholder="Enter Password" required minlength="6" maxlength="20" />
+                        <span asp-validation-for="users.password" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="users.Roles" class="control-label"></label>
+                        <select asp-for="users.Roles" class="form-control" asp-items="Model.roles_ddl_List" required>
+                            <option value="">-- Select Role --</option>
+                        </select>
+                        <span asp-validation-for="users.Roles" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <input type="submit" value="Create" class="btn btn-primary" />
+                        <a asp-action="Users" class="btn btn-secondary">Back to List</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    function validateUserForm(e) {
+        e.preventDefault(); // Prevent default form submission
+
+        // Basic manual validation (can be expanded if needed)
+        const userName = document.getElementById('users_userName').value.trim();
+        const email = document.getElementById('users_email').value.trim();
+        const password = document.getElementById('users_password').value.trim();
+        const role = document.getElementById('users_Roles').value;
+
+        if (!userName || !email || !password || !role) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Missing Information',
+                text: 'Please fill out all fields before submitting.'
+            });
+            return false;
+        }
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Do you want to create this user?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, create user!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                e.target.submit(); // Submit form if confirmed
+            }
+        });
+
+        return false; // Wait for user confirmation before submission
+    }
+</script>
+
+
+
+
+@* 
+<div class="row justify-content-center mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-center">Create New User</h3>
+            </div>
+
+            <div class="card-body">
+                <form asp-action="AddUsers">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="users.userName" class="control-label"></label>
+                        <input asp-for="users.userName" class="form-control" placeholder="Enter Username" />
+                        <span asp-validation-for="users.userName" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="users.email" class="control-label"></label>
+                        <input asp-for="users.email" class="form-control" placeholder="Enter Email" />
+                        <span asp-validation-for="users.email" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="users.password" class="control-label"></label>
+                        <input asp-for="users.password" class="form-control" placeholder="Enter Password" />
+                        <span asp-validation-for="users.password" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="users.Roles" class="control-label"></label>
+                        <select asp-for="users.Roles" class="form-control" asp-items="Model.roles_ddl_List">
+                            <option value="">-- Select Role --</option>
+                        </select>
+                        <span asp-validation-for="users.Roles" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <input type="submit" value="Create" class="btn btn-primary" />
+                        <a asp-action="Users" class="btn btn-secondary">Back to List</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div> *@
