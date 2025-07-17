@@ -19,6 +19,5 @@
         public string actionBy_SessionId { get; set; }
         public string actionBy_IP { get; set; }
 
-
     }
 }

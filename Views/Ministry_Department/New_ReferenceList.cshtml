@@ -1,0 +1,120 @@
+﻿
+@model VigilanceClearance.Models.PESB.PESBViewModel
+
+@{
+    Layout = "~/Views/Shared/_MinistryLayout.cshtml";
+}
+
+<div class="d-flex justify-content-end mb-3">
+    <a asp-controller="Ministry_Department" asp-action="New_Reference_FromMin_ToCVC" class="btn btn-success">
+        <i class="fas fa-plus me-1"></i> Add New Reference
+    </a>
+</div>
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+
+@if (Model.new_reference_List != null && Model.new_reference_List.Any())
+{
+    <div class="table-responsive">
+        <table id="vcReferenceTable" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Sr. No.</th>
+                    <th>Action</th>
+                    <th>ReferenceId</th>
+                    <th>Reference Received For</th>
+                    <th>Reference Received From</th>
+                    <th>Post</th>
+                    <th>Sub Post</th>
+                    <th>Reference No / File No</th>
+                    <th>Submission to CVC Date</th>
+                    <th>CVC Reference ID / File No</th>
+                    <th>Created By</th>
+                    <th>Pending With</th>
+                    <th>UID</th>
+                    <th>Reference Id</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.new_reference_List.Count; i++)
+                {
+                    var item = Model.new_reference_List[i];
+                    <tr>
+                        <td>@(i + 1)</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="location.href='@Url.Action("New_Reference_Details", "Ministry_Department", new { id = item.Id })'">Details</button>
+                        </td>
+                        <td>@item.Id</td>
+                        <td>@item.referenceReceivedFor</td>
+                        <td>@item.referenceReceivedFrom</td>
+                        <td>@item.selectionForThePostCategory</td>
+                        <td>@item.selectionForThePostSubCategory</td>
+                        <td>@item.referenceNoFileNo</td>
+                        <td>@item.referenceOrSubmissionToCvcDate</td>
+                        <td>@item.cvcReferenceIdFileNo</td>
+                        <td>@item.createdBy</td>
+                        <td>@item.pendingWith</td>
+                        <td>@item.uid</td>
+                        <td>@item.referenceId</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning">No records found.</div>
+}
+
+<!-- jQuery (required for DataTables) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+
+
+@* data table *@
+<script>
+    $(document).ready(function () {
+        $('#vcReferenceTable').DataTable({
+            pageLength: 10,
+            lengthMenu: [5, 10, 25, 50, 100],
+            ordering: true,
+            searching: true,
+            language: {
+                emptyTable: "No records available"
+            },
+            columnDefs: [
+                { orderable: false, targets: 1 }
+            ]
+        });
+    });
+</script>
+
+
+@* this is sweat alert message , for add new reference  *@
+@if (TempData["SuccessMessage"] != null)
+{
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: '@TempData["SuccessMessage"]',
+            showConfirmButton: true,
+            confirmButtonText: 'Close', // 👈 Customize the button text
+            timerProgressBar: true
+        });
+    </script>
+}
+
+
+<script>
+    $(document).ready(function () {
+        $('#vcReferenceTable').DataTable(); // Ensure DataTables is included
+    });
+</script>
+
+

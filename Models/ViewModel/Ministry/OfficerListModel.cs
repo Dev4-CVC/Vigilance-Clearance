@@ -5,9 +5,9 @@
         public int Id { get; set; }
         public int MasterReferenceID { get; set; }
         public string selectionForThePostCategory { get; set; }
-        public string selectionForThePostSubCategory { get; set; }
+        public string? selectionForThePostSubCategory { get; set; }
         public string ReferenceReceivedFor { get; set; }
-        public string othersRemarks { get; set; }
+        public string? othersRemarks { get; set; }
         public string orgCode { get; set; }
         public string Officer_Name { get; set; }
         public string Officer_FatherName { get; set; }
@@ -24,11 +24,11 @@
         public string ActionContemplatedAgainstTheOfficerAsOnDate_12 { get; set; }
         public string ComplaintWithVigilanceAnglePending_13 { get; set; }
         public string CreatedBy { get; set; }
-        public DateTime CreatedOn { get; set; }
+        public DateTime? CreatedOn { get; set; }
         public string CreatedBy_SessionId { get; set; }
         public string CreatedBy_IP { get; set; }
         public string UpdateBy { get; set; }
-        public DateTime UpdatedOn { get; set; }
+        public DateTime? UpdatedOn { get; set; }
         public string UpdatedBy_SessionId { get; set; }
         public string UpdatedBy_IP { get; set; }
         public object PendingWith { get; set; }

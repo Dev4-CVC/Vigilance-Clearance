@@ -265,8 +265,6 @@ namespace VigilanceClearance.DataAccessLayer.PESB_Service
 
 
 
-
-
         //db table name: tbl_Master_Vc_ReferenceReceivedFor
         //Action Method: PESB_Appointment
         //(List of new references)
@@ -525,15 +523,6 @@ namespace VigilanceClearance.DataAccessLayer.PESB_Service
         }
 
 
-
-
-
-
-
-
-
-
-
         //new operation:  dated on 9 july 2025
         //new reference 
         public async Task<int> Insert_Add_New_Reference_Async(new_reference_model objmodel)
@@ -736,5 +725,45 @@ namespace VigilanceClearance.DataAccessLayer.PESB_Service
                 return 0;
             }
         }
+
+
+        #region Added as on date 11_07_2025
+        public async Task<List<SelectListItem>> GetOrgByMinCode(string Mincode)
+        {
+            if (string.IsNullOrWhiteSpace(Mincode)) return new List<SelectListItem>();
+
+            var accessToken = _httpContextAccessor.HttpContext?.Session.GetString("AccessToken");
+            if (string.IsNullOrEmpty(accessToken)) return new List<SelectListItem>();
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+            string requestUrl = $"{APIURL}DropDown/GetOrgByMinCode?Mincode={Uri.EscapeDataString(Mincode)}";
+            try
+            {
+                var response = await _httpClient.GetAsync(requestUrl);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    return new List<SelectListItem>();
+                }
+
+                var jsonContent = await response.Content.ReadAsStringAsync();
+                var items = JsonConvert.DeserializeObject<List<DropDownResponseModel>>(jsonContent) ?? new List<DropDownResponseModel>();
+
+                return items.Select(item => new SelectListItem
+                {
+                    Value = item.Value,
+                    Text = item.Text
+                }).ToList();
+            }
+            catch (Exception ex)
+            {
+                return new List<SelectListItem>();
+            }
+        }
+        #endregion
+
+
     }
 }

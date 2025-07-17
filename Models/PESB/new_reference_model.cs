@@ -18,6 +18,8 @@ namespace VigilanceClearance.Models.PESB
         [Display(Name = "Post")]
         public string? selectionForThePostCategory { get; set; }
 
+
+
         [Display(Name = "Sub Post")]
         public string? selectionForThePostSubCategory { get; set; }
 
