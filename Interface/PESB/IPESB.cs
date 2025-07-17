@@ -50,5 +50,12 @@ namespace VigilanceClearance.Interface.PESB
 
         //officer posting details
         Task<int> Insert_Officer_Posting_Details_Async(officer_posting_details_model objmodel);
+
+
+        #region Added as on date 11_07_11
+
+        Task<List<SelectListItem>> GetOrgByMinCode(string Mincode);
+
+        #endregion
     }
 }

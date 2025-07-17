@@ -175,9 +175,9 @@
     </style>
 </head>
 @{
-        var username = Context.Session.GetString("Username");
-        var FullName = Context.Session.GetString("Fullname");
-        int? userId = Context.Session.GetInt32("UserId");
+            var username = Context.Session.GetString("Username");
+            var FullName = Context.Session.GetString("Fullname");
+            int? userId = Context.Session.GetInt32("UserId");
 }
 <body class="hold-transition sidebar-mini">
     <div class="wrapper">
@@ -203,15 +203,23 @@
                             <a asp-action="ProfileOfUser" asp-controller="Account" class="btn btn-sm btn-outline-primary">
                                 <i class="fas fa-edit"></i> Profile
                             </a>
-                            @if (User.Identity.IsAuthenticated)
+                            @* @if (User.Identity.IsAuthenticated)
                             {
                                 <a asp-action="Logout" asp-controller="Account" class="btn btn-sm btn-outline-danger">
                                     <i class="fas fa-sign-out-alt"></i> Logout
                                 </a>
-                            }
+                            } *@
                             <a asp-action="ResetPassword" asp-controller="Account" class="btn btn-sm btn-outline-primary">
                                 <i class="fas fa-edit"></i> Change Password
                             </a>
+                            @* <a asp-action="Logout" asp-controller="Account" method="post" class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a> *@
+                            <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" style="width: 100%; text-align: left;">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -262,7 +270,7 @@
                             </a>
                         </li>
 
-                       
+
                     </ul>
                 </nav>
             </div>
@@ -275,7 +283,7 @@
                     <div class="row mb-2">
                         <div class="col-12 d-flex justify-content-between align-items-center flex-wrap">
                             @* <h1 class="mb-0">@ViewBag.title</h1> *@
-                            <h1 class ="mb-0">  </h1>
+                            <h1 class="mb-0">  </h1>
                             <!-- Right Side: Breadcrumb -->
                             <div class="d-flex align-items-center flex-wrap">
                                 <ol class="breadcrumb mb-0">

@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using VigilanceClearance.Models.Modal_Properties;
 using VigilanceClearance.Models.Modal_Properties.PESB;
+using VigilanceClearance.Models.New_Reference_to_CVCModels;
 using VigilanceClearance.Models.OfficerDetailModel;
+using VigilanceClearance.Models.PESB;
 using VigilanceClearance.Models.ViewModel.Ministry;
 
 namespace VigilanceClearance.Interface.Ministry
@@ -60,6 +62,28 @@ namespace VigilanceClearance.Interface.Ministry
 
         Task<int> InsertComplaintWithVigilanceAnglePending(ComplaintWithVigilanceAnglePendingModel _vigilanceAnglePendingModel);
         Task<List<ComplaintWithVigilanceAnglePendingModel>> GetComplaintWithVigilanceAnglePendingList(string id);
+
+
+        // Start the code for the New Reference To CVC
+
+        Task<int> Insert_New_Reference(InsertReferenceReceivedForModel _insertRefMode);
+
+        // End the code for the New Reference To CVC
+
+        #region Added as on date 14_07_2025
+        Task<int> Insert_New_Officer_Details(InsertNewOfficerDetailFromMinistryModel insertNewOfficerDetailFromMinistryModel);
+
+        #endregion
+
+        #region Added as on date 16_07_2025
+
+        Task<int> UpdateReferenceFromPESB(UpdateRefFromPESBModel _updateRefModel);
+
+
+        Task<List<OfficerListModel>> GetOfficerDetailsByOfficerIdAsync(string id);
+
+        #endregion
+
 
     }
 }

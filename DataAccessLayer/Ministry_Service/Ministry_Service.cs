@@ -8,7 +8,9 @@ using System.Text.Json;
 using VigilanceClearance.Interface.Ministry;
 using VigilanceClearance.Models;
 using VigilanceClearance.Models.Modal_Properties;
+using VigilanceClearance.Models.New_Reference_to_CVCModels;
 using VigilanceClearance.Models.OfficerDetailModel;
+using VigilanceClearance.Models.PESB;
 using VigilanceClearance.Models.ViewModel;
 using VigilanceClearance.Models.ViewModel.Ministry;
 
@@ -179,7 +181,8 @@ namespace VigilanceClearance.DataAccessLayer.Ministry_Service
 
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
-            var requestUrl = $"{BaseUrl}OfficerDetails/OfficerDetailsGetByMasterReferenceID?id={Uri.EscapeDataString(id)}";
+            var requestUrl = $"{BaseUrl}OfficerDetails/OfficerDetailsGetByMasterReferenceID?id={Uri.EscapeDataString(id)}";  // Pahle Ye API Use Ho tahi thi
+            //var requestUrl = $"{BaseUrl}OfficerDetails/OfficerDetails_GetByOfficerId_ForMinistry?OfficerId={Uri.EscapeDataString(id)}";    
 
             try
             {
@@ -750,5 +753,194 @@ namespace VigilanceClearance.DataAccessLayer.Ministry_Service
                 return new List<ComplaintWithVigilanceAnglePendingModel>();
             }
         }
+
+
+        // Start the code for the New Reference To CVC
+        public async Task<int> Insert_New_Reference(InsertReferenceReceivedForModel _insertRefMode)
+        {
+            try
+            {
+                var accessToken = _httpContextAccessor.HttpContext?.Session.GetString("AccessToken");
+                if (string.IsNullOrEmpty(accessToken))
+                    throw new UnauthorizedAccessException("Access token is missing.");
+
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+                var requestUrl = $"{BaseUrl}VcReferenceReceivedFor/InsertReferenceReceivedFor";
+
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    PropertyNameCaseInsensitive = true
+                };
+
+                var json = System.Text.Json.JsonSerializer.Serialize(_insertRefMode, options);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync(requestUrl, content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"API Error: {response.StatusCode} - {errorContent}");
+                    return 0;
+                }
+
+                var responseJson = await response.Content.ReadAsStringAsync();
+
+                if (int.TryParse(responseJson, out int result))
+                {
+                    return result;
+                }
+                // Optionally handle more structured API response if needed
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex.Message}");
+                return 0;
+            }
+        }
+
+        #region Added as on date 14_07_2025
+
+        public async Task<int> Insert_New_Officer_Details(InsertNewOfficerDetailFromMinistryModel insertNewOfficerDetailFromMinistryModel)
+        {
+            try
+            {
+                var accessToken = _httpContextAccessor.HttpContext?.Session.GetString("AccessToken");
+                if (string.IsNullOrEmpty(accessToken))
+                    throw new UnauthorizedAccessException("Access token is missing.");
+
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+                var requestUrl = $"{BaseUrl}OfficerDetails/addOfficerDetails";
+
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    PropertyNameCaseInsensitive = true
+                };
+
+                var json = System.Text.Json.JsonSerializer.Serialize(insertNewOfficerDetailFromMinistryModel, options);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync(requestUrl, content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"API Error: {response.StatusCode} - {errorContent}");
+                    return 0;
+                }
+
+                var responseJson = await response.Content.ReadAsStringAsync();
+
+                if (int.TryParse(responseJson, out int result))
+                    return result;
+
+                // Optionally handle more structured API response if needed
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex.Message}");
+                return 0;
+            }
+        }
+
+        #endregion
+
+
+        #region Added as on date 16_07_2025
+        public async Task<int> UpdateReferenceFromPESB(UpdateRefFromPESBModel _updateRefModel)
+        {
+            try
+            {
+                var accessToken = _httpContextAccessor.HttpContext?.Session.GetString("AccessToken");
+                if (string.IsNullOrEmpty(accessToken))
+                    throw new UnauthorizedAccessException("Access token is missing.");
+
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+                var requestUrl = $"{BaseUrl}VcReferenceReceivedFor/UpdateReferenceFromPESB";
+
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    PropertyNameCaseInsensitive = true
+                };
+
+                var json = System.Text.Json.JsonSerializer.Serialize(_updateRefModel, options);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync(requestUrl, content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"API Error: {response.StatusCode} - {errorContent}");
+                    return 0;
+                }
+
+                var responseJson = await response.Content.ReadAsStringAsync();
+
+                if (int.TryParse(responseJson, out int result))
+                    return result;
+
+                // Optionally handle more structured API response if needed
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex.Message}");
+                return 0;
+            }
+        }
+
+
+
+        public async Task<List<OfficerListModel>> GetOfficerDetailsByOfficerIdAsync(string id)
+        {
+            var accessToken = _httpContextAccessor.HttpContext?.Session.GetString("AccessToken");
+            if (string.IsNullOrEmpty(accessToken)) return new List<OfficerListModel>();
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+            //var requestUrl = $"{BaseUrl}OfficerDetails/OfficerDetailsGetByMasterReferenceID?id={Uri.EscapeDataString(id)}";  // Pahle Ye API Use Ho tahi thi
+            var requestUrl = $"{BaseUrl}OfficerDetails/OfficerDetails_GetByOfficerId_ForMinistry?OfficerId={Uri.EscapeDataString(id)}";    
+
+            try
+            {
+                var response = await _httpClient.GetAsync(requestUrl);
+                if (!response.IsSuccessStatusCode)
+                {
+                    return new List<OfficerListModel>();
+                }
+
+                var jsonContent = await response.Content.ReadAsStringAsync();
+
+                var apiResponse = JsonConvert.DeserializeObject<FetchAPIDataModel<OfficerListModel>>(jsonContent);
+
+                if (apiResponse != null && apiResponse.isSuccess && apiResponse.data != null)
+                {
+                    return apiResponse.data;
+                }
+
+                return new List<OfficerListModel>();
+            }
+            catch (Exception)
+            {
+                return new List<OfficerListModel>();
+            }
+        }
+
+
+        #endregion
+
+
+
+        // End the code for the New Reference To CVC
+
     }
 }

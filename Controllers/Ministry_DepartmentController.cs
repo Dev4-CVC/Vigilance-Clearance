@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 using System.CodeDom;
@@ -14,14 +15,17 @@ using VigilanceClearance.Interface.PESB;
 using VigilanceClearance.Models;
 using VigilanceClearance.Models.DTOs;
 using VigilanceClearance.Models.Modal_Properties;
+using VigilanceClearance.Models.Modal_Properties.Account;
+using VigilanceClearance.Models.New_Reference_to_CVCModels;
 using VigilanceClearance.Models.OfficerDetailModel;
+using VigilanceClearance.Models.PESB;
 using VigilanceClearance.Models.ViewModel;
 using VigilanceClearance.Models.ViewModel.Ministry;
 using VigilanceClearance.Models.ViewModel.PESB;
 
 namespace VigilanceClearance.Controllers
 {
-
+    [Authorize(Roles = "MINISTRY_DH")]
     public class Ministry_DepartmentController : Controller
     {
         private readonly IHttpClientFactory _clientFactory;
@@ -29,16 +33,18 @@ namespace VigilanceClearance.Controllers
         private readonly IConfiguration _configuration;
         private readonly string BaseUrl;
         private readonly IMinistry _ministry;
+        private readonly IPESB _pesb;
 
-        public Ministry_DepartmentController(IHttpClientFactory clientFactory, HttpClient httpClient, IConfiguration configuration, IMinistry ministry)
+        public Ministry_DepartmentController(IHttpClientFactory clientFactory, HttpClient httpClient, IConfiguration configuration, IMinistry ministry, IPESB pesb)
         {
             this._clientFactory = clientFactory;
             _httpClient = httpClient;
             _configuration = configuration;
             BaseUrl = _configuration["BaseUrl"]!;
             this._ministry = ministry;
+            _pesb = pesb;
         }
-
+      
         public IActionResult Index()
         {
             return View();
@@ -51,15 +57,23 @@ namespace VigilanceClearance.Controllers
         {
             try
             {
-                string _UserName = "minpower";
-
-                List<ReferenceReceivedFromCVCModel> apiResponse = await _ministry.GetReferenceReceivedFromCVClist(_UserName);
-
-                if (apiResponse != null)
+                var userDetailsJson = HttpContext.Session.GetString("UserDetails");
+                if (!string.IsNullOrEmpty(userDetailsJson))
                 {
-                    return View(apiResponse);
+                    var userDetails = System.Text.Json.JsonSerializer.Deserialize<UserDetailsModel>(userDetailsJson);
+                    string _MinMastercode = userDetails.MinMasterCode;
+                    List<ReferenceReceivedFromCVCModel> apiResponse = await _ministry.GetReferenceReceivedFromCVClist(_MinMastercode);
+                    if (apiResponse != null)
+                    {
+                        return View(apiResponse);
+                    }
+
+                    return View(new List<ReferenceReceivedFromCVCModel>());
                 }
-                return View(new List<ReferenceReceivedFromCVCModel>());
+                else
+                {
+                    return RedirectToAction("Login", "Account");
+                }
             }
             catch (Exception ex)
             {
@@ -94,8 +108,11 @@ namespace VigilanceClearance.Controllers
             try
             {
                 HttpContext.Session.SetString("vcofficerId", id);
+                
+                TempData["RefId"] = id;
 
-                List<OfficerListModel> Response = await _ministry.GetOfficerListAsync(id);
+                //List<OfficerListModel> Response = await _ministry.GetOfficerListAsync(id);
+                List<OfficerListModel> Response = await _ministry.GetOfficerDetailsByOfficerIdAsync(id);
 
                 OfficerListModel firstOfficer = Response.FirstOrDefault();
                 //7
@@ -587,7 +604,325 @@ namespace VigilanceClearance.Controllers
             }
         }
 
-        #endregion 
+        #endregion
+
+
+
+        #region Start New Reference To CVC
+
+
+        [HttpGet]
+        public async Task<IActionResult> New_ReferenceList()
+        {
+            int id = 0;
+            try
+            {
+                //string username = HttpContext.Session.GetString("Username");
+                var userDetailsJson = HttpContext.Session.GetString("UserDetails");
+
+                if (!string.IsNullOrEmpty(userDetailsJson))
+                {
+                    var userDetails = System.Text.Json.JsonSerializer.Deserialize<UserDetailsModel>(userDetailsJson);
+                    string _UserName = userDetails.UserName;
+
+                    var model = new PESBViewModel
+                    {
+                        new_reference_List = await _pesb.Get_Vc_Reference_Received_For_List_GetById_and_Username_Async(id, _UserName)
+                    };
+
+                    return View(model);
+                }
+                else
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+            }
+            catch (Exception)
+            {
+                ViewBag.Error = "Something went wrong while loading the page.";
+                return View();
+            }
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> New_Reference_FromMin_ToCVC()
+        {
+            try
+            {
+                var userDetailsJson = HttpContext.Session.GetString("UserDetails");
+
+                if (!string.IsNullOrEmpty(userDetailsJson))
+                {
+                    var userDetails = System.Text.Json.JsonSerializer.Deserialize<UserDetailsModel>(userDetailsJson);
+                    string _UserName = userDetails.UserName;
+                    string _Mincode = userDetails.MinCode;
+
+                    var model = new PESBViewModel
+                    {
+                        reference_received_for_ddl_List = await _pesb.GetReferenceDropDownAsync(),
+                        sub_post_ddl_List = new List<SelectListItem>(),
+                        organization_ddl_List = await _pesb.GetOrgByMinCode(_Mincode),
+                        ministry_ddl_List = new List<SelectListItem>(),
+                    };
+                    return View(model);
+                }
+                else
+                {
+                    return RedirectToAction("Login", "Home");
+                }
+            }
+            catch (Exception)
+            {
+                ViewBag.Error = "Something went wrong while loading the page.";
+                return View();
+            }
+        }
+
+
+        #region Added Code for bind the Post On change Reference 
+
+        [HttpGet]
+        public async Task<IActionResult> GetPostsByRefCode(string RefCode)
+        {
+            try
+            {
+                var RefPosts = await _pesb.GetPostDescriptionsDropDownAsync(RefCode);
+                return Json(RefPosts);
+            }
+            catch
+            {
+                return Json(new { Error = "Failed to load sub-posts." });
+            }
+        }
+
+        #endregion
+
+
+        [HttpPost]
+        public async Task<IActionResult> New_Reference_FromMin_ToCVC(PESBViewModel objmodel)
+        {
+            InsertReferenceReceivedForModel _insertRefModel = new InsertReferenceReceivedForModel();
+
+            try
+            {
+                var userDetailsJson = HttpContext.Session.GetString("UserDetails");
+
+                if (!string.IsNullOrEmpty(userDetailsJson))
+                {
+                    var userDetails = System.Text.Json.JsonSerializer.Deserialize<UserDetailsModel>(userDetailsJson);
+                    string _UserName = userDetails.UserName;
+
+                    _insertRefModel.referenceReceivedFor = objmodel.new_reference.referenceReceivedFor;
+                    _insertRefModel.referenceReceivedFrom = "Ministry";
+                    _insertRefModel.referenceReceivedFromCode = objmodel.new_reference.minCode;
+                    _insertRefModel.selectionForThePostCategory = objmodel.new_reference.selectionForThePostCategory ?? "";
+                    _insertRefModel.selectionForThePostSubCategory = objmodel.new_reference.selectionForThePostSubCategory ?? "";
+                    _insertRefModel.orgCode = objmodel.new_reference.orgCode;
+                    _insertRefModel.orgName = "null";
+                    _insertRefModel.minCode = objmodel.new_reference.minCode;
+                    _insertRefModel.minDesc = "null";
+                    _insertRefModel.pendingWith = HttpContext.Session.GetString("UserRole").ToString();
+                    _insertRefModel.referenceID = objmodel.new_reference.referenceNoFileNo ?? "";
+                    _insertRefModel.cvC_ReferenceID_FileNo = objmodel.new_reference.cvcReferenceIdFileNo ?? "";
+                    _insertRefModel.actionBy = _UserName;
+                    _insertRefModel.actionBy_SessionId = HttpContext.Session.Id;
+                    _insertRefModel.actionBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString();
+
+                    int isInserted = await _ministry.Insert_New_Reference(_insertRefModel);
+
+                    if (isInserted > 0)
+                    {
+                        return Json(new { success = true });
+                    }
+                    else
+                    {
+                        return Json(new { success = false, error_new_reference_message = "This record is not saved." });
+                    }
+                }
+
+                else
+                {
+                    return RedirectToAction("Login", "Home");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return View("New_Reference_FromMin_ToCVC");
+            }
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> New_Reference_Details(int id)
+        {
+            try
+            {
+                TempData["RefId"] = id;
+                var result = await _pesb.Get_Vc_Reference_Received_For_Details_GetById_Async(id);
+
+                var model = new AddNewOfficerMainModel
+                {
+                    new_Reference_Model = result.FirstOrDefault(),
+                    officerList = await _ministry.GetOfficerListAsync(id.ToString()),
+                };
+
+                return View(model);
+            }
+            catch (Exception)
+            {
+                ViewBag.Error = "Something went wrong while loading the page.";
+                return View();
+            }
+        }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> AddNewOfficerDetails(int id)
+        {
+            try
+            {
+                var data = new InsertNewOfficerDetailFromMinistryModel
+                {
+                    masterReferenceID = id
+                };
+
+                var model = new AddNewOfficerMainModel
+                {
+                    service_ddl_List = await _pesb.Get_Service_DropDownAsync(),
+                    batch_ddl_List = await _pesb.Get_Batch_DropDownAsync(),
+                    cadre_ddl_List = await _pesb.Get_Cadre_DropDownAsync(),
+                    insertNewOfficerDetailFromMinistryModel = data,
+                };
+                return View(model);
+            }
+            catch (Exception)
+            {
+                ViewBag.Error = "Something went wrong while loading the page.";
+                return View();
+            }
+        }
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> AddNewOfficerDetails([FromBody] AddNewOfficerMainModel objmodel)
+        {
+            try
+            {
+
+                var userDetailsJson = HttpContext.Session.GetString("UserDetails");
+
+                if (!string.IsNullOrEmpty(userDetailsJson))
+                {
+                    var userDetails = System.Text.Json.JsonSerializer.Deserialize<UserDetailsModel>(userDetailsJson);
+                    string _UserName = userDetails.UserName;
+
+                    var _service = objmodel.insertNewOfficerDetailFromMinistryModel.officer_Service;
+                    var Otherservice = string.Empty;
+                    var _Cadre = string.Empty;
+
+                    if (_service == "OTHERS")
+                        Otherservice = objmodel.insertNewOfficerDetailFromMinistryModel.officer_Other_Service;
+                    else
+                        objmodel.insertNewOfficerDetailFromMinistryModel.officer_Other_Service = "";
+
+                    if (_service == "IPS" || _service == "IAS" || _service == "IFoS")
+                        _Cadre = objmodel.insertNewOfficerDetailFromMinistryModel.officer_Cadre;
+                    else
+                        objmodel.insertNewOfficerDetailFromMinistryModel.officer_Cadre = "";
+
+                    // objmodel.insertNewOfficerDetailFromMinistryModel.masterReferenceID = MasterRefId;
+                    objmodel.insertNewOfficerDetailFromMinistryModel.createdBy = _UserName;
+                    objmodel.insertNewOfficerDetailFromMinistryModel.createdBy_SessionId = HttpContext.Session.Id;
+                    objmodel.insertNewOfficerDetailFromMinistryModel.createdBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+
+                    int num = await _ministry.Insert_New_Officer_Details(objmodel.insertNewOfficerDetailFromMinistryModel);
+                    if (num == 0)
+                    {
+                        return Json(new { success = false, message = "Record not saved." });
+                    }
+
+                    return Json(new
+                    {
+                        success = true,
+
+                        redirectUrl = Url.Action("New_Reference_Details", new { id = objmodel.insertNewOfficerDetailFromMinistryModel.masterReferenceID })
+
+                    });
+
+                    //return RedirectToAction();
+                }
+
+                else
+                {
+                    return RedirectToAction("Login", "Home");
+                }
+            }
+            catch (Exception)
+            {
+                return Json(new { success = false, message = "Unexpected error occurred." });
+            }
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> ForwardToApprover(int id)
+        {
+            try
+            {
+                var userDetailsJson = HttpContext.Session.GetString("UserDetails");
+
+                if (!string.IsNullOrEmpty(userDetailsJson))
+                {
+                    var userDetails = System.Text.Json.JsonSerializer.Deserialize<UserDetailsModel>(userDetailsJson);
+                    string _UserName = userDetails.UserName;
+
+                    UpdateRefFromPESBModel _updateRefModel = new UpdateRefFromPESBModel();
+
+                    _updateRefModel.mainReferenceID = id;
+                    _updateRefModel.pendingWith = "MINISTRY_APPROVER";
+                    _updateRefModel.updatedBy = _UserName;
+                    _updateRefModel.updatedBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString();
+                    _updateRefModel.updatedBy_SessionId = HttpContext.Session.Id;
+
+                    int num = await _ministry.UpdateReferenceFromPESB(_updateRefModel);
+                    if (num == 0)
+                    {
+                        //return Json(new { success = false, message = "Record not saved." });
+                        return RedirectToAction("New_ReferenceList");
+                    }
+                    else
+                    {
+                        //return Json(new
+                        //{
+                        //    success = true,
+
+                        //    redirectUrl = Url.Action("New_Reference_Details", new { id = id })
+                        //});
+
+                        return RedirectToAction("New_ReferenceList");
+                    }
+                }
+                else
+                {
+                    return RedirectToAction("Login", "Home");
+                }
+
+                //return View();
+            }
+            catch (Exception)
+            {
+                ViewBag.Error = "Something went wrong while loading the page.";
+                return View();
+            }
+        }
+
+
+        #endregion
+
 
     }
 }

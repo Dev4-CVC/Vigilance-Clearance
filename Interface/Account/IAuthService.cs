@@ -6,5 +6,6 @@ namespace VigilanceClearance.Interface.Account
     public interface IAuthService
     {
         Task<TokenResponse?> LoginAsync(LoginDto loginDto);
+        Task<UserDetailsModel> GetUserDetailsbyUserName(string username);
     }
 }
