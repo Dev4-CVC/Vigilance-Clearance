@@ -109,7 +109,17 @@ namespace VigilanceClearance.Controllers
                 if (roles.Contains("MINISTRY_DH"))
                 {                    
                     return RedirectToAction("Index", "Ministry_Department");
-                }                
+                }
+                else if (roles.Contains("User"))
+                {
+                    return RedirectToAction("PESB_Dashboard", "PESB");
+                }
+                else if (roles.Contains("Admin"))
+                {
+                    return RedirectToAction("Users", "Admin");
+                }
+
+
                 return View(model);
             }
             catch
