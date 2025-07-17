@@ -1,11 +1,15 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Globalization;
 using System.Text.Json;
 using VigilanceClearance.Data.Account;
-using VigilanceClearance.DataAccessLayer.PESB_Service;
 using VigilanceClearance.DataAccessLayer.Ministry_Service;
+using VigilanceClearance.DataAccessLayer.Ministry_Service;
+using VigilanceClearance.DataAccessLayer.PESB_Service;
+using VigilanceClearance.DataAccessLayer.PESB_Service;
 using VigilanceClearance.Interface.Account;
 using VigilanceClearance.Interface.Ministry;
 using VigilanceClearance.Interface.PESB;
+using VigilanceClearance.Middleware;
 using VigilanceClearance.Services;
 using VigilanceClearance.Interface.Admin;
 using VigilanceClearance.DataAccessLayer.Admin_Service;
@@ -19,6 +23,15 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<CaptchaService>();
 builder.Services.AddHttpClient();
 
+
+//Added ason date 17_07_2025
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.LogoutPath = "/Account/Logout";
+    });
+//Added ason date 17_07_2025 End
 
 builder.Services.AddSession(options =>
 {
@@ -55,8 +68,25 @@ builder.Services.AddControllers().AddJsonOptions(opts =>
 });
 //Added as on date 30-06-2025
 
+//Added as on date 30-06-2025
+builder.Services.AddControllers().AddJsonOptions(opts =>
+{
+    opts.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+});
+
 
 var app = builder.Build();
+
+#region Added as on date 17_07_2025
+
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+    context.Response.Headers["Pragma"] = "no-cache";
+    context.Response.Headers["Expires"] = "0";
+    await next();
+});
+#endregion
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -72,6 +102,10 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+
+app.UseMiddleware<JwtSessionAuthMiddleware>(); // Added as on date 17_07_2025
+app.UseAuthentication(); // Added as on date 17_07_2025
 
 app.UseAuthorization();
 

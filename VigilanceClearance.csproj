@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -1744,6 +1744,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.11" />
     <PackageReference Include="Microsoft.jQuery.Unobtrusive.Validation" Version="4.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.12.1" />
   </ItemGroup>
 
 </Project>

@@ -19,10 +19,11 @@ namespace VigilanceClearance.Models.OfficerDetailModel
         public string? PlaceOfPosting { get; set; }
 
         [Required(ErrorMessage = "Tenure From date is required.")]
-        public DateTime TenureFrom { get; set; }
+        public DateTime? TenureFrom { get; set; }
 
         [Required(ErrorMessage = "Tenure To date is required.")]
-        public DateTime TenureTo { get; set; }
+        public DateTime? TenureTo { get; set; }
 
+        //public List<OfficerPostingDetails> officerPostingDetails { get; set; }
     }
 }

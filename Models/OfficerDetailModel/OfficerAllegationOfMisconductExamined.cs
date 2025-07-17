@@ -1,9 +1,14 @@
-﻿namespace VigilanceClearance.Models.OfficerDetailModel
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace VigilanceClearance.Models.OfficerDetailModel
 {
     public class OfficerAllegationOfMisconductExamined
     {
-        public string? AllegationMisconduct { get; set; }
-        public string? Casedetails { get; set; }
-        public DateTime Presentstatusasondate { get; set; }
+        [Display(Name = "Vigilance Angle Examined")]
+        public string? vigilanceAngleExamined { get; set; }
+        public string caseDetails { get; set; }
+        public string presentStatusOfTheCase { get; set; }
+        public string actionrecommendedOptions { get; set; }
+        public string actionRecommendedDetails { get; set; }
     }
 }

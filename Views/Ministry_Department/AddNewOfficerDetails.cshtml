@@ -1,0 +1,381 @@
+﻿@* @model VigilanceClearance.Models.PESB.PESBViewModel *@
+@model VigilanceClearance.Models.New_Reference_to_CVCModels.AddNewOfficerMainModel
+
+@{
+    ViewData["Title"] = "AddNewOfficerDetails";
+    Layout = "~/Views/Shared/_MinistryLayout.cshtml";
+}
+<style>
+    .modal-backdrop {
+        display: none !important;
+    }
+</style>
+
+
+@* Flatpickr CSS  *@
+<link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+
+
+@* 1st card "Details of the officer" *@
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="card card-primary card-outline mb-4">
+                <div class="card-header bg-info text-white">
+                    <div class="card-title">Add New Officer Details</div>
+                </div>
+
+                <form id="officerForm">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>                 
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label>Name of the Officer</label>
+                                <input asp-for="insertNewOfficerDetailFromMinistryModel.officer_Name" class="form-control text-uppercase" placeholder="Officer Name" />
+                                <span asp-validation-for="insertNewOfficerDetailFromMinistryModel.officer_Name" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Father's Name</label>
+                                <input asp-for="insertNewOfficerDetailFromMinistryModel.officer_FatherName" class="form-control text-uppercase" placeholder="Father Name" />
+                                <span asp-validation-for="insertNewOfficerDetailFromMinistryModel.officer_FatherName" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Date of Birth</label>
+                                <input asp-for="insertNewOfficerDetailFromMinistryModel.officer_DateOfBirth" class="form-control datepicker" placeholder="yyyy-mm-dd" />
+                                <span asp-validation-for="insertNewOfficerDetailFromMinistryModel.officer_DateOfBirth" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Row 2 -->
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label>Date of Retirement</label>
+                                <input asp-for="insertNewOfficerDetailFromMinistryModel.officer_RetirementDate" id="DateOfRetirement" class="form-control datepicker" placeholder="yyyy-mm-dd" />
+                                <span asp-validation-for="insertNewOfficerDetailFromMinistryModel.officer_RetirementDate" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Date of Entry into Service</label>
+                                <input asp-for="insertNewOfficerDetailFromMinistryModel.officer_ServiceEntryDate" id="DateOfEntry" class="form-control datepicker" placeholder="yyyy-mm-dd" />
+                                <span asp-validation-for="insertNewOfficerDetailFromMinistryModel.officer_ServiceEntryDate" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Service</label>
+                                @Html.DropDownListFor(model => model.insertNewOfficerDetailFromMinistryModel.officer_Service, Model.service_ddl_List, "-- Select Service --", new { @class = "form-control", id = "Service" })
+                                <span asp-validation-for="insertNewOfficerDetailFromMinistryModel.officer_Service" class="text-danger"></span>
+                            </div>
+
+                        </div>
+
+                        <!-- Row 3 -->
+                        <div class="row mb-3">
+                            <div class="col-md-4" id="cadreDiv">
+                                <label>Cadre</label>
+                                @Html.DropDownListFor(model => model.insertNewOfficerDetailFromMinistryModel.officer_Cadre, Model.cadre_ddl_List, "-- Select Cadre --", new { @class = "form-control", id = "Cadre" })
+                                <span asp-validation-for="insertNewOfficerDetailFromMinistryModel.officer_Cadre" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4" id="OtherServiceDiv" style="display: none;">
+                                <label>Other Service</label>
+                                <input asp-for="insertNewOfficerDetailFromMinistryModel.officer_Other_Service" class="form-control" id="OtherService" placeholder="Other Service" />
+                                <span asp-validation-for="insertNewOfficerDetailFromMinistryModel.officer_Other_Service" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Batch</label>
+                                @Html.DropDownListFor(model => model.insertNewOfficerDetailFromMinistryModel.officer_Batch_Year, Model.batch_ddl_List, "-- Select Batch --", new { @class = "form-control", id = "Batch" })
+                                <span asp-validation-for="insertNewOfficerDetailFromMinistryModel.officer_Batch_Year" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="row mb-3" style="display:none">
+                            <input type="hidden" asp-for="insertNewOfficerDetailFromMinistryModel.masterReferenceID" />
+                        </div>
+                    </div>
+
+                    <div class="card-footer d-flex justify-content-end">
+                        <button type="button" id="addofficerdetailsBtn" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+@* 2nd Card script (date picker)  *@
+<script>
+    flatpickr(".datepicker", {
+        dateFormat: "Y-m-d",
+        allowInput: false
+    });
+
+
+    var entryPicker, retirementPicker;
+
+    // Initialize Date of Entry first
+    entryPicker = flatpickr("#DateOfEntry", {
+        dateFormat: "Y-m-d",
+        allowInput: false,
+        onChange: function (selectedDates) {
+            if (selectedDates.length > 0) {
+                // Set minDate of retirementPicker
+                retirementPicker.set('minDate', selectedDates[0]);
+            }
+        }
+    });
+
+    // Initialize Date of Retirement
+    retirementPicker = flatpickr("#DateOfRetirement", {
+        dateFormat: "Y-m-d",
+        allowInput: false
+    });
+</script>
+
+@* 2nd Card script (toggle for other service and cadre) *@
+<script>
+    $(document).ready(function () {
+        function toggleOtherServiceField() {
+            const selectedValue = $('#Service').val();
+            if (selectedValue === 'OTHERS') {
+                $('#OtherServiceDiv').show();
+            } else {
+                $('#OtherServiceDiv').hide();
+                $('#OtherService').val('');
+            }
+        }
+
+        function toggleCadreDropdown() {
+            const selectedService = $('#Service').val();
+            const servicesToShow = ['IAS', 'IPS', 'IFoS'];
+
+            if (servicesToShow.includes(selectedService)) {
+                $('#cadreDiv').show();
+            } else {
+                $('#cadreDiv').hide();
+                $('#Cadre').val('');
+            }
+        }
+
+        // Initialize both on page load
+        toggleOtherServiceField();
+        toggleCadreDropdown();
+
+        // On change of Service dropdown
+        $('#Service').on('change', function () {
+            toggleOtherServiceField();
+            toggleCadreDropdown();
+        });
+    });
+</script>
+
+@* 3rd card Script (Org and Ministry)*@
+<script>
+    $(document).ready(function () {
+        $('#orgCode').change(function () {
+            var orgCode = $(this).val();
+            var ministryDropdown = $('#minCode');
+
+            // Clear the ministry dropdown
+            ministryDropdown.empty();
+
+            // Disable dropdown and set default option if no organization is selected
+            if (!orgCode) {
+                ministryDropdown.prop('disabled', true)
+                    .append($('<option>').val('').text('-- Select Ministry --'));
+                return;
+            }
+
+            console.log("Sending AJAX for orgCode: " + orgCode); // Debug log for selected organization code
+
+            // Send AJAX request to fetch ministries by organization code
+            $.ajax({
+                url: '@Url.Action("GetMinistryByOrgCode", "PESB")', // Adjust the controller/action as necessary
+                type: 'GET',
+                data: { id: orgCode }, // Pass organization code to server
+                dataType: "json",
+                success: function (data) {
+                    ministryDropdown.empty(); // Clear current options
+
+                    // Check if no data or invalid data
+                    if (!data || data.length === 0 || (data.length === 1 && !data[0].Value && !data[0].value)) {
+                        ministryDropdown.prop('disabled', true)
+                            .append($('<option>').val('').text('-- No Ministry Available --'));
+                        return;
+                    }
+
+                    // Add default "Select Ministry" option
+                    // ministryDropdown.append($('<option>').val('').text('-- Select Ministry --'));
+
+                    // Populate the ministry dropdown with received data
+                    $.each(data, function (i, item) {
+                        var val = item.Value || item.value; // Check both possible key names
+                        var txt = item.Text || item.text;   // Check both possible key names
+                        ministryDropdown.append($('<option>').val(val).text(txt));
+                    });
+
+                    // Enable dropdown after options are added
+                    ministryDropdown.prop('disabled', false);
+                },
+                error: function (xhr) {
+                    alert("Error loading ministries: " + xhr.statusText); // Display error on failure
+                }
+            });
+        });
+    });
+
+</script>
+
+@* sweet alert for officer details *@
+@if (TempData["SuccessMessage_Of_officer_details"] != null)
+{
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: '@TempData["SuccessMessage_Of_officer_details"]',
+            showConfirmButton: true,
+            confirmButtonText: 'Close',
+            timerProgressBar: true
+        });
+    </script>
+}
+
+
+@* Save Officer Details *@
+<script>
+    $(document).ready(function () {
+        $('#addofficerdetailsBtn').click(function () {
+            let isValid = true;
+            $('.text-danger').text(''); // Clear old errors
+            debugger;
+            // Get form values
+            const officer_Name = $('#insertNewOfficerDetailFromMinistryModel_officer_Name').val().trim();
+            const officer_FatherName = $('#insertNewOfficerDetailFromMinistryModel_officer_FatherName').val().trim();
+            const officer_DateOfBirth = $('#insertNewOfficerDetailFromMinistryModel_officer_DateOfBirth').val().trim();
+            const officer_ServiceEntryDate = $('#DateOfEntry').val().trim();
+            const officer_RetirementDate = $('#DateOfRetirement').val().trim();
+            const officer_Service = $('#Service').val();
+            const officer_Cadre = $('#Cadre').val();
+            const officer_other_Service = $('#OtherService').val().trim();
+            const officer_Batch_Year = $('#Batch').val();
+            const masterReferenceID  = $('#insertNewOfficerDetailFromMinistryModel_masterReferenceID').val();
+
+         
+            // Validate required fields
+            if (!officer_Name) {
+                $('#insertNewOfficerDetailFromMinistryModel_officer_Name').next('.text-danger').text('Please enter Officer Name.');
+                isValid = false;
+            }
+            if (!officer_FatherName) {
+                $('#insertNewOfficerDetailFromMinistryModel_officer_FatherName').next('.text-danger').text('Please enter Father Name.');
+                isValid = false;
+            }
+            if (!officer_DateOfBirth) {
+                $('#insertNewOfficerDetailFromMinistryModel_officer_DateOfBirth').next('.text-danger').text('Please enter Date of Birth.');
+                isValid = false;
+            }
+            if (!officer_ServiceEntryDate) {
+                $('#DateOfEntry').next('.text-danger').text('Please enter Service Entry Date.');
+                isValid = false;
+            }
+            if (!officer_RetirementDate) {
+                $('#DateOfRetirement').next('.text-danger').text('Please enter Retirement Date.');
+                isValid = false;
+            }
+            if (!officer_Service) {
+                $('#Service').next('.text-danger').text('Please select Service.');
+                isValid = false;
+            }
+
+            if (officer_Service === 'OTHERS' && !officer_other_Service) {
+                $('#OtherService').next('.text-danger').text('Please enter Other Service.');
+                isValid = false;
+            }
+
+            if (['IAS', 'IPS', 'IFoS'].includes(officer_Service) && !officer_Cadre) {
+                $('#Cadre').next('.text-danger').text('Please select Cadre.');
+                isValid = false;
+            }
+
+            if (!officer_Batch_Year) {
+                $('#Batch').next('.text-danger').text('Please select Batch.');
+                isValid = false;
+            }
+
+            if (!isValid) return;
+
+            Swal.fire({
+                title: "Confirm Submission",
+                text: "Do you want to save the officer details?",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText: "Yes, Save",
+                cancelButtonText: "Cancel"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#addofficerdetailsBtn').prop('disabled', true).text('Submitting...');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/Ministry_Department/AddNewOfficerDetails",
+                        contentType: "application/json",
+                        data: JSON.stringify({
+                        insertNewOfficerDetailFromMinistryModel: {
+                                officer_Name: officer_Name,
+                                officer_FatherName: officer_FatherName,
+                                officer_DateOfBirth: officer_DateOfBirth,
+                                officer_ServiceEntryDate: officer_ServiceEntryDate,
+                                officer_RetirementDate: officer_RetirementDate,
+                                officer_Service: officer_Service,
+                                officer_Other_Service: officer_Service === "OTHERS" ? officer_other_Service : null,
+                                officer_Cadre: ['IAS', 'IPS', 'IFoS'].includes(officer_Service) ? officer_Cadre : null,
+                                officer_Batch_Year: officer_Batch_Year,
+                                masterReferenceID: masterReferenceID
+                            }
+                        }),
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Saved successfully!"
+                                }).then(() => {
+                                    // location.reload();
+                                    window.location.href = response.redirectUrl;
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Failed to Save",
+                                    text: response.message || "An error occurred."
+                                });
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Oops!",
+                                text: "Something went wrong. Please try again."
+                            });
+                        },
+                        complete: function () {
+                            $('#addofficerdetailsBtn').prop('disabled', false).text('Submit');
+                        }
+                    });
+                }
+            });
+        });        
+    });
+</script>
+
+
+
+
+
+
+
+
+

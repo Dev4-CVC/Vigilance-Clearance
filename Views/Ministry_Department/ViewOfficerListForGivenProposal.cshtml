@@ -26,7 +26,14 @@
 <section>
     <div class="card">
         <div class="card-header bg-primary text-white">
-            <h3 class="card-title mb-0">View Reference Received CVC</h3>
+            <div class="row">
+                <div class="col-md-11">
+                    <h3 class="card-title mb-0">View Reference Received CVC</h3>
+                </div>
+                <div class="col-md-1">
+                    <a asp-action="ViewReferenceReceivedCVC" asp-route-id= "#" class="btn btn-light btn-sm">Back</a>
+                </div>
+            </div>
         </div>
         <div class="card-body p-2">
             <div class="table-responsive">
@@ -36,6 +43,7 @@
                             <th>Action</th>
                             <th>Sr.No.</th>
                             <th>Master Reference ID</th>
+                            <th>Officer ID</th>
                             <th>selection For The PostCategory</th>
                             <th>selectionForThePostSubCategory</th>
                             <th>ReferenceReceivedFor</th>
@@ -70,13 +78,14 @@
                                     <td>
                                         <a asp-action="ViewOfficerListForGivenProposal" asp-route-id="@item.Id" class="btn btn-info btn-sm">View</a>
                                         <a asp-action="UpdateReferenceReceivedCVC" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Update</a>
-                                        <button class="btnSubmitRow btn btn-sm btn-primary">Submit</button>
+
                                     </td>
                                     <td>@sno</td>
                                     <td>@item.MasterReferenceID</td>
+                                    <td>@item.Id</td>
                                     <td>@item.selectionForThePostCategory</td>
+                                    <td>@item.selectionForThePostSubCategory</td>
                                     <td>@item.ReferenceReceivedFor</td>
-                                    <td>@item.selectionForThePostCategory</td>
                                     <td>@item.othersRemarks</td>
                                     <td>@item.orgCode</td>
                                     <td>@item.Officer_Name</td>
@@ -152,36 +161,7 @@
     });
 </script>
 
-@* <script>
-       $('#updateBtn').click(function () {
-        var gridData = [];
 
-        $('#ministryTable tbody tr').each(function () {
-            var row = $(this).find('td');
-            var item = {
-                Id: parseInt(row.eq(0).text()),
-                MasterReferenceID: row.eq(1).text(),
-                selectionForThePostCategory: row.eq(2).text()
-            };
-            gridData.push(item);
-        });
-
-        $.ajax({
-            url: '/Ministry_Department/UpdateReferenceReceivedCVC',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(gridData),
-            success: function (response) {
-                alert(response.message);
-            },
-            error: function () {
-                alert("Error occurred");
-            }
-        });
-    });
-
-</script>
- *@
 
 
 

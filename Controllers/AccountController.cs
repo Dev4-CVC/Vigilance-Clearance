@@ -1,24 +1,27 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using CVOIS.Services;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
-using System.Collections.Generic;
-using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
-using CVOIS.Services;
-using VigilanceClearance.Services;
-using VigilanceClearance.Models.ViewModel;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
+using NuGet.Common;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Net.Http;
 using System.Net.Http.Json;
-using Newtonsoft.Json;
-using System.Linq;
-using Microsoft.AspNetCore.Mvc.ViewEngines;
-using VigilanceClearance.Interface.PESB;
-using VigilanceClearance.Models.DTOs;
-using System.Linq.Expressions;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using VigilanceClearance.Interface.Account;
+using VigilanceClearance.Interface.PESB;
+using VigilanceClearance.Models.DTOs;
 using VigilanceClearance.Models.Modal_Properties.Account;
+using VigilanceClearance.Models.ViewModel;
+using VigilanceClearance.Services;
+using System.Text.Json;
 
 namespace VigilanceClearance.Controllers
 {
@@ -64,23 +67,50 @@ namespace VigilanceClearance.Controllers
                     return View(model);
                 }
 
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(tokenResponse.Token);
+                // Typical claim for username: "sub" or "unique_name"
+                var username = jwtToken.Claims.FirstOrDefault(c => c.Type.Contains("name"))?.Value
+                            ?? jwtToken.Claims.FirstOrDefault(c => c.Type.Contains("name"))?.Value;
+
+                // Role claims are usually named "role" or "roles"
+                var roles = jwtToken.Claims
+                    .Where(c => c.Type.Contains("role") || c.Type.Contains("role"))
+                    .Select(c => c.Value)
+                    .ToArray();
+
                 HttpContext.Session.SetString("AccessToken", tokenResponse.Token);
                 HttpContext.Session.SetString("Username", model.Username);
 
-                // Apply redirection based on Username (or you can use a Role field if available)
-                if (model.Username.Equals("chandan@gmail.com", StringComparison.OrdinalIgnoreCase))
-                {
-                    return RedirectToAction("PESB_Dashboard", "PESB");
-                }
-                else if (model.Username.Equals("admin@domain.com", StringComparison.OrdinalIgnoreCase))
-                {
-                    return RedirectToAction("Users", "Admin");
-                }
-                else
-                {
-                    // Default redirect for unknown or general users
-                    return RedirectToAction("Index", "Home");
-                }
+                
+                //if (model.Username.Equals("chandan@gmail.com", StringComparison.OrdinalIgnoreCase))
+                //{
+                //    return RedirectToAction("PESB_Dashboard", "PESB");
+                //}
+                //else if (model.Username.Equals("admin@domain.com", StringComparison.OrdinalIgnoreCase))
+                //{
+                //    return RedirectToAction("Users", "Admin");
+                //}
+                //else
+                //{
+                //    // Default redirect for unknown or general users
+                //    return RedirectToAction("Index", "Home");
+                //}
+
+
+                var UserDetails = await _authService.GetUserDetailsbyUserName(username);
+
+                // Serialize to JSON
+                var userDetailsJson = System.Text.Json.JsonSerializer.Serialize(UserDetails);                                                                          
+                HttpContext.Session.SetString("UserDetails", userDetailsJson);
+                HttpContext.Session.SetString("UserRole", roles[0].ToString());
+                HttpContext.Session.SetString("Username", username);
+
+                if (roles.Contains("MINISTRY_DH"))
+                {                    
+                    return RedirectToAction("Index", "Ministry_Department");
+                }                
+                return View(model);
             }
             catch
             {
@@ -111,6 +141,24 @@ namespace VigilanceClearance.Controllers
         {
             bool isValid = ValidateCaptcha(captcha);
             return Json(new { success = isValid });
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
+        {
+            // Clear authentication cookie
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // Clear session
+            HttpContext.Session.Clear();
+
+            // Optional: Clear TempData
+            TempData.Clear();
+
+            // Optional: Redirect to Login or Home
+            return RedirectToAction("Login", "Account");
         }
 
 

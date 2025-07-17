@@ -25,7 +25,15 @@
 <section>
     <div class="card">
         <div class="card-header bg-primary text-white">
-            <h3 class="card-title mb-0">View Reference Received CVC</h3>
+            <div class="row">
+                <div class="col-md-11">
+                    <h3 class="card-title mb-0">View Reference Received CVC</h3>
+                </div>
+                <div class="col-md-1">
+                    <a asp-action="Index" asp-route-id="#" class="btn btn-light btn-sm">Back</a>
+                </div>
+            </div>
+            
         </div>
         <div class="card-body p-2">
             <div class="table-responsive">
@@ -51,8 +59,8 @@
                         @{
                             int sno = 1;
                             foreach (var item in Model)
-                            {                               
-                               
+                            {
+
                                 <tr>
                                     <td>
                                         <a asp-action="ViewOfficerListForGivenProposal" asp-route-id="@item.id" class="btn btn-info btn-sm">View</a>
@@ -81,68 +89,3 @@
 </section>
 
 
-@*   <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Designation</th>
-                            <th>Department</th>
-                            <th>Joining Date</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>101</td>
-                            <td>Meher Kumar</td>
-                            <td>Developer</td>
-                            <td>IT</td>
-                            <td>2022-01-15</td>
-                            <td>
-                                <a asp-action="viewDetailsReferenceReceivedCVC" asp-route-id="1" class="btn btn-info btn-sm">View</a>
-                                <a asp-action="UpdateReferenceReceivedCVC" asp-route-id="1" class="btn btn-warning btn-sm">Update</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>102</td>
-                            <td>Anjali Verma</td>
-                            <td>Designer</td>
-                            <td>UI/UX</td>
-                            <td>2021-08-20</td>
-                            <td>
-                                <a asp-action="viewDetailsReferenceReceivedCVC" asp-route-id="2" class="btn btn-info btn-sm">View</a>
-                                <a asp-action="UpdateReferenceReceivedCVC" asp-route-id="2" class="btn btn-warning btn-sm">Update</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>103</td>
-                            <td>Raj Singh</td>
-                            <td>Tester</td>
-                            <td>QA</td>
-                            <td>2023-03-10</td>
-                            <td>
-                                <a asp-action="viewDetailsReferenceReceivedCVC" asp-route-id="3" class="btn btn-info btn-sm">View</a>
-                                <a asp-action="UpdateReferenceReceivedCVC" asp-route-id="3" class="btn btn-warning btn-sm">Update</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>104</td>
-                            <td>Rahul Singh</td>
-                            <td>Tester</td>
-                            <td>QA</td>
-                            <td>2023-03-10</td>
-                            <td>
-                                <a asp-action="viewDetailsReferenceReceivedCVC" asp-route-id="4" class="btn btn-info btn-sm">View</a>
-                                <a asp-action="UpdateReferenceReceivedCVC" asp-route-id="4" class="btn btn-warning btn-sm">Update</a>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div> *@
-@* </div>
-
-    </div>
-
-</section> *@

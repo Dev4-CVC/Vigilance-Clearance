@@ -508,6 +508,25 @@ namespace VigilanceClearance.Controllers
             }
         }
 
+
+        #region Added Code for bind the Post On change Reference 
+
+        [HttpGet]
+        public async Task<IActionResult> GetPostsByRefCode(string RefCode)
+        {
+            try
+            {
+                var RefPosts = await _pesb.GetPostDescriptionsDropDownAsync(RefCode);
+                return Json(RefPosts);
+            }
+            catch
+            {
+                return Json(new { Error = "Failed to load sub-posts." });
+            }
+        }
+
+        #endregion
+
         [HttpGet]
         public async Task<IActionResult> GetSubPostsByPostCode(string postCode)
         {
@@ -614,7 +633,6 @@ namespace VigilanceClearance.Controllers
             ViewBag.title = "Officer Details Reports";
             string id = "0";
 
-
             int? referenceid = HttpContext.Session.GetInt32("RefId");
 
             if (!referenceid.HasValue)
@@ -711,12 +729,58 @@ namespace VigilanceClearance.Controllers
         }
 
 
+        [HttpGet]
+        //public async Task<IActionResult> Officer_list(int id)
+        //{
+        //    ViewBag.title = "Officer Details";
+        //    try
+        //    {
+        //        string username = HttpContext.Session.GetString("Username");
+        //        if (string.IsNullOrEmpty(username))
+        //        {
+        //            return RedirectToAction("Login", "Account");
+        //        }
+
+        //        HttpContext.Session.SetInt32("RefId", id);
+
+        //        int? referenceid = HttpContext.Session.GetInt32("RefId");
+
+        //        if (referenceid.HasValue)
+        //        {
+        //            ViewBag.ReferenceId = referenceid.Value;
+        //        }
+
+        //        var model = new PESBViewModel
+        //        {
+        //            //officer_details_List = await _pesb.Get_Officer_List_GetById_Async(id)
+        //        };
+
+        //        if (model == null)
+        //        {
+        //            ViewBag.Error = "No data found.";
+        //            return View();
+        //        }
+        //        return View(model);
+        //    }
+        //    catch (Exception)
+        //    {
+        //        ViewBag.Error = "Something went wrong while loading the page.";
+        //        return View();
+        //    }
+
+        //}
+
+
         [HttpPost]
         public async Task<IActionResult> officer_posting_details([FromBody] PESBViewModel objmodel)
         {
             string id = "0";
 
-            int? officerid = HttpContext.Session.GetInt32("RefId");
+
+            //int? officerid = HttpContext.Session.GetInt32("RefId");
+
+            int? officerid = HttpContext.Session.GetInt32("OfficerId");
+
 
             if (!officerid.HasValue)
             {
@@ -754,6 +818,7 @@ namespace VigilanceClearance.Controllers
                 return Json(new { success = false, message = "An unexpected error occurred." });
             }
         }
+
 
         [HttpGet]
         public async Task<IActionResult> Officer_list(int id)
@@ -837,6 +902,7 @@ namespace VigilanceClearance.Controllers
                 return View();
             }
         }
+
 
     }
 }

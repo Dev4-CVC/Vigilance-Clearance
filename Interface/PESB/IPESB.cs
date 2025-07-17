@@ -45,11 +45,18 @@ namespace VigilanceClearance.Interface.PESB
         //officer details and officer posting details
         Task<int> Insert_Officer_Details_Async(officer_details_model objmodel);
         Task<int> Insert_Officer_Posting_Details_Async(officer_posting_details_model objmodel);
+
         Task<List<SelectListItem>> Get_Service_DropDownAsync();
         Task<List<SelectListItem>> Get_Batch_DropDownAsync();
         Task<List<SelectListItem>> Get_Cadre_DropDownAsync();
         Task<List<officer_details_model>> Get_Officer_List_GetById_Async(int id);
         Task<List<officer_posting_details_model>> Get_Officer_Posting_List_GetById_Async(int id);
         Task<List<officer_details_model>> Get_Officer_Details_Async(int id);
+
+
+
+        #region Added as on date 11_07_11
+        Task<List<SelectListItem>> GetOrgByMinCode(string Mincode);
+        #endregion
     }
 }

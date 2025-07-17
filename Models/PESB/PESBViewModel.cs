@@ -13,13 +13,10 @@ namespace VigilanceClearance.Models.PESB
         public new_reference_model new_reference { get; set; }
         public List<new_reference_model> new_reference_List { get; set; }
         public List<SelectListItem> reference_received_for_ddl_List { get; set; }
-        public List<SelectListItem> post_ddl_List { get; set; }
+        public List<SelectListItem>? post_ddl_List { get; set; } = new();        
         public List<SelectListItem> sub_post_ddl_List { get; set; }
         public List<SelectListItem> organization_ddl_List { get; set; }
         public List<SelectListItem> ministry_ddl_List { get; set; }
-
-
-
 
         //insert Officer details:
         public officer_details_model officer_details { get; set; }
