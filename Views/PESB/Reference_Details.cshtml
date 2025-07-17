@@ -1,0 +1,150 @@
+﻿@model VigilanceClearance.Models.PESB.PESBViewModel
+
+@{
+    // Layout = "~/Views/Shared/_PESBLayout.cshtml";
+    Layout = "~/Views/Shared/_PESB_Main_Layout.cshtml";
+}
+<style>
+    .card-header > .card-tools {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+</style>
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-3">
+
+            <!-- Profile Image -->
+            <div class="card card-primary">
+                <div class="card-body box-profile">
+
+                    @if (Model != null)
+                    {
+                        <ul class="list-group list-group-unbordered mb-3">
+                            <li class="list-group-item">
+                                <b>ID</b> <a class="float-right">@Model.new_reference.Id</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Reference Received For</b> <a class="float-right">@Model.new_reference.referenceReceivedFor</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Reference Received From</b> <a class="float-right">@Model.new_reference.referenceReceivedFrom</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Post</b> <a class="float-right">@Model.new_reference.selectionForThePostCategory</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Sub Post</b> <a class="float-right">@Model.new_reference.selectionForThePostSubCategory</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>File No.</b> <a class="float-right">@Model.new_reference.referenceNoFileNo</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>CVC Date</b> <a class="float-right">@Model.new_reference.referenceOrSubmissionToCvcDate</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>CVC Ref. ID</b> <a class="float-right">@Model.new_reference.cvcReferenceIdFileNo</a>
+                            </li>
+                           @*  <li class="list-group-item">
+                                <b>Created By</b> <a class="float-right">@Model.new_reference.createdBy</a>
+                            </li> *@
+                            <li class="list-group-item">
+                                <b>Pending With</b> <a class="float-right">@Model.new_reference.pendingWith</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>UID</b> <a class="float-right">@Model.new_reference.uid</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Reference ID</b> <a class="float-right">@Model.new_reference.referenceId</a>
+                            </li>
+                        </ul>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning mt-4">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>No data found for this reference.
+                        </div>
+                    }
+                </div>
+            </div>
+
+        </div>
+        
+
+        @* Officer List *@
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12">
+                           
+                            <div class="card-header">
+                                <h1 class="card-title">Officer List</h1>
+                                <div class="card-tools">
+                                    <a href="@Url.Action("Officer_Reports", "PESB")" class="btn btn-primary">
+                                        <i class="bi bi-arrow-right-circle"></i> Add Officer
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="card-body">
+                                <table id="example1" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 50px;">S No.</th>
+                                            <th>Officer Name</th>
+                                            <th>Father's Name</th>
+                                            <th style="width: 150px;">Date Of Birth</th>
+                                            <th style="width: 150px;">Service Entry Date</th>
+                                            <th style="width: 150px;">Retirement Date</th>
+                                            <th>Service</th>
+                                            <th>Cadre</th>
+                                            <th>Batch</th>
+                                            <th>Other Service</th>
+                                        </tr>
+                                    </thead>
+
+                                    @if (Model.officer_details_List != null && Model.officer_details_List.Any())
+                                    {
+                                        int SNo = 1;
+                                        <tbody>
+                                            @foreach (var officer in Model.officer_details_List)
+                                            {
+                                                <tr>
+                                                    <td>@SNo</td>
+                                                    <td>@officer.officer_Name</td>
+                                                    <td>@officer.officer_FatherName</td>
+                                                    <td>@officer.officer_DateOfBirth.ToString("dd-MM-yyyy")</td>
+                                                    <td>@officer.officer_ServiceEntryDate.ToString("dd-MM-yyyy")</td>
+                                                    <td>@officer.officer_RetirementDate.ToString("dd-MM-yyyy")</td>
+                                                    <td>@officer.officer_Service</td>
+                                                    <td>@officer.officer_Cadre</td>
+                                                    <td>@officer.officer_Batch_Year</td>
+                                                    <td>@officer.officer_other_Service</td>
+                                                </tr>
+                                                SNo++;
+                                            }
+                                        </tbody>
+                                    }
+                                    else
+                                    {
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="10" class="text-center">No officers found.</td>
+                                            </tr>
+                                        </tbody>
+                                    }
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+

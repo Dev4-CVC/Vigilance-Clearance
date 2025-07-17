@@ -1,7 +1,7 @@
-﻿@model VigilanceClearance.Models.PESB.new_reference_model
+﻿@model VigilanceClearance.Models.PESB.PESBViewModel
 
 @{
-    Layout = "~/Views/Shared/_PESBLayout.cshtml";
+    Layout = "~/Views/Shared/_PESB_Main_Layout.cshtml";
 }
 
 <!-- Add this in the <head> section -->
@@ -12,7 +12,6 @@
         <i class="bi bi-arrow-right-circle"></i> Add Officer
     </a>
 </div>
-
 
 
 <div class="container">
@@ -28,57 +27,62 @@
                 <div class="row g-3">
                     <div class="col-md-6">
                         <div class="border rounded p-3">
-                            <strong>Reference Received For:</strong> <span class="text-muted">@Model.referenceReceivedFor</span>
+                            <strong>Id:</strong> <span class="text-muted">@Model.new_reference.Id</span>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="border rounded p-3">
-                            <strong>Reference Received From:</strong> <span class="text-muted">@Model.referenceReceivedFrom</span>
+                            <strong>Reference Received For:</strong> <span class="text-muted">@Model.new_reference.referenceReceivedFor</span>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="border rounded p-3">
-                            <strong>Post:</strong> <span class="text-muted">@Model.selectionForThePostCategory</span>
+                            <strong>Reference Received From:</strong> <span class="text-muted">@Model.new_reference.referenceReceivedFrom</span>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="border rounded p-3">
-                            <strong>Sub Post :</strong> <span class="text-muted">@Model.selectionForThePostSubCategory</span>
+                            <strong>Post:</strong> <span class="text-muted">@Model.new_reference.selectionForThePostCategory</span>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="border rounded p-3">
-                            <strong>File No:</strong> <span class="text-muted">@Model.referenceNoFileNo</span>
+                            <strong>Sub Post :</strong> <span class="text-muted">@Model.new_reference.selectionForThePostSubCategory</span>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="border rounded p-3">
-                            <strong>CVC Date:</strong> <span class="text-muted">@Model.referenceOrSubmissionToCvcDate</span>
+                            <strong>File No:</strong> <span class="text-muted">@Model.new_reference.referenceNoFileNo</span>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="border rounded p-3">
-                            <strong>CVC Ref ID:</strong> <span class="text-muted">@Model.cvcReferenceIdFileNo</span>
+                            <strong>CVC Date:</strong> <span class="text-muted">@Model.new_reference.referenceOrSubmissionToCvcDate</span>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="border rounded p-3">
-                            <strong>Created By:</strong> <span class="text-muted">@Model.createdBy</span>
+                            <strong>CVC Ref ID:</strong> <span class="text-muted">@Model.new_reference.cvcReferenceIdFileNo</span>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="border rounded p-3">
-                            <strong>Pending With:</strong> <span class="text-muted">@Model.pendingWith</span>
+                            <strong>Created By:</strong> <span class="text-muted">@Model.new_reference.createdBy</span>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="border rounded p-3">
-                            <strong>UID:</strong> <span class="text-muted">@Model.uid</span>
+                            <strong>Pending With:</strong> <span class="text-muted">@Model.new_reference.pendingWith</span>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="border rounded p-3">
-                            <strong>Reference ID:</strong> <span class="text-muted">@Model.referenceId</span>
+                            <strong>UID:</strong> <span class="text-muted">@Model.new_reference.uid</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="border rounded p-3">
+                            <strong>Reference ID:</strong> <span class="text-muted">@Model.new_reference.referenceId</span>
                         </div>
                     </div>
                 </div>
@@ -91,5 +95,29 @@
             <i class="bi bi-exclamation-triangle-fill me-2"></i>No data found for this reference.
         </div>
     }
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Father Name</th>
+                <th>Service</th>
+            </tr>
+        </thead>
+        @if (Model.officer_details_List != null && Model.officer_details_List.Any())
+        {
+            <tbody>
+                @foreach (var officer in Model.officer_details_List)
+                {
+                    <tr>
+                        <td>@officer.officer_Name</td>
+                        <td>@officer.officer_FatherName</td>
+                        <td>@officer.officer_Service</td>
+                    </tr>
+                }
+            </tbody>
+        };
+
+    </table>
 </div>
 

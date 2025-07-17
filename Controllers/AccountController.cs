@@ -21,7 +21,7 @@ using VigilanceClearance.Models.DTOs;
 using VigilanceClearance.Models.Modal_Properties.Account;
 using VigilanceClearance.Models.ViewModel;
 using VigilanceClearance.Services;
-using System.Text.Json; // or Newtonsoft.Json
+using System.Text.Json;
 
 namespace VigilanceClearance.Controllers
 {
@@ -80,6 +80,23 @@ namespace VigilanceClearance.Controllers
                     .ToArray();
 
                 HttpContext.Session.SetString("AccessToken", tokenResponse.Token);
+                HttpContext.Session.SetString("Username", model.Username);
+
+                
+                //if (model.Username.Equals("chandan@gmail.com", StringComparison.OrdinalIgnoreCase))
+                //{
+                //    return RedirectToAction("PESB_Dashboard", "PESB");
+                //}
+                //else if (model.Username.Equals("admin@domain.com", StringComparison.OrdinalIgnoreCase))
+                //{
+                //    return RedirectToAction("Users", "Admin");
+                //}
+                //else
+                //{
+                //    // Default redirect for unknown or general users
+                //    return RedirectToAction("Index", "Home");
+                //}
+
 
                 var UserDetails = await _authService.GetUserDetailsbyUserName(username);
 

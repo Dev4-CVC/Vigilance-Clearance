@@ -1,0 +1,121 @@
+﻿@model VigilanceClearance.Models.PESB.PESBViewModel
+
+@{
+    Layout = "~/Views/Shared/_PESB_Main_Layout.cshtml";
+}
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+
+
+
+
+@if (Model.officer_details_List != null && Model.officer_details_List.Any())
+{
+    <div class="table-responsive">
+        <table id="vcReferenceTable" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Action</th>
+                    <th>masterReferenceID</th>
+                    <th>officer_Name</th>
+                    <th>officer_FatherName</th>
+
+                    <th>officer_DateOfBirth</th>
+                    <th>officer_ServiceEntryDate</th>
+                    <th>officer_RetirementDate</th>
+
+                    <th>officer_Service</th>
+                    <th>Cadre</th>
+                    <th>Other Service</th>
+                    <th>Batch Year</th>
+
+                    <th>createdBy</th>
+                    <th>createdBy_SessionId</th>
+                    <th>createdBy_IP</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.officer_details_List.Count; i++)
+                {
+                    var item = Model.officer_details_List[i];
+                    <tr>
+                        <td>@(i + 1)</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="location.href='@Url.Action("Officer_Details", "PESB", new { id = item.Id })'">Details</button>
+                        </td>
+                        <td>@item.masterReferenceID</td>
+                        <td>@item.officer_Name</td>
+                        <td>@item.officer_FatherName</td>
+
+                        <td>@item.officer_DateOfBirth</td>
+                        <td>@item.officer_ServiceEntryDate</td>
+                        <td>@item.officer_RetirementDate</td>
+
+                        <td>@item.officer_Service</td>
+                        <td>@item.officer_Cadre</td>
+                        <td>@item.officer_other_Service</td>
+                        <td>@item.officer_Batch_Year</td>
+
+                        <td>@item.createdBy</td>
+                        <td>@item.createdBy_SessionId</td>
+                        <td>@item.createdBy_IP</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning">No records found.</div>
+}
+
+<!-- jQuery (required for DataTables) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+
+
+@* data table *@
+@* <script>
+    $(document).ready(function () {
+        $('#vcReferenceTable').DataTable({
+            pageLength: 10,
+            lengthMenu: [5, 10, 25, 50, 100],
+            ordering: true,
+            searching: true,
+            language: {
+                emptyTable: "No records available"
+            },
+            columnDefs: [
+                { orderable: false, targets: 1 }
+            ]
+        });
+    });
+</script>
+ *@
+
+@* this is sweat alert message , for add new reference  *@
+@* @if (TempData["SuccessMessage"] != null)
+{
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: '@TempData["SuccessMessage"]',
+            showConfirmButton: true,
+            confirmButtonText: 'Close', // 👈 Customize the button text
+            timerProgressBar: true
+        });
+    </script>
+} *@
+
+@*
+<script>
+    $(document).ready(function () {
+        $('#vcReferenceTable').DataTable(); // Ensure DataTables is included
+    });
+</script> *@

@@ -9,6 +9,7 @@ using VigilanceClearance.Interface.PESB;
 using VigilanceClearance.Models;
 using VigilanceClearance.Models.Modal_Properties.PESB;
 using VigilanceClearance.Models.PESB;
+using VigilanceClearance.Models.ViewModel.Ministry;
 using VigilanceClearance.Models.ViewModel.PESB;
 
 namespace VigilanceClearance.DataAccessLayer.PESB_Service
@@ -290,7 +291,7 @@ namespace VigilanceClearance.DataAccessLayer.PESB_Service
                 var jsonContent = await response.Content.ReadAsStringAsync();
 
                 var apiResponse = JsonConvert.DeserializeObject<ApiResponseWrapper<List<VcReferenceReceivedFor_VM>>>(jsonContent);
-                
+
                 return apiResponse?.isSuccess == true && apiResponse.data != null ? apiResponse.data : new List<VcReferenceReceivedFor_VM>();
             }
             catch (Exception)
@@ -336,96 +337,6 @@ namespace VigilanceClearance.DataAccessLayer.PESB_Service
         }
 
 
-
-
-        //db table name: tbl_Master_Vc_ServiceNew
-        //Action Method: PESB_Reports
-        public async Task<List<SelectListItem>> Get_Service_DropDownAsync()
-        {
-            var accessToken = _httpContextAccessor.HttpContext?.Session.GetString("AccessToken");
-            if (string.IsNullOrEmpty(accessToken)) return new List<SelectListItem>();
-
-            try
-            {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-
-                var response = await _httpClient.GetAsync($"{APIURL}DropDown/ServiceGetAll");
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    return new List<SelectListItem>();
-                }
-
-                var json = await response.Content.ReadAsStringAsync();
-                var items = JsonConvert.DeserializeObject<List<DropDownResponseModel>>(json) ?? new();
-
-                return items.Select(item => new SelectListItem
-                {
-                    Value = item.Value,
-                    Text = item.Text
-                }).ToList();
-            }
-            catch
-            {
-                return new List<SelectListItem>();
-            }
-        }
-
-        //db table name: tbl_Master_Vc_Cadre
-        //Action Method: PESB_Reports
-        public async Task<List<SelectListItem>> Get_Cadre_DropDownAsync()
-        {
-            var accessToken = _httpContextAccessor.HttpContext?.Session.GetString("AccessToken");
-            if (string.IsNullOrEmpty(accessToken)) return new List<SelectListItem>();
-
-            try
-            {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-
-                var response = await _httpClient.GetAsync($"{APIURL}DropDown/CadreGetAll");
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    return new List<SelectListItem>();
-                }
-
-                var json = await response.Content.ReadAsStringAsync();
-                var items = JsonConvert.DeserializeObject<List<DropDownResponseModel>>(json) ?? new();
-
-                return items.Select(item => new SelectListItem
-                {
-                    Value = item.Value,
-                    Text = item.Text
-                }).ToList();
-            }
-            catch
-            {
-                return new List<SelectListItem>();
-            }
-        }
-
-        public Task<List<SelectListItem>> Get_Batch_DropDownAsync()
-        {
-            try
-            {
-                var batchList = new List<SelectListItem>();
-
-                for (int year = 1970; year <= 2070; year++)
-                {
-                    batchList.Add(new SelectListItem
-                    {
-                        Value = year.ToString(),
-                        Text = year.ToString()
-                    });
-                }
-
-                return Task.FromResult(batchList);
-            }
-            catch (Exception)
-            {
-                return Task.FromResult(new List<SelectListItem>());
-            }
-        }
 
 
 
@@ -523,6 +434,9 @@ namespace VigilanceClearance.DataAccessLayer.PESB_Service
         }
 
 
+
+
+
         //new operation:  dated on 9 july 2025
         //new reference 
         public async Task<int> Insert_Add_New_Reference_Async(new_reference_model objmodel)
@@ -572,10 +486,10 @@ namespace VigilanceClearance.DataAccessLayer.PESB_Service
         public async Task<List<new_reference_model>> Get_Vc_Reference_Received_For_List_GetById_and_Username_Async(int id, string username)
         {
             if (string.IsNullOrWhiteSpace(username)) return new List<new_reference_model>();
-      
+
             var context = _httpContextAccessor.HttpContext;
             if (context == null) return new List<new_reference_model>();
-       
+
             var accessToken = _httpContextAccessor.HttpContext?.Session.GetString("AccessToken");
             if (string.IsNullOrEmpty(accessToken)) return new List<new_reference_model>();
 
@@ -634,7 +548,7 @@ namespace VigilanceClearance.DataAccessLayer.PESB_Service
         }
 
 
-        //officer details
+        //officer details and officer posting details
         public async Task<int> Insert_Officer_Details_Async(officer_details_model objmodel)
         {
             try
@@ -679,8 +593,6 @@ namespace VigilanceClearance.DataAccessLayer.PESB_Service
                 return 0;
             }
         }
-
-        //officer posting details
         public async Task<int> Insert_Officer_Posting_Details_Async(officer_posting_details_model objmodel)
         {
             try
@@ -725,9 +637,195 @@ namespace VigilanceClearance.DataAccessLayer.PESB_Service
                 return 0;
             }
         }
+        public async Task<List<SelectListItem>> Get_Service_DropDownAsync()
+        {
+            var accessToken = _httpContextAccessor.HttpContext?.Session.GetString("AccessToken");
+            if (string.IsNullOrEmpty(accessToken)) return new List<SelectListItem>();
+
+            try
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+                var response = await _httpClient.GetAsync($"{APIURL}DropDown/ServiceGetAll");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return new List<SelectListItem>();
+                }
+
+                var json = await response.Content.ReadAsStringAsync();
+                var items = JsonConvert.DeserializeObject<List<DropDownResponseModel>>(json) ?? new();
+
+                return items.Select(item => new SelectListItem
+                {
+                    Value = item.Value,
+                    Text = item.Text
+                }).ToList();
+            }
+            catch
+            {
+                return new List<SelectListItem>();
+            }
+        }
+        public async Task<List<SelectListItem>> Get_Cadre_DropDownAsync()
+        {
+            var accessToken = _httpContextAccessor.HttpContext?.Session.GetString("AccessToken");
+            if (string.IsNullOrEmpty(accessToken)) return new List<SelectListItem>();
+
+            try
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+                var response = await _httpClient.GetAsync($"{APIURL}DropDown/CadreGetAll");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return new List<SelectListItem>();
+                }
+
+                var json = await response.Content.ReadAsStringAsync();
+                var items = JsonConvert.DeserializeObject<List<DropDownResponseModel>>(json) ?? new();
+
+                return items.Select(item => new SelectListItem
+                {
+                    Value = item.Value,
+                    Text = item.Text
+                }).ToList();
+            }
+            catch
+            {
+                return new List<SelectListItem>();
+            }
+        }
+        public Task<List<SelectListItem>> Get_Batch_DropDownAsync()
+        {
+            try
+            {
+                var batchList = new List<SelectListItem>();
+
+                for (int year = 1970; year <= 2070; year++)
+                {
+                    batchList.Add(new SelectListItem
+                    {
+                        Value = year.ToString(),
+                        Text = year.ToString()
+                    });
+                }
+
+                return Task.FromResult(batchList);
+            }
+            catch (Exception)
+            {
+                return Task.FromResult(new List<SelectListItem>());
+            }
+        }
+        public async Task<List<officer_details_model>> Get_Officer_List_GetById_Async(int id)
+        {
+            if (id <= 0) return new List<officer_details_model>();
+
+            var accessToken = _httpContextAccessor.HttpContext?.Session.GetString("AccessToken");
+            if (string.IsNullOrEmpty(accessToken)) return new List<officer_details_model>();
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+            var requestUrl = $"{APIURL}OfficerDetails/OfficerDetailsGetByMasterReferenceID?id={id}";
+
+            try
+            {
+                var response = await _httpClient.GetAsync(requestUrl);
+                if (!response.IsSuccessStatusCode)
+                {
+                    return new List<officer_details_model>();
+                }
+
+                var jsonContent = await response.Content.ReadAsStringAsync();
+
+                var apiResponse = JsonConvert.DeserializeObject<ApiResponseWrapper<List<officer_details_model>>>(jsonContent);
+
+                return apiResponse?.isSuccess == true && apiResponse.data != null
+                    ? apiResponse.data
+                    : new List<officer_details_model>();
+            }
+            catch (Exception)
+            {
+                return new List<officer_details_model>();
+            }
+        }
+        public async Task<List<officer_posting_details_model>> Get_Officer_Posting_List_GetById_Async(int id)
+        {
+            if (id <= 0) return new List<officer_posting_details_model>();
+
+            var accessToken = _httpContextAccessor.HttpContext?.Session.GetString("AccessToken");
+            if (string.IsNullOrEmpty(accessToken)) return new List<officer_posting_details_model>();
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+            var requestUrl = $"{APIURL}OfficerPostingDetails/OfficerPostingDetailsGetByOfficerId?id={id}";
+
+            try
+            {
+                var response = await _httpClient.GetAsync(requestUrl);
+                if (!response.IsSuccessStatusCode)
+                {
+                    return new List<officer_posting_details_model>();
+                }
+
+                var jsonContent = await response.Content.ReadAsStringAsync();
+
+                var apiResponse = JsonConvert.DeserializeObject<ApiResponseWrapper<List<officer_posting_details_model>>>(jsonContent);
+
+                return apiResponse?.isSuccess == true && apiResponse.data != null
+                    ? apiResponse.data
+                    : new List<officer_posting_details_model>();
+            }
+            catch (Exception)
+            {
+                return new List<officer_posting_details_model>();
+            }
+        }
+        public async Task<List<officer_details_model>> Get_Officer_Details_Async(int id)
+        {
+            if (id <= 0) return new List<officer_details_model>();
+
+            var accessToken = _httpContextAccessor.HttpContext?.Session.GetString("AccessToken");
+            if (string.IsNullOrEmpty(accessToken)) return new List<officer_details_model>();
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+            var requestUrl = $"{APIURL}OfficerDetails/OfficerDetailsGetById?id={id}";
+
+            try
+            {
+                var response = await _httpClient.GetAsync(requestUrl);
+                if (!response.IsSuccessStatusCode)
+                {
+                    return new List<officer_details_model>();
+                }
+
+                var jsonContent = await response.Content.ReadAsStringAsync();
+
+                var apiResponse = JsonConvert.DeserializeObject<ApiResponseWrapper<officer_details_model>>(jsonContent);
+
+                if (apiResponse?.isSuccess == true && apiResponse.data != null)
+                {
+                    return new List<officer_details_model> { apiResponse.data };
+                }
+                else
+                {
+                    return new List<officer_details_model>();
+                }
+
+            }
+            catch (Exception)
+            {
+                return new List<officer_details_model>();
+            }
+        }
+
 
 
         #region Added as on date 11_07_2025
+
         public async Task<List<SelectListItem>> GetOrgByMinCode(string Mincode)
         {
             if (string.IsNullOrWhiteSpace(Mincode)) return new List<SelectListItem>();
@@ -751,6 +849,7 @@ namespace VigilanceClearance.DataAccessLayer.PESB_Service
                 var jsonContent = await response.Content.ReadAsStringAsync();
                 var items = JsonConvert.DeserializeObject<List<DropDownResponseModel>>(jsonContent) ?? new List<DropDownResponseModel>();
 
+
                 return items.Select(item => new SelectListItem
                 {
                     Value = item.Value,
@@ -758,11 +857,13 @@ namespace VigilanceClearance.DataAccessLayer.PESB_Service
                 }).ToList();
             }
             catch (Exception ex)
+
             {
                 return new List<SelectListItem>();
             }
         }
         #endregion
+
 
 
     }

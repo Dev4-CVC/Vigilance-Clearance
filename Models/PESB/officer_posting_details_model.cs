@@ -10,8 +10,6 @@ namespace VigilanceClearance.Models.ViewModel.PESB
         //public int referenceid { get; set; }
         public int vcOfficerId  { get; set; }
 
-
-
         public string orgCode { get; set; }
         public string orgMinistry { get; set; }
         public string designation { get; set; }
@@ -30,5 +28,7 @@ namespace VigilanceClearance.Models.ViewModel.PESB
         public string actionBy { get; set; }
         public string actionBy_SessionId { get; set; }
         public string actionBy_IP { get; set; }
+
+
     }
 }

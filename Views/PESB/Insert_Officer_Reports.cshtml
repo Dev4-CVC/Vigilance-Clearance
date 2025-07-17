@@ -1,0 +1,75 @@
+﻿@model VigilanceClearance.Models.PESB.PESBViewModel
+
+@{
+    Layout = "~/Views/Shared/_PESBLayout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Insert_Officer_Reports">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="officer_details.officer_Name" class="control-label"></label>
+                <input asp-for="officer_details.officer_Name" class="form-control" />
+                <span asp-validation-for="officer_details.officer_Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="officer_details.officer_FatherName" class="control-label"></label>
+                <input asp-for="officer_details.officer_FatherName" class="form-control" />
+                <span asp-validation-for="officer_details.officer_FatherName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="officer_details.officer_DateOfBirth" class="control-label"></label>
+                <input asp-for="officer_details.officer_DateOfBirth" class="form-control datepicker" />
+                <span asp-validation-for="officer_details.officer_DateOfBirth" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="officer_details.officer_ServiceEntryDate" class="control-label"></label>
+                <input asp-for="officer_details.officer_ServiceEntryDate" class="form-control datepicker" />
+                <span asp-validation-for="officer_details.officer_ServiceEntryDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="officer_details.officer_RetirementDate" class="control-label"></label>
+                <input asp-for="officer_details.officer_RetirementDate" class="form-control datepicker" />
+                <span asp-validation-for="officer_details.officer_RetirementDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="officer_details.officer_Service" class="control-label"></label>
+                <input asp-for="officer_details.officer_Service" class="form-control" />
+                <span asp-validation-for="officer_details.officer_Service" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="officer_details.officer_Cadre" class="control-label"></label>
+                <input asp-for="officer_details.officer_Cadre" class="form-control" />
+                <span asp-validation-for="officer_details.officer_Cadre" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="officer_details.officer_other_Service" class="control-label"></label>
+                <input asp-for="officer_details.officer_other_Service" class="form-control" />
+                <span asp-validation-for="officer_details.officer_other_Service" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="officer_details.officer_Batch_Year" class="control-label"></label>
+                <input asp-for="officer_details.officer_Batch_Year" class="form-control" />
+                <span asp-validation-for="officer_details.officer_Batch_Year" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script>
+    flatpickr(".datepicker", {
+        dateFormat: "Y-m-d",
+        allowInput: false
+    });
+</script>

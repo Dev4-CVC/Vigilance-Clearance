@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Reflection.Metadata;
 using VigilanceClearance.Interface.PESB;
 using VigilanceClearance.Models.Modal_Properties.PESB;
 using VigilanceClearance.Models.PESB;
@@ -274,29 +275,6 @@ namespace VigilanceClearance.Controllers
                 ViewBag.Error = "Something went wrong while loading the page.";
                 return View();
             }
-
-            //int id = 0;
-            //try
-            //{
-            //    ViewBag.title = "PESB Appointment";
-
-            //    string username = HttpContext.Session.GetString("Username");
-            //    if (string.IsNullOrEmpty(username))
-            //    {
-            //        return RedirectToAction("Login", "Account");
-            //    }
-
-            //    var model = new VcReferenceReceivedFor_VM
-            //    {
-            //        data_List = await _pesb.Get_VC_ReferenceReceivedFor_List_GetByIdAsync(id, username)
-            //    };
-            //    return View(model);
-            //}
-            //catch (Exception)
-            //{
-            //    ViewBag.Error = "Something went wrong while loading the page.";
-            //    return View();
-            //}
         }
 
 
@@ -593,12 +571,51 @@ namespace VigilanceClearance.Controllers
                 }
 
                 var result = await _pesb.Get_Vc_Reference_Received_For_Details_GetById_Async(id);
-                var model = result.FirstOrDefault();
-                if (model == null)
+                var data = result.FirstOrDefault();
+                if (data == null)
                 {
                     ViewBag.Error = "No data found.";
                     return View();
                 }
+
+                var model = new PESBViewModel
+                {
+                    new_reference = data,
+                    officer_details_List = await _pesb.Get_Officer_List_GetById_Async(id)
+                };
+
+                return View(model);
+            }
+            catch (Exception)
+            {
+                ViewBag.Error = "Something went wrong while loading the page.";
+                return View();
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Reference_Details(int id)
+        {
+            ViewBag.title = "Reference Details";
+            try
+            {
+                HttpContext.Session.SetInt32("RefId", id);
+
+               
+                var result = await _pesb.Get_Vc_Reference_Received_For_Details_GetById_Async(id);
+                var data = result.FirstOrDefault();
+                if (data == null)
+                {
+                    ViewBag.Error = "No data found.";
+                    return View();
+                }
+
+                var model = new PESBViewModel
+                {
+                    new_reference = data,
+                    officer_details_List = await _pesb.Get_Officer_List_GetById_Async(id)
+                };
+
                 return View(model);
             }
             catch (Exception)
@@ -613,7 +630,7 @@ namespace VigilanceClearance.Controllers
         [HttpGet]
         public async Task<IActionResult> Officer_Reports()
         {
-            ViewBag.title = "Officer Reports";
+            ViewBag.title = "Officer Details Reports";
             string id = "0";
 
             int? referenceid = HttpContext.Session.GetInt32("RefId");
@@ -623,6 +640,7 @@ namespace VigilanceClearance.Controllers
                 ViewBag.Error = "Reference ID not found in session.";
                 return View(); // Or redirect back to a safe page
             }
+
             ViewBag.ReferenceId = referenceid.Value;
             try
             {
@@ -632,7 +650,9 @@ namespace VigilanceClearance.Controllers
                     batch_ddl_List = await _pesb.Get_Batch_DropDownAsync(),
                     cadre_ddl_List = await _pesb.Get_Cadre_DropDownAsync(),
                     organization_ddl_List = await _pesb.GetOrganizationDropDownAsync(id),
-                    ministry_ddl_List = new List<SelectListItem>()
+                    ministry_ddl_List = new List<SelectListItem>(),
+                    //officer_details_List = await _pesb.Get_Officer_List_GetById_Async(referenceid.Value),
+                    //officer_posting_details_List = await _pesb.Get_Officer_Posting_List_GetById_Async(referenceid.Value),
                 };
                 return View(model);
             }
@@ -649,6 +669,8 @@ namespace VigilanceClearance.Controllers
             try
             {
                 int? referenceid = HttpContext.Session.GetInt32("RefId");
+
+                int? id = referenceid;
 
                 if (!referenceid.HasValue)
                 {
@@ -692,7 +714,13 @@ namespace VigilanceClearance.Controllers
                     return Json(new { success = false, message = "Record not saved." });
                 }
 
-                return Json(new { success = true });
+                // ✅ Return JSON with redirect URL
+                return Json(new
+                {
+                    success = true,
+                    redirectUrl = Url.Action("Reference_Details", new { id = id })
+                });
+
             }
             catch (Exception ex)
             {
@@ -700,53 +728,59 @@ namespace VigilanceClearance.Controllers
             }
         }
 
+
         [HttpGet]
-        public async Task<IActionResult> Officer_list(int id)
-        {
-            ViewBag.title = "Officer Details";
-            try
-            {
-                string username = HttpContext.Session.GetString("Username");
-                if (string.IsNullOrEmpty(username))
-                {
-                    return RedirectToAction("Login", "Account");
-                }
+        //public async Task<IActionResult> Officer_list(int id)
+        //{
+        //    ViewBag.title = "Officer Details";
+        //    try
+        //    {
+        //        string username = HttpContext.Session.GetString("Username");
+        //        if (string.IsNullOrEmpty(username))
+        //        {
+        //            return RedirectToAction("Login", "Account");
+        //        }
 
-                HttpContext.Session.SetInt32("RefId", id);
+        //        HttpContext.Session.SetInt32("RefId", id);
 
-                int? referenceid = HttpContext.Session.GetInt32("RefId");
+        //        int? referenceid = HttpContext.Session.GetInt32("RefId");
 
-                if (referenceid.HasValue)
-                {
-                    ViewBag.ReferenceId = referenceid.Value;
-                }
+        //        if (referenceid.HasValue)
+        //        {
+        //            ViewBag.ReferenceId = referenceid.Value;
+        //        }
 
-                var model = new PESBViewModel
-                {
-                    //officer_details_List = await _pesb.Get_Officer_List_GetById_Async(id)
-                };
+        //        var model = new PESBViewModel
+        //        {
+        //            //officer_details_List = await _pesb.Get_Officer_List_GetById_Async(id)
+        //        };
 
-                if (model == null)
-                {
-                    ViewBag.Error = "No data found.";
-                    return View();
-                }
-                return View(model);
-            }
-            catch (Exception)
-            {
-                ViewBag.Error = "Something went wrong while loading the page.";
-                return View();
-            }
+        //        if (model == null)
+        //        {
+        //            ViewBag.Error = "No data found.";
+        //            return View();
+        //        }
+        //        return View(model);
+        //    }
+        //    catch (Exception)
+        //    {
+        //        ViewBag.Error = "Something went wrong while loading the page.";
+        //        return View();
+        //    }
 
-        }
+        //}
+
 
         [HttpPost]
         public async Task<IActionResult> officer_posting_details([FromBody] PESBViewModel objmodel)
         {
             string id = "0";
 
+
+            //int? officerid = HttpContext.Session.GetInt32("RefId");
+
             int? officerid = HttpContext.Session.GetInt32("OfficerId");
+
 
             if (!officerid.HasValue)
             {
@@ -782,6 +816,90 @@ namespace VigilanceClearance.Controllers
             catch (Exception ex)
             {
                 return Json(new { success = false, message = "An unexpected error occurred." });
+            }
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> Officer_list(int id)
+        {
+            ViewBag.title = "Officer Details";
+            try
+            {
+                string username = HttpContext.Session.GetString("Username");
+                if (string.IsNullOrEmpty(username))
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+
+                HttpContext.Session.SetInt32("RefId", id);
+
+                int? referenceid = HttpContext.Session.GetInt32("RefId");
+
+                if (referenceid.HasValue)
+                {
+                    ViewBag.ReferenceId = referenceid.Value;
+                }
+
+                var model = new PESBViewModel
+                {
+                    officer_details_List = await _pesb.Get_Officer_List_GetById_Async(id)
+                };
+
+                if (model.officer_details_List == null || !model.officer_details_List.Any())
+                {
+                    ViewBag.Error = "No data found.";
+                    return View(model);
+                }
+
+                return View(model);
+            }
+            catch (Exception)
+            {
+                ViewBag.Error = "Something went wrong while loading the page.";
+                return View();
+            }
+        }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> Officer_Details(int masterReferenceID)
+        {
+            ViewBag.title = "Reference Details";
+            try
+            {
+                //HttpContext.Session.SetInt32("RefId", masterReferenceID);
+
+                int referenceid = (int)HttpContext.Session.GetInt32("RefId");
+
+                //if (referenceid.HasValue)
+                //{
+                //    ViewBag.ReferenceId = referenceid.Value;
+                //}
+
+                var masterreferenceresult = await _pesb.Get_Vc_Reference_Received_For_Details_GetById_Async(masterReferenceID);
+                var modelreference = masterreferenceresult.FirstOrDefault();
+                if (masterreferenceresult == null)
+                {
+                    ViewBag.Error = "No data found.";
+                    return View();
+                }
+
+
+                var model = new PESBViewModel
+                {
+                    new_reference = modelreference,
+                    officer_details_List = await _pesb.Get_Officer_List_GetById_Async(referenceid)
+                };
+
+                return View(model);
+
+            }
+            catch (Exception)
+            {
+                ViewBag.Error = "Something went wrong while loading the page.";
+                return View();
             }
         }
 
