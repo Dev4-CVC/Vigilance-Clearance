@@ -1,0 +1,185 @@
+﻿@using VigilanceClearance.Models.ViewModel
+@using VigilanceClearance.Models.ViewModel.CBI_DealingHand
+@using VigilanceClearance.Models.ViewModel.Ministry
+@model List<OfficerAndFeedbackViewModel>
+@{
+    ViewData["Title"] = "ViewOfficerListForGivenProposal";
+    Layout = "~/Views/Shared/_CBILayout.cshtml";
+}
+
+<style>
+    .table-responsive {
+        max-height: 500px;
+        overflow-x: auto;
+        overflow-y: auto;
+    }
+
+    .table thead th {
+      /*   position: sticky;
+        top: 0; */
+        background-color: #f8f9fa;
+        z-index: 1;
+    }
+</style>
+
+<section>
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title mb-0">Simplified Officer List</h3>
+        </div>
+        <div class="card-body p-2">
+            <div >
+                <table class="table table-bordered table-hover table-sm">
+                    <thead class="thead-light" style="font-size-adjust">
+                        <tr>
+                            <th>S.No.</th>
+                            <th style="display:none" >Officer Id</th>
+                            <th>Name of the <br />Officer</th>
+                            <th>Father's <br />Name</th>
+                            <th>Date of<br /> Birth</th>
+                            <th>Date of <br />Retirement</th>
+                            <th>Date of Entry<br /> into Service</th>
+                            <th>Service Details<br /> (Batch/Year/Cadre)</th>
+                            <th>Officer  <br />Cadre</th>
+                            <th>Comments<br /> of CBI</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int sno = 1;
+                        }
+
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@sno</td>
+                                <td style="display:none">@item.Id</td>
+                                <td>@item.Officer_Name</td>
+                                <td>@item.Officer_FatherName</td>
+                                <td>@item.Officer_DateOfBirth?.ToString("dd-MM-yyyy")</td>
+                                <td>@item.Officer_RetirementDate?.ToString("dd-MM-yyyy")</td>
+                                <td>@item.Officer_ServiceEntryDate?.ToString("dd-MM-yyyy")</td>
+                                <td>@item.Officer_Batch_Year</td>
+                                <td>@item.Officer_Cadre</td>
+                                <td>
+                                    <div>
+                                        <select class="form-select form-select-sm" onchange="handleCBICommentChange(this, @item.Id,'@item.Officer_Name')">
+                                            <option value="">-- Select --</option>
+                                            <option value="Nothing Adverse">Nothing Adverse</option>
+                                            <option value="Adverse/Comments">Adverse/Comments</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        @{
+                                            int SrNo = 1;
+                                        }
+                                        <table class="table table-bordered table-hover table-sm">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>Sr. No.</th>
+                                                    <th>Feebback Of CBI</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var cbifeedback in item.cBIFeedbackModels)
+                                                {
+                                                    <tr>
+                                                        <td>@SrNo</td>
+                                                        <td>@cbifeedback.FeebbackOf_CBI</td>
+                                                    </tr>
+                                                    SrNo++;
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td>
+                              
+                            </tr>
+                            sno++;
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="modal fade" id="cbiCommentModal" tabindex="-1" aria-labelledby="cbiCommentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form method="post" asp-controller="Cbi_DealingHand" asp-action="SaveCBIAdverseComment">
+            @Html.AntiForgeryToken()
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">CBI Adverse Comment Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="cbiAdverseCommentContainer">
+                    @await Html.PartialAsync("_CBIAdverseCommentForm", new CBIAdverseCommentViewModel { OfficerId = 0 })
+                </div>
+                <input type="hidden" name="OfficerId" id="modalOfficerId" />
+                <input type="hidden" name="OfficerName" id="modalOfficerName" />
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        let lastChangedSelect = null;
+
+        function handleCBICommentChange(selectElem, officerId, officerName) {
+            const value = selectElem.value;
+            lastChangedSelect = selectElem; // save reference to reset later
+
+            if (value === "Adverse/Comments") {
+                document.getElementById("modalOfficerId").value = officerId;
+                document.getElementById("displayOfficerId").innerText = officerId;
+
+                document.getElementById("modalOfficerName").value = officerName;
+                document.getElementById("displayOfficerName").innerText = officerName;
+
+                const modal = new bootstrap.Modal(document.getElementById('cbiCommentModal'));
+                modal.show();
+            }
+        }
+
+        // Reset dropdown when modal is closed
+        const modalEl = document.getElementById('cbiCommentModal');
+        modalEl.addEventListener('hidden.bs.modal', function () {
+            if (lastChangedSelect) {
+                lastChangedSelect.value = ""; // reset to default
+                lastChangedSelect = null; // clear reference
+            }
+        });
+    </script>
+}
+
+@* 
+@section Scripts {
+    <script>
+        function handleCBICommentChange(selectElem, officerId, OfficerName) {
+            const value = selectElem.value;
+
+            if (value === "Adverse/Comments") {
+                document.getElementById("modalOfficerId").value = officerId;
+                document.getElementById("displayOfficerId").innerText = officerId;
+
+                document.getElementById("modalOfficerName").value = OfficerName;
+                document.getElementById("displayOfficerName").innerText = OfficerName;
+                const modal = new bootstrap.Modal(document.getElementById('cbiCommentModal'));
+                modal.show();
+            }
+        }
+        const modalEl = document.getElementById('cbiCommentModal');
+        modalEl.addEventListener('hidden.bs.modal', function () {
+            if (lastChangedSelect) {
+                lastChangedSelect.value = ""; // reset to default
+                lastChangedSelect = null; // clear reference
+            }
+        });
+    </script>
+} *@
+

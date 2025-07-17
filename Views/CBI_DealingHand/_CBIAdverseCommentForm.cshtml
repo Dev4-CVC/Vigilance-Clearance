@@ -1,0 +1,15 @@
+﻿@model VigilanceClearance.Models.ViewModel.CBI_DealingHand.CBIAdverseCommentViewModel
+
+<div class="d-flex justify-content-between">
+    <p class="mb-0"><strong>Officer ID:</strong> <span id="displayOfficerId"></span></p>
+    <p class="mb-0"><strong>Officer Name:</strong> <span id="displayOfficerName"></span></p>
+</div>
+<br />
+
+
+<div class="form-group">
+    <label for="CaseDetails">Case Details</label>
+    <textarea asp-for="FeebbackOfCbi" class="form-control" rows="3"></textarea>
+</div>
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>

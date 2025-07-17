@@ -16,6 +16,7 @@ using VigilanceClearance.Models;
 using VigilanceClearance.Models.DTOs;
 using VigilanceClearance.Models.Modal_Properties;
 using VigilanceClearance.Models.Modal_Properties.Account;
+using VigilanceClearance.Models.Modal_Properties.PESB;
 using VigilanceClearance.Models.New_Reference_to_CVCModels;
 using VigilanceClearance.Models.OfficerDetailModel;
 using VigilanceClearance.Models.PESB;
@@ -148,7 +149,7 @@ namespace VigilanceClearance.Controllers
                         Organization = null // or default
                     },
 
-                    officerPersonalDetailModel = new OfficerPersonalDetailModel
+                    officerPersonalDetailModel = new Models.OfficerDetailModel.OfficerPersonalDetailModel
                     {
                         Officer_Name = firstOfficer.Officer_Name,
                         Officer_FatherName = firstOfficer.Officer_FatherName,

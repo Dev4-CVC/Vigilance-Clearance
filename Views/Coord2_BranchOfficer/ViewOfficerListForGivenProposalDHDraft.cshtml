@@ -1,0 +1,218 @@
+﻿@using VigilanceClearance.Models.OfficerDetailModel
+@using VigilanceClearance.Models.ViewModel.Coord2_DealingHand
+@model List<OfficerPersonalDetailModel>
+@{
+    ViewData["Title"] = "ViewOfficerListForGivenProposal";
+    Layout = "~/Views/Shared/_CBILayout.cshtml";
+}
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        overflow-x: hidden;
+    }
+
+    .table-responsive {
+        overflow-x: unset;
+        overflow-y: auto;
+        max-height: none;
+        width: 100%;
+    }
+
+    .table th, .table td {
+        white-space: normal !important;
+        word-break: break-word;
+        vertical-align: top;
+    }
+
+    .card {
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .btn-sm {
+        padding: 0.35rem 0.75rem;
+        border-radius: 0.25rem;
+    }
+</style>
+
+
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <div class="d-flex justify-content-between align-items-center flex-wrap">
+                    <!-- Card Title -->
+                  @*   <h6 class="card-title mb-0 me-2">Officer List</h6> *@
+
+                    <!-- Static Checkboxes -->
+                    <div class="d-flex flex-wrap gap-1">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="checkbox1" value="1">
+                        <label class="form-check-label" for="Ministry">Ministry</label>
+                        </div>
+                      
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="checkbox4" value="4">
+                        <label class="form-check-label" for="CBI">CBI</label>
+                        </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="checkbox4" value="4">
+                        <label class="form-check-label" for="PIDPI">PIDPI</label>
+                    </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="checkbox5" value="5">
+                        <label class="form-check-label" for="Section1">Section1</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="checkbox6" value="6">
+                        <label class="form-check-label" for="Section2">Section2</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="checkbox7" value="7">
+                        <label class="form-check-label" for="Section3">Section3</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="checkbox8" value="8">
+                        <label class="form-check-label" for="Section4">Section4</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="checkbox9" value="9">
+                        <label class="form-check-label" for="Section5">Section5</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="checkbox10" value="10">
+                        <label class="form-check-label" for="Section6">Section6</label>
+                        </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="checkbox10" value="10">
+                        <label class="form-check-label" for="Section7">Section7</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="checkbox10" value="10">
+                        <label class="form-check-label" for="Section8">Section8</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="checkbox10" value="10">
+                        <label class="form-check-label" for="Section9">Section9</label>
+                    </div>
+                    </div>
+
+                    <!-- Button -->
+                    <a href="javascript:void(0);" id="sendProposalBtn" class="btn btn-warning btn-sm fw-semibold ms-2">
+                        SEND PROPOSAL BACK TO DH
+                    </a>
+                <a href="javascript:void(0);" id="forwardtoConcernDepartmen" class="btn btn-warning btn-sm fw-semibold ms-2">
+                    FORWARD TO CONCERNED DEPARTMENT
+                </a>
+                </div>
+            </div>
+            <!-- Card body or other content -->
+        </div>
+    </div>
+<section class="container-fluid mt-3">
+    <div class="row">
+        <!-- Left side: Officer List (25% width) -->
+        @* <div class="col-md-3">
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h6 class="card-title mb-0">Officer List</h6>
+                    <a href="javascript:void(0);" id="sendProposalBtn" class="btn btn-warning btn-sm fw-semibold">
+                        SEND PROPOSAL BACK TO DH
+                    </a>
+                </div> *@
+
+        <div class="col-md-3">
+                <div class="card-body p-2">
+                    <table class="table table-bordered table-hover table-sm w-100">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>S.No.</th>
+                                <th>Name</th>
+                                <th>Batch Year</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int sno = 1;
+                            }
+
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@sno</td>
+                                    <td>@item.Officer_Name</td>
+                                    <td>@item.Officer_Batch_Year</td>
+                                </tr>
+                                sno++;
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        <!-- Right side: Placeholder (75% width) -->
+        <div class="col-md-9">
+            <!-- This can later hold details, forms, preview, etc. -->
+        </div>
+
+       
+    </div>
+</section>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#forwardtoConcernDepartmen').click(function () {
+                $.ajax({
+                    url: '/Coord2_BranchOfficer/UpdateVcReferenceByDH',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    success: function (response) {
+                        alert(response);
+                        if (response === "1" || response === 1) {
+                           
+                            alert("Proposal sent to DH successfully.");
+                            $('#forwardtoConcernDepartmen').prop('disabled', true); // ✅ Disable button
+                        } else {
+                            alert("Failed to send proposal.");
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("AJAX Error:", status, error);
+                        alert("An error occurred while sending the proposal.");
+                    }
+                });
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('#sendProposalBtn').click(function () {
+                $.ajax({
+                    url: '/Coord2_BranchOfficer/UpdateVcReferenceByDH',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    success: function (response) {
+                       
+                        if (response === "1" || response === 1) {
+
+                            alert("Proposal sent to DH successfully.");
+                            $('#sendProposalBtn').prop('disabled', true); // ✅ Disable button
+                        } else {
+                            alert("Failed to send proposal.");
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("AJAX Error:", status, error);
+                        alert("An error occurred while sending the proposal.");
+                    }
+                });
+            });
+        });
+    </script>
+}
