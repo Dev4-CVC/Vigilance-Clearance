@@ -7,6 +7,8 @@ using VigilanceClearance.Interface.Account;
 using VigilanceClearance.Interface.Ministry;
 using VigilanceClearance.Interface.PESB;
 using VigilanceClearance.Services;
+using VigilanceClearance.Interface.Admin;
+using VigilanceClearance.DataAccessLayer.Admin_Service;
 
 var time = 30;
 var builder = WebApplication.CreateBuilder(args);
@@ -32,6 +34,7 @@ builder.Services.AddSession();
 builder.Services.AddHttpContextAccessor();
 
 //interface services
+builder.Services.AddScoped<IAdmin, Admin_Service>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPESB, PESB_Services>();
 builder.Services.AddScoped<IMinistry, Ministry_Service>();
@@ -72,13 +75,18 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-
+app.UseDeveloperExceptionPage();
 
 app.MapControllerRoute(
     name: "default",
+    pattern: "{controller=Account}/{action=Login}/{id?}");
 
-  pattern: "{controller=Account}/{action=Login}/{id?}");
 
-
+//app.UseEndpoints(endpoints =>
+//{
+//    endpoints.MapControllerRoute(
+//        name: "default",
+//        pattern: "{controller=Account}/{action=Login}/{id?}");
+//});
 
 app.Run();

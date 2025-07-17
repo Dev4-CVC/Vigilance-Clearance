@@ -1,0 +1,373 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>@ViewBag.title | Vigilance Clearance</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Vigilance Clearance">
+    <meta name="MobileOptimized" content="width">
+    <meta name="HandheldFriendly" content="true">
+    <meta name="copyright" content="Copyright 2025">
+    <link rel="icon" href="~/images/Logo/cvcimage.jpg" type="image/x-icon">
+
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+
+    <!-- AdminLTE & Plugins -->
+    <link href="~/ltscript/dist/css/adminlte.min.css" rel="stylesheet" />
+    <link href="~/ltscript/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/ltscript/plugins/datatables-responsive/css/responsive.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/ltscript/plugins/datatables-buttons/css/buttons.bootstrap4.min.css" rel="stylesheet" />
+    <link href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" rel="stylesheet" />
+    <link href="~/css/stylesheet.css" rel="stylesheet" />
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <link href="~/css/stylesheet.css" rel="stylesheet" />
+    <style>
+        /* Sidebar */
+        .main-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 250px;
+            overflow-y: auto;
+            z-index: 1030;
+            transition: width 0.3s ease;
+        }
+
+        /* Content wrapper */
+        .content-wrapper {
+            background-color: #f4f6f9;
+            transition: margin-left 0.3s ease;
+            margin-left: 250px;
+        }
+
+
+        /* Top header */
+        .ml-custom-header {
+            margin-left: 250px; /* Align with sidebar */
+            transition: margin-left 0.3s ease;
+            background: linear-gradient(90deg, #0d6efd, #20c997);
+            color: #fff;
+        }
+        /* Collapse mode */
+        body.sidebar-collapse .main-sidebar {
+            width: 73px; /* Match your collapsed sidebar width */
+        }
+
+        body.sidebar-collapse .content-wrapper,
+        body.sidebar-collapse .ml-custom-header {
+            margin-left: 73px;
+        }
+
+        /* Optional: smoother breadcrumb/header spacing */
+        .content-header {
+            padding: 5px 10px;
+            background-color: #FFF;
+            border-bottom: 1px solid black;
+            margin-top: 0px;
+            margin-bottom: 12px;
+        }
+
+
+        .content {
+            min-height: 608px;
+        }
+
+
+        .hover-link:hover {
+            background-color: #20B2AA !important;
+            color: #fff !important;
+        }
+
+
+        .nav-treeview .nav-link:hover {
+            background-color: #ADD8E6 !important;
+            color: #000 !important;
+        }
+
+        .hover-link:hover i,
+        .hover-link:hover p {
+            color: #fff !important;
+        }
+
+        .nav-treeview .nav-link:hover i,
+        .nav-treeview .nav-link:hover p {
+            color: #000 !important;
+        }
+
+
+
+        #visitorCount {
+            font-weight: bold;
+            color: #007bff; /* Bootstrap primary color */
+            padding: 2px 8px;
+            background-color: #e7f1ff;
+            border-radius: 6px;
+            margin-left: 8px;
+            font-size: 14px;
+        }
+
+        /* scroll down css */
+        .nav-treeview {
+            max-height: 300px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #ccc transparent;
+        }
+
+            .nav-treeview::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .nav-treeview::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            .nav-treeview::-webkit-scrollbar-thumb {
+                background-color: #999;
+                border-radius: 4px;
+            }
+
+
+
+        /* //dropdown */
+        /* Style for the dropdown button */
+        .dropdown .dropbtn {
+            font-size: 18px;
+            color: #000;
+            text-align: center;
+            padding: 14px 16px;
+            background-color: inherit;
+            border: none;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* Dropdown container */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+            max-width: 100%;
+            overflow-x: visible;
+        }
+
+
+        /* Dropdown content (hidden by default) */
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #f9f9f9;
+            min-width: 180px;
+            box-shadow: 4px 10px 16px rgba(114, 0, 0, 0.2);
+            z-index: 1;
+            padding: 10px;
+            left: auto;
+        }
+
+
+            /* Override default link styles inside dropdown */
+            .dropdown-content a.btn {
+                display: block;
+                width: 100%;
+                margin-bottom: 8px;
+                text-align: left;
+            }
+
+                /* Optional: remove last margin */
+                .dropdown-content a.btn:last-child {
+                    margin-bottom: 0;
+                }
+
+        /* Show dropdown on hover */
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .text-muted {
+            color: #6c757d;
+            font-weight: normal;
+        }
+    </style>
+</head>
+@{
+    var username = Context.Session.GetString("Username");
+    var FullName = Context.Session.GetString("Fullname");
+    int? userId = Context.Session.GetInt32("UserId");
+}
+<body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+        @* Project Heading / Breadcrumb *@
+        <div class="content-header ml-custom-header" style="margin-bottom: 0rem;">
+            <div class="container-fluid d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-sm btn-toggle-sidebar me-3" data-widget="pushmenu">
+                        <i class="fas fa-bars"></i>
+                    </button>
+
+                    <div class="image" style="margin-right: 20px;">
+                        <img src="@Url.Content("~/images/logo/cvcimage.jpg")" class="img-circle elevation-2" alt="Logo" style="width: 40px; height: 40px;" />
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">Vigilance Clearance</h4>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center ms-auto mt-2 mt-sm-0">
+                    <h5 class="mb-0 me-3">
+                        <i class="fas fa-user me-2"></i> Welcome, <span class="text-dark font-weight-bold p-2">@username</span>
+                    </h5>
+                    <div class="dropdown">
+                        <button class="dropbtn">Account <i class="fas fa-caret-down"></i></button>
+                        <div class="dropdown-content">
+                            <a asp-action="ProfileOfUser" asp-controller="Account" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-edit"></i> Profile
+                            </a>
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                <a asp-action="Logout" asp-controller="Account" class="btn btn-sm btn-outline-danger">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </a>
+                            }
+                            <a asp-action="ResetPassword" asp-controller="Account" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-edit"></i> Change Password
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* Sidebar navbar *@
+        <aside class="main-sidebar sidebar-dark-primary elevation-4">
+            <div class="sidebar">
+                <div class="user-panel mt-3 pb-3 d-flex align-items-center">
+                    <div class="image">
+                        <img src="@Url.Content("~/images/logo/cvcimage.jpg")" class="img-circle elevation-2" alt="User Image" />
+                    </div>
+                    <div class="info"> <span class="d-block text-white">PESB</span></div>
+                </div>
+
+                @* Sidebar Menu *@
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                        @* Interface heading above all tabs *@
+                        <li class="nav-header" style="font-size: 1rem; background-color: #343a40; color: #ffffff; padding: 10px;">
+                            INTERFACE
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="@Url.Content("~/Admin/Index")" class="nav-link hover-link">
+                                <i class="nav-icon fas fa-home"></i><p>Home</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="@Url.Content("~/Admin/Users")" class="nav-link hover-link">
+                                <i class="nav-icon fas fa-home"></i><p>Users</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="@Url.Content("~/Admin/UserRole")" class="nav-link hover-link">
+                                <i class="nav-icon fas fa-home"></i><p>User Role</p>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+
+        @* Content Wrapper. Contains page content *@
+        <div class="content-wrapper">
+            <div class="content-header custom-padding-x">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-12 d-flex justify-content-between align-items-center flex-wrap">
+                            <h1 class="mb-0">@ViewBag.title</h1>
+
+                            <!-- Right Side: Breadcrumb -->
+                            <div class="d-flex align-items-center flex-wrap">
+                                <ol class="breadcrumb mb-0">
+                                    <li class="breadcrumb-item">
+                                        <a href="@Url.Content("~/PESB/PESB_Dashboard")">Home</a>
+                                    </li>
+                                    <li class="breadcrumb-item active">@ViewBag.Title</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* Main content *@
+            <div class="content">
+                @RenderBody()
+            </div>
+        </div>
+
+        @* Main Footer  *@
+        <footer class="main-footer bg-light text-center text-md-start py-3 px-3 mt-auto">
+            <div class="container-fluid d-flex flex-column flex-md-row justify-content-between align-items-center">
+                <div class="text-muted">
+                    <strong>
+                        &copy; 2024–2025
+                        <a href="@Url.Content("~/PESB/PESBDashboard")" class="text-decoration-none">Vigilance Clearance</a>
+                    </strong>
+                    All rights reserved.
+                </div>
+                <div class="d-flex align-items-center gap-3 mt-2 mt-md-0">
+                    <span class="text-muted">Version 1.0</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap4.min.css" rel="stylesheet" />
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap4.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            const table1 = $("#example1").DataTable({
+                responsive: true,
+                lengthChange: false,
+                autoWidth: false,
+                buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"]
+            });
+            table1.buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+
+            $("#example2").DataTable({
+                paging: true,
+                lengthChange: false,
+                searching: false,
+                ordering: true,
+                info: true,
+                autoWidth: false,
+                responsive: true
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            let params1 = (new URL(window.location.href)).toString();
+            var parts2qu = params1.split('?');
+            let count = parts2qu.length;
+            if (count > 1) {
+                window.location.href = '/404.html';
+            }
+        });
+    </script>
+</body>
+</html>

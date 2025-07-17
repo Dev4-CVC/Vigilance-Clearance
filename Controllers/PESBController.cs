@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Reflection.Metadata;
 using VigilanceClearance.Interface.PESB;
 using VigilanceClearance.Models.Modal_Properties.PESB;
 using VigilanceClearance.Models.PESB;
@@ -274,29 +275,6 @@ namespace VigilanceClearance.Controllers
                 ViewBag.Error = "Something went wrong while loading the page.";
                 return View();
             }
-
-            //int id = 0;
-            //try
-            //{
-            //    ViewBag.title = "PESB Appointment";
-
-            //    string username = HttpContext.Session.GetString("Username");
-            //    if (string.IsNullOrEmpty(username))
-            //    {
-            //        return RedirectToAction("Login", "Account");
-            //    }
-
-            //    var model = new VcReferenceReceivedFor_VM
-            //    {
-            //        data_List = await _pesb.Get_VC_ReferenceReceivedFor_List_GetByIdAsync(id, username)
-            //    };
-            //    return View(model);
-            //}
-            //catch (Exception)
-            //{
-            //    ViewBag.Error = "Something went wrong while loading the page.";
-            //    return View();
-            //}
         }
 
 
@@ -512,7 +490,7 @@ namespace VigilanceClearance.Controllers
 
                 objmodel.new_reference.pendingWith = "CVC";
                 objmodel.new_reference.uid = null;
-                objmodel.new_reference.referenceId = null;
+                objmodel.new_reference.referenceId = "ABC123";
 
                 int isInserted = await _pesb.Insert_Add_New_Reference_Async(objmodel.new_reference);
                 if (isInserted > 0)
@@ -564,13 +542,61 @@ namespace VigilanceClearance.Controllers
             ViewBag.title = "Reference Details";
             try
             {
+                HttpContext.Session.SetInt32("RefId", id);
+
+                int? referenceid = HttpContext.Session.GetInt32("RefId");
+
+                if (referenceid.HasValue)
+                {
+                    ViewBag.ReferenceId = referenceid.Value;
+                }
+
                 var result = await _pesb.Get_Vc_Reference_Received_For_Details_GetById_Async(id);
-                var model = result.FirstOrDefault();
-                if (model == null)
+                var data = result.FirstOrDefault();
+                if (data == null)
                 {
                     ViewBag.Error = "No data found.";
                     return View();
                 }
+
+                var model = new PESBViewModel
+                {
+                    new_reference = data,
+                    officer_details_List = await _pesb.Get_Officer_List_GetById_Async(id)
+                };
+
+                return View(model);
+            }
+            catch (Exception)
+            {
+                ViewBag.Error = "Something went wrong while loading the page.";
+                return View();
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Reference_Details(int id)
+        {
+            ViewBag.title = "Reference Details";
+            try
+            {
+                HttpContext.Session.SetInt32("RefId", id);
+
+               
+                var result = await _pesb.Get_Vc_Reference_Received_For_Details_GetById_Async(id);
+                var data = result.FirstOrDefault();
+                if (data == null)
+                {
+                    ViewBag.Error = "No data found.";
+                    return View();
+                }
+
+                var model = new PESBViewModel
+                {
+                    new_reference = data,
+                    officer_details_List = await _pesb.Get_Officer_List_GetById_Async(id)
+                };
+
                 return View(model);
             }
             catch (Exception)
@@ -582,14 +608,22 @@ namespace VigilanceClearance.Controllers
 
 
         //Officer Details and Officer Posting Details
+        [HttpGet]
         public async Task<IActionResult> Officer_Reports()
         {
-            ViewBag.title = "Officer Reports";
+            ViewBag.title = "Officer Details Reports";
             string id = "0";
-            //if (referenceid.HasValue)
-            //{
-            //    ViewBag.ReferenceId = referenceid.Value;
-            //}
+
+
+            int? referenceid = HttpContext.Session.GetInt32("RefId");
+
+            if (!referenceid.HasValue)
+            {
+                ViewBag.Error = "Reference ID not found in session.";
+                return View(); // Or redirect back to a safe page
+            }
+
+            ViewBag.ReferenceId = referenceid.Value;
             try
             {
                 var model = new PESBViewModel
@@ -598,7 +632,9 @@ namespace VigilanceClearance.Controllers
                     batch_ddl_List = await _pesb.Get_Batch_DropDownAsync(),
                     cadre_ddl_List = await _pesb.Get_Cadre_DropDownAsync(),
                     organization_ddl_List = await _pesb.GetOrganizationDropDownAsync(id),
-                    ministry_ddl_List = new List<SelectListItem>()
+                    ministry_ddl_List = new List<SelectListItem>(),
+                    //officer_details_List = await _pesb.Get_Officer_List_GetById_Async(referenceid.Value),
+                    //officer_posting_details_List = await _pesb.Get_Officer_Posting_List_GetById_Async(referenceid.Value),
                 };
                 return View(model);
             }
@@ -614,6 +650,16 @@ namespace VigilanceClearance.Controllers
         {
             try
             {
+                int? referenceid = HttpContext.Session.GetInt32("RefId");
+
+                int? id = referenceid;
+
+                if (!referenceid.HasValue)
+                {
+                    ViewBag.Error = "Reference ID not found in session.";
+                    return View(); // Or redirect back to a safe page
+                }
+
                 var _service = objmodel.officer_details.officer_Service;
                 var Otherservice = string.Empty;
                 var _Cadre = string.Empty;
@@ -629,7 +675,7 @@ namespace VigilanceClearance.Controllers
                     objmodel.officer_details.officer_Cadre = null;
 
                 // Assign values from model
-                objmodel.officer_details.masterReferenceID = 1;
+                objmodel.officer_details.masterReferenceID = (long)referenceid;
 
                 objmodel.officer_details.officer_DateOfBirth = (DateTime)objmodel.officer_details.officer_DateOfBirth;
                 objmodel.officer_details.officer_RetirementDate = (DateTime)objmodel.officer_details.officer_RetirementDate;
@@ -650,7 +696,13 @@ namespace VigilanceClearance.Controllers
                     return Json(new { success = false, message = "Record not saved." });
                 }
 
-                return Json(new { success = true });
+                // ✅ Return JSON with redirect URL
+                return Json(new
+                {
+                    success = true,
+                    redirectUrl = Url.Action("Reference_Details", new { id = id })
+                });
+
             }
             catch (Exception ex)
             {
@@ -658,25 +710,35 @@ namespace VigilanceClearance.Controllers
             }
         }
 
+
         [HttpPost]
         public async Task<IActionResult> officer_posting_details([FromBody] PESBViewModel objmodel)
         {
             string id = "0";
 
-            objmodel.officer_posting_details.vcOfficerId = 1;
-            objmodel.officer_posting_details.orgCode = objmodel.officer_posting_details.orgCode;
-            objmodel.officer_posting_details.orgMinistry = objmodel.officer_posting_details.orgMinistry;
-            objmodel.officer_posting_details.designation = objmodel.officer_posting_details.designation;
-            objmodel.officer_posting_details.placeOfPosting = objmodel.officer_posting_details.placeOfPosting;
-            objmodel.officer_posting_details.fromDate = (DateTime)objmodel.officer_posting_details.fromDate;
-            objmodel.officer_posting_details.toDate = (DateTime)objmodel.officer_posting_details.toDate;
+            int? officerid = HttpContext.Session.GetInt32("RefId");
 
-            objmodel.officer_posting_details.actionBy = HttpContext.Session.GetString("Username");
-            objmodel.officer_posting_details.actionBy_SessionId = HttpContext.Session.Id;
-            objmodel.officer_posting_details.actionBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+            if (!officerid.HasValue)
+            {
+                ViewBag.Error = "officer ID not found in session.";
+                return View();
+            }
 
             try
             {
+                objmodel.officer_posting_details.vcOfficerId = (int)officerid;
+                objmodel.officer_posting_details.orgCode = objmodel.officer_posting_details.orgCode;
+                objmodel.officer_posting_details.orgMinistry = objmodel.officer_posting_details.orgMinistry;
+                objmodel.officer_posting_details.designation = objmodel.officer_posting_details.designation;
+                objmodel.officer_posting_details.placeOfPosting = objmodel.officer_posting_details.placeOfPosting;
+                objmodel.officer_posting_details.fromDate = (DateTime)objmodel.officer_posting_details.fromDate;
+                objmodel.officer_posting_details.toDate = (DateTime)objmodel.officer_posting_details.toDate;
+
+                objmodel.officer_posting_details.actionBy = HttpContext.Session.GetString("Username");
+                objmodel.officer_posting_details.actionBy_SessionId = HttpContext.Session.Id;
+                objmodel.officer_posting_details.actionBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+
+
                 int result = await _pesb.Insert_Officer_Posting_Details_Async(objmodel.officer_posting_details);
 
                 if (result == 0)
@@ -692,5 +754,89 @@ namespace VigilanceClearance.Controllers
                 return Json(new { success = false, message = "An unexpected error occurred." });
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Officer_list(int id)
+        {
+            ViewBag.title = "Officer Details";
+            try
+            {
+                string username = HttpContext.Session.GetString("Username");
+                if (string.IsNullOrEmpty(username))
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+
+                HttpContext.Session.SetInt32("RefId", id);
+
+                int? referenceid = HttpContext.Session.GetInt32("RefId");
+
+                if (referenceid.HasValue)
+                {
+                    ViewBag.ReferenceId = referenceid.Value;
+                }
+
+                var model = new PESBViewModel
+                {
+                    officer_details_List = await _pesb.Get_Officer_List_GetById_Async(id)
+                };
+
+                if (model.officer_details_List == null || !model.officer_details_List.Any())
+                {
+                    ViewBag.Error = "No data found.";
+                    return View(model);
+                }
+
+                return View(model);
+            }
+            catch (Exception)
+            {
+                ViewBag.Error = "Something went wrong while loading the page.";
+                return View();
+            }
+        }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> Officer_Details(int masterReferenceID)
+        {
+            ViewBag.title = "Reference Details";
+            try
+            {
+                //HttpContext.Session.SetInt32("RefId", masterReferenceID);
+
+                int referenceid = (int)HttpContext.Session.GetInt32("RefId");
+
+                //if (referenceid.HasValue)
+                //{
+                //    ViewBag.ReferenceId = referenceid.Value;
+                //}
+
+                var masterreferenceresult = await _pesb.Get_Vc_Reference_Received_For_Details_GetById_Async(masterReferenceID);
+                var modelreference = masterreferenceresult.FirstOrDefault();
+                if (masterreferenceresult == null)
+                {
+                    ViewBag.Error = "No data found.";
+                    return View();
+                }
+
+
+                var model = new PESBViewModel
+                {
+                    new_reference = modelreference,
+                    officer_details_List = await _pesb.Get_Officer_List_GetById_Async(referenceid)
+                };
+
+                return View(model);
+
+            }
+            catch (Exception)
+            {
+                ViewBag.Error = "Something went wrong while loading the page.";
+                return View();
+            }
+        }
+
     }
 }

@@ -65,14 +65,22 @@ namespace VigilanceClearance.Controllers
                 }
 
                 HttpContext.Session.SetString("AccessToken", tokenResponse.Token);
-
-               
                 HttpContext.Session.SetString("Username", model.Username);
-                return RedirectToAction("PESB_Dashboard", "PESB");
 
-                //return RedirectToAction("Index", "Ministry_Department");
-
-
+                // Apply redirection based on Username (or you can use a Role field if available)
+                if (model.Username.Equals("chandan@gmail.com", StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction("PESB_Dashboard", "PESB");
+                }
+                else if (model.Username.Equals("admin@domain.com", StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction("Users", "Admin");
+                }
+                else
+                {
+                    // Default redirect for unknown or general users
+                    return RedirectToAction("Index", "Home");
+                }
             }
             catch
             {

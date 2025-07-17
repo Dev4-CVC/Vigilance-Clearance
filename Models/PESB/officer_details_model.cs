@@ -2,13 +2,16 @@
 {
     public class officer_details_model
     {
+        public int Id { get; set; }
         public long masterReferenceID { get; set; }
 
         public string officer_Name { get; set; }
         public string officer_FatherName { get; set; }
+
         public DateTime officer_DateOfBirth { get; set; }
         public DateTime officer_ServiceEntryDate { get; set; }
         public DateTime officer_RetirementDate { get; set; }
+
         public string officer_Service { get; set; }
         public string officer_Cadre { get; set; }
         public string officer_other_Service { get; set; }
