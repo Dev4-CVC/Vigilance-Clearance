@@ -8,6 +8,7 @@ namespace VigilanceClearance.Models.ViewModel.PESB
     {
         //public int OfficerId { get; set; }
         //public int referenceid { get; set; }
+        public int Id  { get; set; }
         public int vcOfficerId  { get; set; }
 
         public string orgCode { get; set; }
@@ -17,12 +18,12 @@ namespace VigilanceClearance.Models.ViewModel.PESB
 
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [Display(Name = "From Date")]
-        public DateTime? fromDate { get; set; }
+        public DateTime fromDate { get; set; }
 
       
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [Display(Name = "To Date")]
-        public DateTime? toDate { get; set; }
+        public DateTime toDate { get; set; }
 
 
         public string actionBy { get; set; }

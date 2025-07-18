@@ -662,7 +662,7 @@ namespace VigilanceClearance.Controllers
                     {
                         reference_received_for_ddl_List = await _pesb.GetReferenceDropDownAsync(),
                         sub_post_ddl_List = new List<SelectListItem>(),
-                        organization_ddl_List = await _pesb.GetOrgByMinCode(_Mincode),
+                        organization_ddl_List = await _pesb.GetOrganizationDropDownAsync(_Mincode),
                         ministry_ddl_List = new List<SelectListItem>(),
                     };
                     return View(model);
@@ -723,8 +723,8 @@ namespace VigilanceClearance.Controllers
                     _insertRefModel.minCode = objmodel.new_reference.minCode;
                     _insertRefModel.minDesc = "null";
                     _insertRefModel.pendingWith = HttpContext.Session.GetString("UserRole").ToString();
-                    _insertRefModel.referenceID = objmodel.new_reference.referenceNoFileNo ?? "";
-                    _insertRefModel.cvC_ReferenceID_FileNo = objmodel.new_reference.cvcReferenceIdFileNo ?? "";
+                    _insertRefModel.referenceID = objmodel.new_reference.ReferenceNo_FileNo ?? "";
+                    _insertRefModel.cvC_ReferenceID_FileNo = objmodel.new_reference.CVC_ReferenceID_FileNo?? "";
                     _insertRefModel.actionBy = _UserName;
                     _insertRefModel.actionBy_SessionId = HttpContext.Session.Id;
                     _insertRefModel.actionBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString();

@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.CodeDom;
+using VigilanceClearance.Models.Admin;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.CodeDom;
 using VigilanceClearance.Interface.Admin;
@@ -10,6 +12,7 @@ namespace VigilanceClearance.Controllers
 {
     public class AdminController : Controller
     {
+
         private readonly IHttpClientFactory _clientFactory;
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
@@ -28,37 +31,51 @@ namespace VigilanceClearance.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> Users()
+        public IActionResult Users()
         {
-            ViewBag.title = "Users";
-            
-            string username = HttpContext.Session.GetString("Username");
-            if (string.IsNullOrEmpty(username))
-            {
-                return RedirectToAction("Login", "Home");
-            }
-
-            try
-            {
-                var model = new UsersMain_Model
-                {
-                    users_List = await _admin.Get_Users_List_Async()
-                };
-
-                var successMessage = TempData["SuccessMessage"] as string;
-                if (!string.IsNullOrEmpty(successMessage))
-                {
-                    ViewBag.SuccessMessage = successMessage;
-                }
-
-                return View(model);
-            }
-            catch (Exception)
-            {
-                ViewBag.Error = "Something went wrong while loading the page.";
-                return View();
-            }
+            return View();
         }
+
+
+        [HttpGet]
+        public IActionResult UserRole()
+        {
+            return View();
+        }
+
+        
+
+        //public async Task<IActionResult> Users()
+        //{
+        //    ViewBag.title = "Users";
+            
+        //    string username = HttpContext.Session.GetString("Username");
+        //    if (string.IsNullOrEmpty(username))
+        //    {
+        //        return RedirectToAction("Login", "Home");
+        //    }
+
+        //    try
+        //    {
+        //        var model = new UsersMain_Model
+        //        {
+        //            users_List = await _admin.Get_Users_List_Async()
+        //        };
+
+        //        var successMessage = TempData["SuccessMessage"] as string;
+        //        if (!string.IsNullOrEmpty(successMessage))
+        //        {
+        //            ViewBag.SuccessMessage = successMessage;
+        //        }
+
+        //        return View(model);
+        //    }
+        //    catch (Exception)
+        //    {
+        //        ViewBag.Error = "Something went wrong while loading the page.";
+        //        return View();
+        //    }
+        //}
 
         [HttpGet]
         public async Task<IActionResult> AddUsers()
@@ -224,10 +241,6 @@ namespace VigilanceClearance.Controllers
                 return View(objmodel);
             }
         }
-
-
-
-
 
     }
 }

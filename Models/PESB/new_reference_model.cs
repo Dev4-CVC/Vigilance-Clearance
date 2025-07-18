@@ -34,13 +34,13 @@ namespace VigilanceClearance.Models.PESB
 
 
         [Display(Name = "Reference No./ File No.")]
-        public string? referenceNoFileNo { get; set; } = null;
+        public string? ReferenceNo_FileNo { get; set; }
         
         [Display(Name = "Submission to CVC Date")]
-        public string? referenceOrSubmissionToCvcDate { get; set; }
+        public string? ReferenceOrSubmissionToCvcDate { get; set; }
 
         [Display(Name = "Reference File No.")]
-        public string? cvcReferenceIdFileNo { get; set; }
+        public string? CVC_ReferenceID_FileNo { get; set; }
 
 
         public string? createdBy { get; set; }
