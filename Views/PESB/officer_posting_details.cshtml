@@ -1,0 +1,279 @@
+﻿@model VigilanceClearance.Models.PESB.PESBViewModel
+
+@{
+    Layout = "~/Views/Shared/_PESB_Main_Layout.cshtml";
+}
+
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/flatpickr/dist/flatpickr.min.css" />
+<script src="https://unpkg.com/flatpickr"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="officer_posting_details">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+         
+            <div class="form-group">
+                <label asp-for="officer_posting_details.orgCode" class="control-label"></label>
+                @* <input asp-for="officer_posting_details.orgCode" class="form-control" /> *@
+                @Html.DropDownListFor(model => model.officer_posting_details.orgCode, Model.organization_ddl_List, "-- Select Organization --",
+                         new { @class = "form-control", id = "orgCode", tabindex = "-1" })
+                <span asp-validation-for="officer_posting_details.orgCode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="officer_posting_details.orgMinistry" class="control-label"></label>
+                @* <input asp-for="officer_posting_details.orgMinistry" class="form-control" /> *@
+                @Html.DropDownListFor(model => model.officer_posting_details.orgMinistry, Model.ministry_ddl_List, "-- Select Ministry --",
+                         new { @class = "form-control", id = "minCode", tabindex = "-1" })
+                <span asp-validation-for="officer_posting_details.orgMinistry" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="officer_posting_details.designation" class="control-label"></label>
+                <input asp-for="officer_posting_details.designation" class="form-control" />
+                <span asp-validation-for="officer_posting_details.designation" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="officer_posting_details.placeOfPosting" class="control-label"></label>
+                <input asp-for="officer_posting_details.placeOfPosting" class="form-control " />
+                <span asp-validation-for="officer_posting_details.placeOfPosting" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="officer_posting_details.fromDate" class="control-label"></label>
+                <input asp-for="officer_posting_details.fromDate" class="form-control datepicker" />
+                <span asp-validation-for="officer_posting_details.fromDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="officer_posting_details.toDate" class="control-label"></label>
+                <input asp-for="officer_posting_details.toDate" class="form-control datepicker" />
+                <span asp-validation-for="officer_posting_details.toDate" class="text-danger"></span>
+            </div>
+
+            <div class="card-footer d-flex justify-content-end">
+                <button type="button" id="addPositionBtn" class="btn btn-primary">Submit</button>
+                @*   <button type="submit" id="addofficerdetailsBtn" class="btn btn-primary">Submit</button> *@
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+
+@* 2nd Card script (date picker)  *@
+<script>
+    flatpickr(".datepicker", {
+        dateFormat: "Y-m-d",
+        allowInput: false
+    });
+
+
+    var entryPicker, retirementPicker;
+
+    // Initialize Date of Entry first
+    entryPicker = flatpickr("#DateOfEntry", {
+        dateFormat: "Y-m-d",
+        allowInput: false,
+        onChange: function (selectedDates) {
+            if (selectedDates.length > 0) {
+                // Set minDate of retirementPicker
+                retirementPicker.set('minDate', selectedDates[0]);
+            }
+        }
+    });
+
+    // Initialize Date of Retirement
+    retirementPicker = flatpickr("#DateOfRetirement", {
+        dateFormat: "Y-m-d",
+        allowInput: false
+    });
+</script>
+
+@* Save Officer Posting Details *@
+<script>
+    $(document).ready(function () {
+        $('#addPositionBtn').click(function () {
+            let isValid = true;
+            $('.text-danger').text(''); // Clear errors
+
+            // Get form values
+            // const masterReferenceID = $('input[name="officer_details.masterReferenceID"]').val();
+            const orgCode = $('#orgCode').val();
+            const minCode = $('#minCode').val();
+            const designation = $('#officer_posting_details_designation').val().trim();
+            const placeOfPosting = $('#officer_posting_details_placeOfPosting').val().trim();
+            const fromDate = $('#officer_posting_details_fromDate').val()?.trim();
+            const toDate = $('#officer_posting_details_toDate').val()?.trim();
+
+            // Basic validation
+            if (!orgCode) {
+                $('#orgCode').next('.text-danger').text('Please select Organization');
+                isValid = false;
+            }
+            if (!minCode) {
+                $('#minCode').next('.text-danger').text('Please select Ministry');
+                isValid = false;
+            }
+            if (!designation) {
+                $('#officer_posting_details_designation').next('.text-danger').text('Please enter Designation');
+                isValid = false;
+            }
+            if (!placeOfPosting) {
+                $('#officer_posting_details_placeOfPosting').next('.text-danger').text('Please enter Place of Posting');
+                isValid = false;
+            }
+            if (!fromDate) {
+                $('#officer_posting_details_fromDate').closest('.col-md-3').find('.text-danger').text('Please enter Tenure From');
+                isValid = false;
+            }
+            if (!fromDate) {
+                $('#officer_posting_details_fromDate').closest('.form-group').find('.text-danger').text('Please enter From Date.');
+                isValid = false;
+            }
+
+            if (!toDate) {
+                $('#officer_posting_details_toDate').closest('.form-group').find('.text-danger').text('Please enter To Date.');
+                isValid = false;
+            }
+
+            if (fromDate && toDate) {
+                const from = new Date(fromDate);
+                const to = new Date(toDate);
+
+                if (from > to) {
+                    $('#officer_posting_details_toDate')
+                        .closest('.form-group')
+                        .find('.text-danger')
+                        .text('To Date should be after From Date.');
+                    isValid = false;
+                }
+            }
+
+
+            if (!isValid) return;
+
+            Swal.fire({
+                title: "Confirm Submission",
+                text: "Do you want to save this posting detail?",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText: "Yes, Save",
+                cancelButtonText: "Cancel"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#addPositionBtn').prop('disabled', true).text('Submitting...');
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/PESB/officer_posting_details",
+                        contentType: "application/json",
+                        data: JSON.stringify({
+                            // officer_details: {
+                            //     masterReferenceID: masterReferenceID
+                            // },
+                            officer_posting_details: {
+                                orgCode: orgCode,
+                                orgMinistry: minCode,
+                                designation: designation,
+                                placeOfPosting: placeOfPosting,
+                                fromDate: fromDate,
+                                toDate: toDate
+                            }
+                        }),
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Saved successfully!"
+                                }).then(() => {
+                                    window.location.href = response.redirectUrl;  // or close modal
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Failed to Save",
+                                    text: response.message || "An error occurred."
+                                });
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Oops!",
+                                text: "Something went wrong. Please try again."
+                            });
+                        },
+                        complete: function () {
+                            $('#addPositionBtn').prop('disabled', false).text('Submit');
+                        }
+                    });
+                }
+            });
+        });
+    });
+</script>
+
+@* 3rd card Script (Org and Ministry)*@
+<script>
+    $(document).ready(function () {
+        $('#orgCode').change(function () {
+            var orgCode = $(this).val();
+            var ministryDropdown = $('#minCode');
+
+            // Clear the ministry dropdown
+            ministryDropdown.empty();
+
+            // Disable dropdown and set default option if no organization is selected
+            if (!orgCode) {
+                ministryDropdown.prop('disabled', true)
+                    .append($('<option>').val('').text('-- Select Ministry --'));
+                return;
+            }
+
+            console.log("Sending AJAX for orgCode: " + orgCode); // Debug log for selected organization code
+
+            // Send AJAX request to fetch ministries by organization code
+            $.ajax({
+                url: '@Url.Action("GetMinistryByOrgCode", "PESB")', // Adjust the controller/action as necessary
+                type: 'GET',
+                data: { id: orgCode }, // Pass organization code to server
+                dataType: "json",
+                success: function (data) {
+                    ministryDropdown.empty(); // Clear current options
+
+                    // Check if no data or invalid data
+                    if (!data || data.length === 0 || (data.length === 1 && !data[0].Value && !data[0].value)) {
+                        ministryDropdown.prop('disabled', true)
+                            .append($('<option>').val('').text('-- No Ministry Available --'));
+                        return;
+                    }
+
+                    // Add default "Select Ministry" option
+                    // ministryDropdown.append($('<option>').val('').text('-- Select Ministry --'));
+
+                    // Populate the ministry dropdown with received data
+                    $.each(data, function (i, item) {
+                        var val = item.Value || item.value; // Check both possible key names
+                        var txt = item.Text || item.text;   // Check both possible key names
+                        ministryDropdown.append($('<option>').val(val).text(txt));
+                    });
+
+                    // Enable dropdown after options are added
+                    ministryDropdown.prop('disabled', false);
+                },
+                error: function (xhr) {
+                    alert("Error loading ministries: " + xhr.statusText); // Display error on failure
+                }
+            });
+        });
+    });
+
+</script>
+
+
+

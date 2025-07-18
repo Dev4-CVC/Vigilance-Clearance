@@ -1,0 +1,170 @@
+﻿@model VigilanceClearance.Models.PESB.PESBViewModel
+
+@{
+	Layout = "~/Views/Shared/_PESB_Main_Layout.cshtml";
+}
+
+
+<!-- #region name -->
+
+<div class="container">
+	<h4 class="mb-4 text-white p-3 rounded" style="background: linear-gradient(90deg, #0d6efd, #20c997); border-bottom: 1px solid rgba(255,255,255,0.3);">
+		Reference & Officer Details
+	</h4>
+
+	@if (Model?.new_reference != null && Model?.officer_details != null)
+	{
+		<div class="card shadow-sm mb-4">
+			<div class="card-body">
+
+				<!-- Reference Details Section -->
+				<h5 class="mb-3">Reference Details</h5>
+				<div class="row g-3 mb-4">
+					<div class="col-md-3">
+						<div class="border rounded p-2"><strong>Id:</strong> <span class="text-muted">@Model.new_reference.Id</span></div>
+					</div>
+					<div class="col-md-3">
+						<div class="border rounded p-2"><strong>Reference For:</strong> <span class="text-muted">@Model.new_reference.referenceReceivedFor</span></div>
+					</div>
+					<div class="col-md-3">
+						<div class="border rounded p-2"><strong>Received From:</strong> <span class="text-muted">@Model.new_reference.referenceReceivedFrom</span></div>
+					</div>
+					<div class="col-md-3">
+						<div class="border rounded p-2"><strong>Post:</strong> <span class="text-muted">@Model.new_reference.selectionForThePostCategory</span></div>
+					</div>
+					<div class="col-md-3">
+						<div class="border rounded p-2"><strong>Sub Post:</strong> <span class="text-muted">@Model.new_reference.selectionForThePostSubCategory</span></div>
+					</div>
+					<div class="col-md-3">
+						<div class="border rounded p-2"><strong>File No:</strong> <span class="text-muted">@Model.new_reference.ReferenceNo_FileNo</span></div>
+					</div>
+					<div class="col-md-3">
+						<div class="border rounded p-2"><strong>CVC Date:</strong> <span class="text-muted">@Model.new_reference.ReferenceOrSubmissionToCvcDate</span></div>
+					</div>
+					<div class="col-md-3">
+						<div class="border rounded p-2"><strong>CVC Ref ID:</strong> <span class="text-muted">@Model.new_reference.CVC_ReferenceID_FileNo</span></div>
+					</div>
+					<div class="col-md-3">
+						<div class="border rounded p-2"><strong>Created By:</strong> <span class="text-muted">@Model.new_reference.createdBy</span></div>
+					</div>
+					<div class="col-md-3">
+						<div class="border rounded p-2"><strong>Pending With:</strong> <span class="text-muted">@Model.new_reference.pendingWith</span></div>
+					</div>
+					<div class="col-md-3">
+						<div class="border rounded p-2"><strong>UID:</strong> <span class="text-muted">@Model.new_reference.uid</span></div>
+					</div>
+					<div class="col-md-3">
+						<div class="border rounded p-2"><strong>Reference ID:</strong> <span class="text-muted">@Model.new_reference.referenceId</span></div>
+					</div>
+				</div>
+
+				<!-- Officer Details Section -->
+				<h5 class="mb-3">Officer Details</h5>
+				<div class="row g-3">
+					<div class="col-md-3">
+						<div class="border rounded p-2"><strong>Id:</strong> <span class="text-muted">@Model.officer_details.Id</span></div>
+					</div>
+					<div class="col-md-3">
+						<div class="border rounded p-2"><strong>Ref Id:</strong> <span class="text-muted">@Model.officer_details.masterReferenceID</span></div>
+					</div>
+					<div class="col-md-3">
+						<div class="border rounded p-2"><strong>Name:</strong> <span class="text-muted">@Model.officer_details.officer_Name</span></div>
+					</div>
+					<div class="col-md-3">
+						<div class="border rounded p-2"><strong>Father's Name:</strong> <span class="text-muted">@Model.officer_details.officer_FatherName</span></div>
+					</div>
+					<div class="col-md-3">
+						<div class="border rounded p-2"><strong>DOB:</strong> <span class="text-muted">@Model.officer_details.officer_DateOfBirth.ToString("yyyy-MM-dd")</span></div>
+					</div>
+					<div class="col-md-3">
+						<div class="border rounded p-2"><strong>Service Entry Date:</strong> <span class="text-muted">@Model.officer_details.officer_ServiceEntryDate.ToString("yyyy-MM-dd")</span></div>
+					</div>
+					<div class="col-md-3">
+						<div class="bordr rounded p-2"><strong>Retirement:</strong> <span class="text-muted">@Model.officer_details.officer_RetirementDate.ToString("yyyy-MM-dd")</span></div>
+					</div>
+					<div class="col-md-3">
+						<div class="border rounded p-2"><strong>Service:</strong> <span class="text-muted">@Model.officer_details.officer_Service</span></div>
+					</div>
+					<div class="col-md-3">
+						<div class="border rounded p-2"><strong>Cadre:</strong> <span class="text-muted">@Model.officer_details.officer_Cadre</span></div>
+					</div>
+					<div class="col-md-3">
+						<div class="border rounded p-2"><strong>Other Service:</strong> <span class="text-muted">@Model.officer_details.officer_other_Service</span></div>
+					</div>
+					<div class="col-md-3">
+						<div class="border rounded p-2"><strong>Batch:</strong> <span class="text-muted">@Model.officer_details.officer_Batch_Year</span></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	}
+	else
+	{
+		<div class="alert alert-warning">
+			<i class="bi bi-exclamation-triangle-fill me-2"></i>No data found for this reference or officer.
+		</div>
+	}
+
+	<table class="table table-bordered">
+		<thead>
+			<tr>
+				@* <th>Action</th> *@
+				<th>S. No.</th>
+				<th>Organization</th>
+				<th>Ministry</th>
+				<th>Place of Posting</th>
+				<th>Designation</th>
+				<th>Tenure From</th>
+				<th>Tenure To</th>
+
+			</tr>
+		</thead>
+		@if (Model.officer_posting_details_List != null && Model.officer_posting_details_List.Any())
+		{
+			int sno = 1;
+			<tbody>
+				@foreach (var officerPosting in Model.officer_posting_details_List)
+				{
+					<tr>
+						@*   <td>
+                            <button class="btn btn-sm btn-primary" onclick="location.href='@Url.Action("ViewOfficerDetails", "PESB", new { id = officer.Id, masterrefid= officer.masterReferenceID })'">View</button>
+                        </td> *@
+						<td>@sno</td>
+						<td>@officerPosting.orgCode</td>
+						<td>@officerPosting.orgMinistry</td>
+						<td>@officerPosting.placeOfPosting</td>
+						<td>@officerPosting.designation</td>
+						<td>@officerPosting.fromDate.ToString("yyyy-MM-dd")</td>
+						<td>@officerPosting.toDate.ToString("yyyy-MM-dd")</td>
+					</tr>
+					sno++;
+				}
+			</tbody>
+		}
+
+	</table>
+
+
+	<!-- Add Posting Button -->
+	<div class="d-flex justify-content-end mb-3">
+		@* <a asp-controller="PESB" asp-action="Reference_Details" class="btn btn-primary">
+			<i class="fas fa-plus me-1"></i> Go to Reference Details
+		</a> *@
+
+		<button class="btn btn-sm btn-primary" onclick="location.href='@Url.Action("Reference_Details", "PESB", new { id = Model.officer_details.masterReferenceID})'">Go to Reference Details</button>
+		
+		@if (Model.new_reference.pendingWith == "PESB")
+		{
+			<a asp-controller="PESB" asp-action="officer_posting_details" class="btn btn-success">
+				<i class="fas fa-plus me-1"></i> Add Posting
+			</a>
+		}
+
+	</div>
+</div>
+
+
+
+
+
+<!-- #endregion -->

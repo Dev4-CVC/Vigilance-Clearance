@@ -8,7 +8,6 @@
 
 
 
-
 @if (Model.officer_details_List != null && Model.officer_details_List.Any())
 {
     <div class="table-responsive">
@@ -80,7 +79,7 @@ else
 
 
 @* data table *@
-@* <script>
+<script>
     $(document).ready(function () {
         $('#vcReferenceTable').DataTable({
             pageLength: 10,
@@ -96,10 +95,10 @@ else
         });
     });
 </script>
- *@
+
 
 @* this is sweat alert message , for add new reference  *@
-@* @if (TempData["SuccessMessage"] != null)
+ @if (TempData["SuccessMessage"] != null)
 {
     <script>
         Swal.fire({
@@ -111,11 +110,12 @@ else
             timerProgressBar: true
         });
     </script>
-} *@
+} 
 
-@*
+
+
 <script>
     $(document).ready(function () {
         $('#vcReferenceTable').DataTable(); // Ensure DataTables is included
     });
-</script> *@
+</script>
