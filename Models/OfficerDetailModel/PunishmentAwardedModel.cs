@@ -2,6 +2,7 @@
 {
     public class PunishmentAwardedModel
     {
+        public int masterReferenceId { get; set; }
         public int officerId { get; set; }
         public string punishmentAwarded { get; set; }
         public string punishmentDetails { get; set; }

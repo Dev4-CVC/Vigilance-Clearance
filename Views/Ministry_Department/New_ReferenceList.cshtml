@@ -5,6 +5,14 @@
     Layout = "~/Views/Shared/_MinistryLayout.cshtml";
 }
 
+@if (TempData["msg"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["msg"]
+    </div>
+}
+
+
 <div class="d-flex justify-content-end mb-3">
     <a asp-controller="Ministry_Department" asp-action="New_Reference_FromMin_ToCVC" class="btn btn-success">
         <i class="fas fa-plus me-1"></i> Add New Reference
@@ -22,7 +30,7 @@
                 <tr>
                     <th>Sr. No.</th>
                     <th>Action</th>
-                    <th>ReferenceId</th>
+                    <th>Master ReferenceId</th>
                     <th>Reference Received For</th>
                     <th>Reference Received From</th>
                     <th>Post</th>
@@ -43,7 +51,7 @@
                     <tr>
                         <td>@(i + 1)</td>
                         <td>
-                            <button class="btn btn-sm btn-primary" onclick="location.href='@Url.Action("New_Reference_Details", "Ministry_Department", new { id = item.Id })'">Details</button>
+                            <button class="btn btn-sm btn-primary" onclick="location.href='@Url.Action("New_Reference_Details", "Ministry_Department", new { MasterRefID = item.Id })'">Details</button>
                         </td>
                         <td>@item.Id</td>
                         <td>@item.referenceReceivedFor</td>

@@ -80,23 +80,7 @@ namespace VigilanceClearance.Controllers
                     .ToArray();
 
                 HttpContext.Session.SetString("AccessToken", tokenResponse.Token);
-                HttpContext.Session.SetString("Username", model.Username);
-
-                
-                //if (model.Username.Equals("chandan@gmail.com", StringComparison.OrdinalIgnoreCase))
-                //{
-                //    return RedirectToAction("PESB_Dashboard", "PESB");
-                //}
-                //else if (model.Username.Equals("admin@domain.com", StringComparison.OrdinalIgnoreCase))
-                //{
-                //    return RedirectToAction("Users", "Admin");
-                //}
-                //else
-                //{
-                //    // Default redirect for unknown or general users
-                //    return RedirectToAction("Index", "Home");
-                //}
-
+                //HttpContext.Session.SetString("Username", model.Username);
 
                 var UserDetails = await _authService.GetUserDetailsbyUserName(username);
 
@@ -110,6 +94,14 @@ namespace VigilanceClearance.Controllers
                 {                    
                     return RedirectToAction("Index", "Ministry_Department");
                 }
+               else if (roles.Contains("MINISTRY_APPROVER"))
+                {
+                    return RedirectToAction("Index", "Ministry_Department");
+                }
+                else if (roles.Contains("MINISTRY_CVO"))
+                {
+                    return RedirectToAction("Index", "Ministry_Department");
+                }
                 else if (roles.Contains("User"))
                 {
                     return RedirectToAction("PESB_Dashboard", "PESB");
@@ -118,7 +110,6 @@ namespace VigilanceClearance.Controllers
                 {
                     return RedirectToAction("Users", "Admin");
                 }
-
 
                 return View(model);
             }
@@ -154,6 +145,22 @@ namespace VigilanceClearance.Controllers
         }
 
 
+        [HttpGet]
+        public async Task<IActionResult> LogoutRedirect()
+        {
+            // Clear authentication cookie
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // Clear session
+            HttpContext.Session.Clear();
+
+            // Optional: Clear TempData
+            TempData.Clear();
+
+            // Optional: Redirect to Login or Home
+            return RedirectToAction("Login", "Account");
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
@@ -171,6 +178,7 @@ namespace VigilanceClearance.Controllers
             return RedirectToAction("Login", "Account");
         }
 
+        
 
     }
 }

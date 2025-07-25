@@ -3,6 +3,7 @@
     public class AllegationOfMisconductExaminedModel
     {
         public int id { get; set; }
+        public int masterReferenceId { get; set; }
         public int officerId { get; set; }
         public string vigilanceAngleExamined { get; set; }
         public string caseDetails { get; set; }

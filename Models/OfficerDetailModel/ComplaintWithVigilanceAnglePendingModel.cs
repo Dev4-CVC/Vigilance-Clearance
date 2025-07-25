@@ -2,6 +2,7 @@
 {
     public class ComplaintWithVigilanceAnglePendingModel
     {
+        public int masterReferenceId { get; set; }
         public int officerId { get; set; }
         public string whether_vigilanceAngelPending { get; set; }
         public string detailsOfTheCase { get; set; }

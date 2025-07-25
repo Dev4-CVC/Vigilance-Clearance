@@ -93,30 +93,56 @@
     }
 </style>
 
+@{
+    var _Role = Context.Session.GetString("UserRole");
+}
+
 <div class="card-container">
 
-    <div class="card ministry-card">
-        <div class="card-body">
-            <i class="card-icon fas fa-university"></i>
-           
-            <h5>Reference Received from CVC</h5>
-            <a asp-controller="Ministry_Department" asp-action="ViewReferenceReceivedCVC" class="btn">View Details</a>
-        </div>
-    </div>
+    @{
+        if (_Role == "MINISTRY_APPROVER")
+        {
+            <div class="card ministry-card">
+                <div class="card-body">
+                    <i class="card-icon fas fa-university"></i>
+                    <h5>Reference Received from Ministry DH</h5>
+                    <a asp-controller="Ministry_Department" asp-action="GetReferenceListPendingWith_MinistryApprover" class="btn">View Details</a>
+                </div>
+            </div>
+        }
+        else if (_Role == "MINISTRY_CVO")
+        {
+            <div class="card ministry-card">
+                <div class="card-body">
+                    <i class="card-icon fas fa-university"></i>
+                    <h5>Reference Received from Ministry Approver</h5>
+                    <a asp-controller="Ministry_Department" asp-action="GetReferenceListPendingWith_MinistryApprover" class="btn">View Details</a>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="card ministry-card">
+                <div class="card-body">
+                    <i class="card-icon fas fa-university"></i>
+                    <h5>Reference Received from CVC</h5>
+                    <a asp-controller="Ministry_Department" asp-action="ViewReferenceReceivedCVC" class="btn">View Details</a>
+                </div>
+            </div>
 
-    <div class="card department-card">
-        <div class="card-body">
-            <i class="card-icon fas fa-building"></i>
-           @*  <h5>Total Departments: 55</h5> *@
-            <h5>New Reference to CVC </h5>
-            <a asp-controller="Ministry_Department" asp-action="New_ReferenceList" class="btn">View Details</a>
-        </div>
-    </div>
-
+            <div class="card department-card">
+                <div class="card-body">
+                    <i class="card-icon fas fa-building"></i>
+                    <h5>New Reference to CVC </h5>
+                    <a asp-controller="Ministry_Department" asp-action="New_ReferenceList" class="btn">View Details</a>
+                </div>
+            </div>
+        }
+    }
+  
     <div class="card organization-card">
         <div class="card-body">
             <i class="card-icon fas fa-sitemap"></i>
-           @*  <h5>Total Organizations: 55</h5> *@
             <h5>Search</h5>
             <a asp-controller="#" asp-action="#" class="btn">View Details</a>
         </div>

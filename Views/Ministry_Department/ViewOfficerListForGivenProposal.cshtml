@@ -77,7 +77,11 @@
                                 <tr>
                                     <td>
                                         <a asp-action="ViewOfficerListForGivenProposal" asp-route-id="@item.Id" class="btn btn-info btn-sm">View</a>
-                                        <a asp-action="UpdateReferenceReceivedCVC" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Update</a>
+                                        @* <a asp-action="UpdateReferenceReceivedCVC" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Update</a>*@
+                                        <button class="btn btn-sm btn-primary"
+                                                onclick="location.href='@Url.Action("UpdateReferenceReceivedCVC", "Ministry_Department", new { id = item.Id, refId = item.MasterReferenceID, flag = "ReceivedfromCVC" })'">
+                                            Update
+                                        </button>
 
                                     </td>
                                     <td>@sno</td>

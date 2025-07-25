@@ -2,6 +2,7 @@
 {
     public class InsertOfficerDetailsModel
     {
+        public int masterReferenceId { get; set; }
         public int VcOfficerId { get; set; }
 
         public string OrgCode { get; set; }

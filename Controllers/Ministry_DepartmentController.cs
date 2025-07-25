@@ -14,6 +14,7 @@ using VigilanceClearance.Interface.Ministry;
 using VigilanceClearance.Interface.PESB;
 using VigilanceClearance.Models;
 using VigilanceClearance.Models.DTOs;
+using VigilanceClearance.Models.Ministry_ApproverModels;
 using VigilanceClearance.Models.Modal_Properties;
 using VigilanceClearance.Models.Modal_Properties.Account;
 using VigilanceClearance.Models.New_Reference_to_CVCModels;
@@ -25,7 +26,7 @@ using VigilanceClearance.Models.ViewModel.PESB;
 
 namespace VigilanceClearance.Controllers
 {
-    [Authorize(Roles = "MINISTRY_DH")]
+    [Authorize(Roles = "MINISTRY_DH,MINISTRY_APPROVER,MINISTRY_CVO")]
     public class Ministry_DepartmentController : Controller
     {
         private readonly IHttpClientFactory _clientFactory;
@@ -44,10 +45,30 @@ namespace VigilanceClearance.Controllers
             this._ministry = ministry;
             _pesb = pesb;
         }
-      
+
         public IActionResult Index()
         {
-            return View();
+            try
+            {
+                var userDetailsJson = HttpContext.Session.GetString("UserDetails");
+                if (!string.IsNullOrEmpty(userDetailsJson))
+                {
+                    var userDetails = System.Text.Json.JsonSerializer.Deserialize<UserDetailsModel>(userDetailsJson);
+                    string _MinMastercode = userDetails.MinMasterCode;
+
+                   TempData["Role"] =  HttpContext.Session.GetString("UserRole");
+                }
+                else
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+
+                return View();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
 
@@ -62,17 +83,18 @@ namespace VigilanceClearance.Controllers
                 {
                     var userDetails = System.Text.Json.JsonSerializer.Deserialize<UserDetailsModel>(userDetailsJson);
                     string _MinMastercode = userDetails.MinMasterCode;
-                    List<ReferenceReceivedFromCVCModel> apiResponse = await _ministry.GetReferenceReceivedFromCVClist(_MinMastercode);
+                    string _Mincode = userDetails.MinCode;
+                    //List<ReferenceReceivedFromCVCModel> apiResponse = await _ministry.GetReferenceReceivedFromCVClist(_MinMastercode);
+                    List<References_from_coord2_To_MinistryModel> apiResponse = await _ministry.References_from_coord2_To_Ministry(_Mincode);
                     if (apiResponse != null)
                     {
                         return View(apiResponse);
                     }
-
-                    return View(new List<ReferenceReceivedFromCVCModel>());
+                    return View(new List<References_from_coord2_To_MinistryModel>());
                 }
                 else
                 {
-                    return RedirectToAction("Login", "Account");
+                    return RedirectToAction("LogoutRedirect", "Account");
                 }
             }
             catch (Exception ex)
@@ -103,15 +125,16 @@ namespace VigilanceClearance.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> UpdateReferenceReceivedCVC(string id)
+        public async Task<IActionResult> UpdateReferenceReceivedCVC(string id, string refId , string flag)
         {
             try
             {
                 HttpContext.Session.SetString("vcofficerId", id);
-                
-                TempData["RefId"] = id;
+                HttpContext.Session.SetString("MasterRefID", refId);
+                HttpContext.Session.SetString("flag", flag);
 
-                //List<OfficerListModel> Response = await _ministry.GetOfficerListAsync(id);
+                TempData["RefId"] = id;  // Iska use back button ke liye ho raha hai / agar first box se aana hai to refid jayegi or second se aaya hai to id (Matlab officerid) jayegi
+
                 List<OfficerListModel> Response = await _ministry.GetOfficerDetailsByOfficerIdAsync(id);
 
                 OfficerListModel firstOfficer = Response.FirstOrDefault();
@@ -119,7 +142,6 @@ namespace VigilanceClearance.Controllers
                 List<OfficerPostingDetailsViewModellist> Postinglist = await _ministry.GetOfficerPostingList(id);
                 //8
                 List<InsertIntegrityAgreedOrDoubtfulModel> IntegrityAgreedlist = await _ministry.GetInsertIntegrityAgreedOrDoubtfulList(id);
-
 
                 //9           
                 List<AllegationOfMisconductExaminedModel> AllegationOfMisconductlist = await _ministry.GetAllegationOfMisconductExaminedList(id);
@@ -136,6 +158,8 @@ namespace VigilanceClearance.Controllers
                 //13
                 List<ComplaintWithVigilanceAnglePendingModel> ComplaintWithVigilanceAnglePendingModellist = await _ministry.GetComplaintWithVigilanceAnglePendingList(id);
 
+
+                var result = await _pesb.Get_Vc_Reference_Received_For_Details_GetById_Async(int.Parse(refId));
 
 
                 string orgcode = string.Empty;
@@ -167,6 +191,8 @@ namespace VigilanceClearance.Controllers
                     DisciplinaryCriminalProceedingsModellist = DisciplinaryCriminalProceedingsModellist,
                     ActionContemplatedAgainstTheOfficerModellist = ActionContemplatedAgainstTheOfficerlist,
                     ComplaintWithVigilanceAnglePendingModellist = ComplaintWithVigilanceAnglePendingModellist,
+
+                    new_Reference_Model = result.FirstOrDefault(),
                 };
 
                 return View(model);
@@ -199,177 +225,200 @@ namespace VigilanceClearance.Controllers
         [HttpPost]
         public async Task<IActionResult> AddOfficerPostingDetails(OfficerDetailMainModel model)
         {
-            InsertOfficerDetailsModel insertOfficerDetailsModel = new InsertOfficerDetailsModel();
-            string Id = HttpContext.Session.GetString("vcofficerId");
-            try
+            if (!string.IsNullOrEmpty(HttpContext.Session.GetString("MasterRefID")) || !string.IsNullOrEmpty(HttpContext.Session.GetString("vcofficerId")))
             {
-                ModelState.Clear();  // Wipe the tree
-                if (TryValidateModel(model.officerPostingDetail7, nameof(model.officerPostingDetail7)))
+                InsertOfficerDetailsModel insertOfficerDetailsModel = new InsertOfficerDetailsModel();
+                string Id = HttpContext.Session.GetString("vcofficerId");                
+                string MasterRefId = HttpContext.Session.GetString("MasterRefID");
+                string _flag = HttpContext.Session.GetString("flag");
+                try
                 {
-                    // Submodel is valid!
-                    insertOfficerDetailsModel.OrgCode = model.officerPostingDetail7.Organization;
-                    insertOfficerDetailsModel.OrgMinistry = model.officerPostingDetail7.Ministry;
-                    insertOfficerDetailsModel.Designation = model.officerPostingDetail7.Designation;
-                    insertOfficerDetailsModel.PlaceOfPosting = model.officerPostingDetail7.PlaceOfPosting;
-                    insertOfficerDetailsModel.VcOfficerId = int.Parse(Id);
-                    string fromDate = DateTime.Parse(model.officerPostingDetail7.TenureFrom.ToString()).ToString("yyyy-MM-dd");
-                    string toDate = DateTime.Parse(model.officerPostingDetail7.TenureTo.ToString()).ToString("yyyy-MM-dd");
-
-                    insertOfficerDetailsModel.FromDate = DateTime.Parse(fromDate);
-                    insertOfficerDetailsModel.ToDate = DateTime.Parse(toDate);
-
-                    //insertOfficerDetailsModel.FromDate = model.officerPostingDetail7.TenureFrom;
-                    //insertOfficerDetailsModel.ToDate = model.officerPostingDetail7.TenureTo;
-
-                    insertOfficerDetailsModel.actionBy = HttpContext.Session.GetString("Username");
-                    insertOfficerDetailsModel.actionBy_SessionId = HttpContext.Session.Id;
-                    insertOfficerDetailsModel.actionBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
-
-                    int num = await _ministry.InsertOfficerPostingDetail(insertOfficerDetailsModel);
-
-                    if (num > 0)
+                    ModelState.Clear();  // Wipe the tree
+                    if (TryValidateModel(model.officerPostingDetail7, nameof(model.officerPostingDetail7)))
                     {
-                        TempData["successmsg"] = "Data Submitted Successfuly";
-                        TempData.Keep("successmsg");
+                        // Submodel is valid!
+                        insertOfficerDetailsModel.masterReferenceId = int.Parse(MasterRefId);
+                        insertOfficerDetailsModel.OrgCode = model.officerPostingDetail7.Organization;
+                        insertOfficerDetailsModel.OrgMinistry = model.officerPostingDetail7.Ministry;
+                        insertOfficerDetailsModel.Designation = model.officerPostingDetail7.Designation;
+                        insertOfficerDetailsModel.PlaceOfPosting = model.officerPostingDetail7.PlaceOfPosting;
+                        insertOfficerDetailsModel.VcOfficerId = int.Parse(Id);
+                        string fromDate = DateTime.Parse(model.officerPostingDetail7.TenureFrom.ToString()).ToString("yyyy-MM-dd");
+                        string toDate = DateTime.Parse(model.officerPostingDetail7.TenureTo.ToString()).ToString("yyyy-MM-dd");
+
+                        insertOfficerDetailsModel.FromDate = DateTime.Parse(fromDate);
+                        insertOfficerDetailsModel.ToDate = DateTime.Parse(toDate);
+
+                        //insertOfficerDetailsModel.FromDate = model.officerPostingDetail7.TenureFrom;
+                        //insertOfficerDetailsModel.ToDate = model.officerPostingDetail7.TenureTo;
+
+                        insertOfficerDetailsModel.actionBy = HttpContext.Session.GetString("Username");
+                        insertOfficerDetailsModel.actionBy_SessionId = HttpContext.Session.Id;
+                        insertOfficerDetailsModel.actionBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+
+                        int num = await _ministry.InsertOfficerPostingDetail(insertOfficerDetailsModel);
+
+                        if (num > 0)
+                        {
+                            TempData["successmsg"] = "Data Submitted Successfuly";
+                            TempData.Keep("successmsg");
+                        }
+                        else
+                        {
+                            TempData["successmsg"] = "Data Not Submitted";
+                        }
+
+                        /* return RedirectToAction("UpdateReferenceReceivedCVC", new { id = Id });*/ // Send the update page
+                        return Redirect(Url.Action("UpdateReferenceReceivedCVC", new { id = Id, refId = MasterRefId , flag = _flag }) + "#section7");
                     }
                     else
                     {
-                        TempData["successmsg"] = "Data Not Submitted";
+                        TempData["successmsg"] = "Error: Something Went Wrong in model state";
+                        TempData.Keep("successmsg");
+                        return Redirect(Url.Action("UpdateReferenceReceivedCVC", new { id = Id, refId = MasterRefId, flag = _flag }) + "#section7");
                     }
-
-                    return RedirectToAction("UpdateReferenceReceivedCVC", new { id = Id }); // Send the update page
                 }
-                else
+                catch (Exception ex)
                 {
-                    TempData["successmsg"] = "Error: Something Went Wrong in model state";
-                    TempData.Keep("successmsg");
-                    return RedirectToAction("UpdateReferenceReceivedCVC", new { id = Id });
+                    ModelState.AddModelError(string.Empty, "Failed to load country list.");
+                    return View();
                 }
             }
-            catch (Exception ex)
+            else
             {
-                ModelState.AddModelError(string.Empty, "Failed to load country list.");
-                return View();
+                return RedirectToAction("LogoutRedirect", "Account");
             }
         }
 
-
+        //8
         #region Added as on date 03-07-2025
-
 
         [HttpPost]
         public async Task<IActionResult> AddIntegrityAgreedOrDoubtful(OfficerDetailMainModel model)
         {
-            string Id = HttpContext.Session.GetString("vcofficerId");
-
-            InsertIntegrityAgreedOrDoubtfulModel _insertIntegritymodel = new InsertIntegrityAgreedOrDoubtfulModel();
-
-            try
+            if (!string.IsNullOrEmpty(HttpContext.Session.GetString("MasterRefID")) || !string.IsNullOrEmpty(HttpContext.Session.GetString("vcofficerId")))
             {
-                ModelState.Remove("officerIntegrityAgreedOrDoubtful_8.YearFrom");
-                ModelState.Remove("officerIntegrityAgreedOrDoubtful_8.YearTo");
-                ModelState.Remove("officerIntegrityAgreedOrDoubtful_8.RemovedFromAgreedlistDate");
+                string Id = HttpContext.Session.GetString("vcofficerId");
+                string MasterRefId = HttpContext.Session.GetString("MasterRefID");
+                string _flag = HttpContext.Session.GetString("flag");
+                InsertIntegrityAgreedOrDoubtfulModel _insertIntegritymodel = new InsertIntegrityAgreedOrDoubtfulModel();
 
-                ModelState.Clear();  // Wipe the tree
-                if (TryValidateModel(model.officerIntegrityAgreedOrDoubtful_8, nameof(model.officerIntegrityAgreedOrDoubtful_8)))
+                try
                 {
+                    ModelState.Remove("officerIntegrityAgreedOrDoubtful_8.YearFrom");
+                    ModelState.Remove("officerIntegrityAgreedOrDoubtful_8.YearTo");
+                    ModelState.Remove("officerIntegrityAgreedOrDoubtful_8.RemovedFromAgreedlistDate");
 
-                    _insertIntegritymodel.officerId = int.Parse(Id);
-                    _insertIntegritymodel.enteredInTheList = model.officerIntegrityAgreedOrDoubtful_8.IsAgreed.ToString();
-                    _insertIntegritymodel.dateOfEntryInTheList = DateTime.Now;
-                    _insertIntegritymodel.removedFromTheList = string.Empty;
-                    _insertIntegritymodel.dateOfRemovalFromTheList = string.Empty;
-                    _insertIntegritymodel.actionBy = HttpContext.Session.GetString("Username");
-                    _insertIntegritymodel.actionOn = DateTime.Now;
-                    _insertIntegritymodel.actionBy_SessionId = HttpContext.Session.Id;
-                    _insertIntegritymodel.actionBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
-
-                    int num = await _ministry.InsertIntegrityAgreedOrDoubtful(_insertIntegritymodel);
-
-                    if (num > 0)
+                    ModelState.Clear();  // Wipe the tree
+                    if (TryValidateModel(model.officerIntegrityAgreedOrDoubtful_8, nameof(model.officerIntegrityAgreedOrDoubtful_8)))
                     {
-                        TempData["successmsg"] = "Data Submitted Successfuly";
-                        TempData.Keep("successmsg");
+                        _insertIntegritymodel.masterReferenceId = int.Parse(MasterRefId);
+                        _insertIntegritymodel.officerId = int.Parse(Id);
+                        _insertIntegritymodel.enteredInTheList = model.officerIntegrityAgreedOrDoubtful_8.IsAgreed.ToString();
+                        _insertIntegritymodel.dateOfEntryInTheList = DateTime.Now;
+                        _insertIntegritymodel.removedFromTheList = string.Empty;
+                        _insertIntegritymodel.dateOfRemovalFromTheList = string.Empty;
+                        _insertIntegritymodel.actionBy = HttpContext.Session.GetString("Username");
+                        _insertIntegritymodel.actionOn = DateTime.Now;
+                        _insertIntegritymodel.actionBy_SessionId = HttpContext.Session.Id;
+                        _insertIntegritymodel.actionBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+
+                        int num = await _ministry.InsertIntegrityAgreedOrDoubtful(_insertIntegritymodel);
+
+                        if (num > 0)
+                        {
+                            TempData["successmsg"] = "Data Submitted Successfuly";
+                            TempData.Keep("successmsg");
+                        }
+                        else
+                        {
+                            TempData["successmsg"] = "Data Not Submitted";
+                        }
+                        return Redirect(Url.Action("UpdateReferenceReceivedCVC", new { id = Id, refId = MasterRefId, flag = _flag }) + "#section8");
                     }
                     else
                     {
-                        TempData["successmsg"] = "Data Not Submitted";
+                        TempData["successmsg"] = "Error: Something Went Wrong in model state";
+                        TempData.Keep("successmsg");
+                        return Redirect(Url.Action("UpdateReferenceReceivedCVC", new { id = Id, refId = MasterRefId, flag = _flag }) + "#section8");
                     }
-
-                    // return RedirectToAction("UpdateReferenceReceivedCVC", Id); // Send the update page
-                    return RedirectToAction("UpdateReferenceReceivedCVC", new { id = Id });
                 }
-                else
+                catch (Exception ex)
                 {
-                    TempData["successmsg"] = "Error: Something Went Wrong in model state";
-                    TempData.Keep("successmsg");
-                    return RedirectToAction("UpdateReferenceReceivedCVC", new { id = Id });
+                    ModelState.AddModelError(string.Empty, "Failed to load country list.");
+                    return View();
                 }
             }
-            catch (Exception ex)
+            else
             {
-                ModelState.AddModelError(string.Empty, "Failed to load country list.");
-                return View();
+                return RedirectToAction("LogoutRedirect", "Account");
             }
         }
 
         #endregion
-
+        //9
         #region Added as on date 04_07_2025
 
         [HttpPost]
         public async Task<IActionResult> AddAllegationOfMisconductExamined(OfficerDetailMainModel model)
         {
-            string Id = HttpContext.Session.GetString("vcofficerId");
-
-            AllegationOfMisconductExaminedModel _insertAllegationOfMisconduct = new AllegationOfMisconductExaminedModel();
-
-            try
+            if (!string.IsNullOrEmpty(HttpContext.Session.GetString("MasterRefID")) || !string.IsNullOrEmpty(HttpContext.Session.GetString("vcofficerId")))
             {
+                string Id = HttpContext.Session.GetString("vcofficerId");
+                string MasterRefId = HttpContext.Session.GetString("MasterRefID");
+                string _flag = HttpContext.Session.GetString("flag");
+                AllegationOfMisconductExaminedModel _insertAllegationOfMisconduct = new AllegationOfMisconductExaminedModel();
 
-                ModelState.Remove("officerAllegationOfMisconductExamined_9.vigilanceAngleExamined");
-
-                ModelState.Clear();  // Wipe the tree
-                if (TryValidateModel(model.officerAllegationOfMisconductExamined_9, nameof(model.officerAllegationOfMisconductExamined_9)))
+                try
                 {
+                    ModelState.Remove("officerAllegationOfMisconductExamined_9.vigilanceAngleExamined");
 
-                    _insertAllegationOfMisconduct.officerId = int.Parse(Id);
-                    _insertAllegationOfMisconduct.vigilanceAngleExamined = "Yes";
-                    _insertAllegationOfMisconduct.caseDetails = model.officerAllegationOfMisconductExamined_9.caseDetails;
-                    _insertAllegationOfMisconduct.presentStatusOfTheCase = model.officerAllegationOfMisconductExamined_9.presentStatusOfTheCase;
-                    _insertAllegationOfMisconduct.actionrecommendedOptions = model.officerAllegationOfMisconductExamined_9.actionrecommendedOptions;
-                    _insertAllegationOfMisconduct.actionRecommendedDetails = model.officerAllegationOfMisconductExamined_9.actionRecommendedDetails;
-                    _insertAllegationOfMisconduct.actionBy = HttpContext.Session.GetString("Username");
-                    _insertAllegationOfMisconduct.actionOn = DateTime.Now;
-                    _insertAllegationOfMisconduct.actionBy_SessionId = HttpContext.Session.Id;
-                    _insertAllegationOfMisconduct.actionBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
-
-                    int num = await _ministry.InsertAllegationOfMisconductExamined(_insertAllegationOfMisconduct);
-
-                    if (num > 0)
+                    ModelState.Clear();  // Wipe the tree
+                    if (TryValidateModel(model.officerAllegationOfMisconductExamined_9, nameof(model.officerAllegationOfMisconductExamined_9)))
                     {
-                        TempData["successmsg"] = "Data Submitted Successfuly";
-                        TempData.Keep("successmsg");
+                        _insertAllegationOfMisconduct.masterReferenceId = int.Parse(MasterRefId);
+                        _insertAllegationOfMisconduct.officerId = int.Parse(Id);
+                        _insertAllegationOfMisconduct.vigilanceAngleExamined = "Yes";
+                        _insertAllegationOfMisconduct.caseDetails = model.officerAllegationOfMisconductExamined_9.caseDetails;
+                        _insertAllegationOfMisconduct.presentStatusOfTheCase = model.officerAllegationOfMisconductExamined_9.presentStatusOfTheCase;
+                        _insertAllegationOfMisconduct.actionrecommendedOptions = model.officerAllegationOfMisconductExamined_9.actionrecommendedOptions;
+                        _insertAllegationOfMisconduct.actionRecommendedDetails = model.officerAllegationOfMisconductExamined_9.actionRecommendedDetails;
+                        _insertAllegationOfMisconduct.actionBy = HttpContext.Session.GetString("Username");
+                        _insertAllegationOfMisconduct.actionOn = DateTime.Now;
+                        _insertAllegationOfMisconduct.actionBy_SessionId = HttpContext.Session.Id;
+                        _insertAllegationOfMisconduct.actionBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+
+                        int num = await _ministry.InsertAllegationOfMisconductExamined(_insertAllegationOfMisconduct);
+
+                        if (num > 0)
+                        {
+                            TempData["successmsg"] = "Data Submitted Successfuly";
+                            TempData.Keep("successmsg");
+                        }
+                        else
+                        {
+                            TempData["successmsg"] = "Data Not Submitted";
+                        }
+                        //return Redirect(Url.Action("UpdateReferenceReceivedCVC", new { id = Id }) + "#section9");
+                        return Redirect(Url.Action("UpdateReferenceReceivedCVC", new { id = Id, refId = MasterRefId , flag = _flag }) + "#section9");
                     }
                     else
                     {
-                        TempData["successmsg"] = "Data Not Submitted";
+                        TempData["successmsg"] = "Error: Something Went Wrong in model state";
+                        TempData.Keep("successmsg");
+                        //return Redirect(Url.Action("UpdateReferenceReceivedCVC", new { id = Id }) + "#section9");
+                        return Redirect(Url.Action("UpdateReferenceReceivedCVC", new { id = Id, refId = MasterRefId, flag = _flag }) + "#section9");
                     }
-
-                    // return RedirectToAction("UpdateReferenceReceivedCVC", Id); // Send the update page
-                    return RedirectToAction("UpdateReferenceReceivedCVC", new { id = Id });
                 }
-                else
+                catch (Exception ex)
                 {
-                    TempData["successmsg"] = "Error: Something Went Wrong in model state";
-                    TempData.Keep("successmsg");
-                    return RedirectToAction("UpdateReferenceReceivedCVC", new { id = Id });
+                    ModelState.AddModelError(string.Empty, "Failed to load country list.");
+                    return View();
                 }
             }
-            catch (Exception ex)
+            else
             {
-                ModelState.AddModelError(string.Empty, "Failed to load country list.");
-                return View();
+                return RedirectToAction("LogoutRedirect", "Account");
             }
         }
 
@@ -379,57 +428,64 @@ namespace VigilanceClearance.Controllers
         [HttpPost]
         public async Task<IActionResult> AddPunishmentAwarded(OfficerDetailMainModel model)
         {
-            string Id = HttpContext.Session.GetString("vcofficerId");
-
-            PunishmentAwardedModel _punishmentAwarded = new PunishmentAwardedModel();
-
-            try
+            if (!string.IsNullOrEmpty(HttpContext.Session.GetString("MasterRefID")) || !string.IsNullOrEmpty(HttpContext.Session.GetString("vcofficerId")))
             {
 
-                ModelState.Remove("officerPunishmentAwarded_10.punishmentAwarded");
-
-                ModelState.Clear();  // Wipe the tree
-                if (TryValidateModel(model.officerPunishmentAwarded_10, nameof(model.officerPunishmentAwarded_10)))
+                string Id = HttpContext.Session.GetString("vcofficerId");
+                string MasterRefId = HttpContext.Session.GetString("MasterRefID");
+                string _flag = HttpContext.Session.GetString("flag");
+                PunishmentAwardedModel _punishmentAwarded = new PunishmentAwardedModel();
+                try
                 {
-
-                    _punishmentAwarded.officerId = int.Parse(Id);
-                    _punishmentAwarded.punishmentAwarded = "Yes";
-                    _punishmentAwarded.punishmentDetails = model.officerPunishmentAwarded_10.punishmentDetails;
-                    _punishmentAwarded.punishmentFromDate = model.officerPunishmentAwarded_10.punishmentFromDate;
-                    _punishmentAwarded.punishmentToDate = model.officerPunishmentAwarded_10.punishmentToDate;
-                    _punishmentAwarded.checkName_FromDate = model.officerPunishmentAwarded_10.checkName_FromDate;
-                    _punishmentAwarded.checkName_ToDate = model.officerPunishmentAwarded_10.checkName_ToDate;
-                    _punishmentAwarded.additionalRemarks_IfAny = model.officerPunishmentAwarded_10.additionalRemarks_IfAny;
-                    _punishmentAwarded.actionBy = HttpContext.Session.GetString("Username");
-                    //_punishmentAwarded.actionOn = DateTime.Now;
-                    _punishmentAwarded.actionBy_SessionId = HttpContext.Session.Id;
-                    _punishmentAwarded.actionBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
-
-                    int num = await _ministry.InPunishmentAwarded(_punishmentAwarded);
-
-                    if (num > 0)
+                    ModelState.Remove("officerPunishmentAwarded_10.punishmentAwarded");
+                    ModelState.Clear();  // Wipe the tree
+                    if (TryValidateModel(model.officerPunishmentAwarded_10, nameof(model.officerPunishmentAwarded_10)))
                     {
-                        TempData["successmsg"] = "Data Submitted Successfuly";
-                        TempData.Keep("successmsg");
+                        _punishmentAwarded.masterReferenceId = int.Parse(MasterRefId);
+                        _punishmentAwarded.officerId = int.Parse(Id);
+                        _punishmentAwarded.punishmentAwarded = "Yes";
+                        _punishmentAwarded.punishmentDetails = model.officerPunishmentAwarded_10.punishmentDetails;
+                        _punishmentAwarded.punishmentFromDate = model.officerPunishmentAwarded_10.punishmentFromDate;
+                        _punishmentAwarded.punishmentToDate = model.officerPunishmentAwarded_10.punishmentToDate;
+                        _punishmentAwarded.checkName_FromDate = model.officerPunishmentAwarded_10.checkName_FromDate;
+                        _punishmentAwarded.checkName_ToDate = model.officerPunishmentAwarded_10.checkName_ToDate;
+                        _punishmentAwarded.additionalRemarks_IfAny = model.officerPunishmentAwarded_10.additionalRemarks_IfAny;
+                        _punishmentAwarded.actionBy = HttpContext.Session.GetString("Username");
+                        //_punishmentAwarded.actionOn = DateTime.Now;
+                        _punishmentAwarded.actionBy_SessionId = HttpContext.Session.Id;
+                        _punishmentAwarded.actionBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+
+                        int num = await _ministry.InPunishmentAwarded(_punishmentAwarded);
+
+                        if (num > 0)
+                        {
+                            TempData["successmsg"] = "Data Submitted Successfuly";
+                            TempData.Keep("successmsg");
+                        }
+                        else
+                        {
+                            TempData["successmsg"] = "Data Not Submitted";
+                        }
+                        //return Redirect(Url.Action("UpdateReferenceReceivedCVC", new { id = Id }) + "#section10");
+                        return Redirect(Url.Action("UpdateReferenceReceivedCVC", new { id = Id, refId = MasterRefId, flag = _flag }) + "#section10");
                     }
                     else
                     {
-                        TempData["successmsg"] = "Data Not Submitted";
+                        TempData["successmsg"] = "Error: Something Went Wrong in model state";
+                        TempData.Keep("successmsg");
+                        //return Redirect(Url.Action("UpdateReferenceReceivedCVC", new { id = Id }) + "#section10");
+                        return Redirect(Url.Action("UpdateReferenceReceivedCVC", new { id = Id, refId = MasterRefId, flag = _flag }) + "#section10");
                     }
-
-                    return RedirectToAction("UpdateReferenceReceivedCVC", new { id = Id });
                 }
-                else
+                catch (Exception ex)
                 {
-                    TempData["successmsg"] = "Error: Something Went Wrong in model state";
-                    TempData.Keep("successmsg");
-                    return RedirectToAction("UpdateReferenceReceivedCVC", new { id = Id });
+                    ModelState.AddModelError(string.Empty, "Failed to load country list.");
+                    return View();
                 }
             }
-            catch (Exception ex)
+            else
             {
-                ModelState.AddModelError(string.Empty, "Failed to load country list.");
-                return View();
+                return RedirectToAction("LogoutRedirect", "Account");
             }
         }
 
@@ -441,173 +497,198 @@ namespace VigilanceClearance.Controllers
         [HttpPost]
         public async Task<IActionResult> AddDisciplinaryCriminalProceedings(OfficerDetailMainModel model)
         {
-            string Id = HttpContext.Session.GetString("vcofficerId");
-
-            //PunishmentAwardedModel _punishmentAwarded = new PunishmentAwardedModel();
-
-            DisciplinaryCriminalProceedingsModel _disciplinaryCriminalProceedings = new DisciplinaryCriminalProceedingsModel();
-            try
+            if (!string.IsNullOrEmpty(HttpContext.Session.GetString("MasterRefID")) || !string.IsNullOrEmpty(HttpContext.Session.GetString("vcofficerId")))
             {
-
-                ModelState.Remove("officerDisciplinaryCriminalProceedings_11.DisciplinaryProceeding");
-
-                ModelState.Clear();  // Wipe the tree
-                if (TryValidateModel(model.officerDisciplinaryCriminalProceedings_11, nameof(model.officerDisciplinaryCriminalProceedings_11)))
+                string Id = HttpContext.Session.GetString("vcofficerId");
+                string MasterRefId = HttpContext.Session.GetString("MasterRefID");
+                string _flag = HttpContext.Session.GetString("flag");
+                DisciplinaryCriminalProceedingsModel _disciplinaryCriminalProceedings = new DisciplinaryCriminalProceedingsModel();
+                try
                 {
+                    ModelState.Remove("officerDisciplinaryCriminalProceedings_11.DisciplinaryProceeding");
 
-                    _disciplinaryCriminalProceedings.officerId = int.Parse(Id);
-                    _disciplinaryCriminalProceedings.whether_DisciplinaryCriminalProceedingsPending = "Yes";
-                    _disciplinaryCriminalProceedings.whether_Suspended = model.officerDisciplinaryCriminalProceedings_11.whether_Suspended;
-                    _disciplinaryCriminalProceedings.suspensionDate = model.officerDisciplinaryCriminalProceedings_11.suspensionDate;
-                    _disciplinaryCriminalProceedings.whetherRevoked = model.officerDisciplinaryCriminalProceedings_11.whetherRevoked;
-                    _disciplinaryCriminalProceedings.revocationDate = model.officerDisciplinaryCriminalProceedings_11.revocationDate;
-                    _disciplinaryCriminalProceedings.detailsOf_Case = model.officerDisciplinaryCriminalProceedings_11.detailsOf_Case;
-                    _disciplinaryCriminalProceedings.presentStatusOftheCase = model.officerDisciplinaryCriminalProceedings_11.presentStatusOftheCase;
-                    _disciplinaryCriminalProceedings.actionBy = HttpContext.Session.GetString("Username");
-                    _disciplinaryCriminalProceedings.actionBy_SessionId = HttpContext.Session.Id;
-                    _disciplinaryCriminalProceedings.actionBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
-
-                    int num = await _ministry.InsertDisciplinaryCriminalProceedings(_disciplinaryCriminalProceedings);
-
-                    if (num > 0)
+                    ModelState.Clear();  // Wipe the tree
+                    if (TryValidateModel(model.officerDisciplinaryCriminalProceedings_11, nameof(model.officerDisciplinaryCriminalProceedings_11)))
                     {
-                        TempData["successmsg"] = "Data Submitted Successfuly";
-                        TempData.Keep("successmsg");
+                        _disciplinaryCriminalProceedings.masterReferenceId = int.Parse(MasterRefId);
+                        _disciplinaryCriminalProceedings.officerId = int.Parse(Id);
+                        _disciplinaryCriminalProceedings.whether_DisciplinaryCriminalProceedingsPending = "Yes";
+                        _disciplinaryCriminalProceedings.whether_Suspended = model.officerDisciplinaryCriminalProceedings_11.whether_Suspended;
+                        _disciplinaryCriminalProceedings.suspensionDate = model.officerDisciplinaryCriminalProceedings_11.suspensionDate;
+                        _disciplinaryCriminalProceedings.whetherRevoked = model.officerDisciplinaryCriminalProceedings_11.whetherRevoked;
+                        _disciplinaryCriminalProceedings.revocationDate = model.officerDisciplinaryCriminalProceedings_11.revocationDate;
+                        _disciplinaryCriminalProceedings.detailsOf_Case = model.officerDisciplinaryCriminalProceedings_11.detailsOf_Case;
+                        _disciplinaryCriminalProceedings.presentStatusOftheCase = model.officerDisciplinaryCriminalProceedings_11.presentStatusOftheCase;
+                        _disciplinaryCriminalProceedings.actionBy = HttpContext.Session.GetString("Username");
+                        _disciplinaryCriminalProceedings.actionBy_SessionId = HttpContext.Session.Id;
+                        _disciplinaryCriminalProceedings.actionBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+
+                        int num = await _ministry.InsertDisciplinaryCriminalProceedings(_disciplinaryCriminalProceedings);
+
+                        if (num > 0)
+                        {
+                            TempData["successmsg"] = "Data Submitted Successfuly";
+                            TempData.Keep("successmsg");
+                        }
+                        else
+                        {
+                            TempData["successmsg"] = "Data Not Submitted";
+                        }
+                        //return Redirect(Url.Action("UpdateReferenceReceivedCVC", new { id = Id }) + "#section11");
+                        return Redirect(Url.Action("UpdateReferenceReceivedCVC", new { id = Id, refId = MasterRefId, flag = _flag }) + "#section11");
                     }
                     else
                     {
-                        TempData["successmsg"] = "Data Not Submitted";
+                        TempData["successmsg"] = "Error: Something Went Wrong in model state";
+                        TempData.Keep("successmsg");
+                        //return Redirect(Url.Action("UpdateReferenceReceivedCVC", new { id = Id }) + "#section11");
+                        return Redirect(Url.Action("UpdateReferenceReceivedCVC", new { id = Id, refId = MasterRefId, flag = _flag }) + "#section11");
                     }
-
-                    return RedirectToAction("UpdateReferenceReceivedCVC", new { id = Id });
                 }
-                else
+                catch (Exception ex)
                 {
-                    TempData["successmsg"] = "Error: Something Went Wrong in model state";
-                    TempData.Keep("successmsg");
-                    return RedirectToAction("UpdateReferenceReceivedCVC", new { id = Id });
+                    ModelState.AddModelError(string.Empty, "Failed to load country list.");
+                    return View();
                 }
             }
-            catch (Exception ex)
+            else
             {
-                ModelState.AddModelError(string.Empty, "Failed to load country list.");
-                return View();
+                return RedirectToAction("LogoutRedirect", "Account");
             }
         }
 
-
+        //12
         [HttpPost]
         public async Task<IActionResult> AddActionContemplatedAgainstTheOfficer(OfficerDetailMainModel model)
         {
-            string Id = HttpContext.Session.GetString("vcofficerId");
-
-            ActionContemplatedAgainstTheOfficerModel _actionContemplatedAgainstTheOfficerModel = new ActionContemplatedAgainstTheOfficerModel();
-
-            try
+            if (!string.IsNullOrEmpty(HttpContext.Session.GetString("MasterRefID")) || !string.IsNullOrEmpty(HttpContext.Session.GetString("vcofficerId")))
             {
-                ModelState.Remove("officerActionContemplatedAgainstTheOfficerAsOnDate_12.whether_CaseContemplated");
+                string Id = HttpContext.Session.GetString("vcofficerId");
+                string MasterRefId = HttpContext.Session.GetString("MasterRefID");
+                string _flag = HttpContext.Session.GetString("flag");
+                ActionContemplatedAgainstTheOfficerModel _actionContemplatedAgainstTheOfficerModel = new ActionContemplatedAgainstTheOfficerModel();
 
-                ModelState.Clear();  // Wipe the tree
-                if (TryValidateModel(model.officerActionContemplatedAgainstTheOfficerAsOnDate_12, nameof(model.officerActionContemplatedAgainstTheOfficerAsOnDate_12)))
+                try
                 {
+                    ModelState.Remove("officerActionContemplatedAgainstTheOfficerAsOnDate_12.whether_CaseContemplated");
 
-                    _actionContemplatedAgainstTheOfficerModel.officerId = int.Parse(Id);
-                    _actionContemplatedAgainstTheOfficerModel.whether_CaseContemplated = "Yes";
-                    _actionContemplatedAgainstTheOfficerModel.detailsOfTheCase = model.officerActionContemplatedAgainstTheOfficerAsOnDate_12.detailsOfTheCase;
-                    _actionContemplatedAgainstTheOfficerModel.presentStatusOftheCase = model.officerActionContemplatedAgainstTheOfficerAsOnDate_12.presentStatusOftheCase;
-                    _actionContemplatedAgainstTheOfficerModel.actionBy = HttpContext.Session.GetString("Username");
-                    _actionContemplatedAgainstTheOfficerModel.actionBy_SessionId = HttpContext.Session.Id;
-                    _actionContemplatedAgainstTheOfficerModel.actionBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
-
-                    int num = await _ministry.InsertActionContemplatedAgainstTheOfficer(_actionContemplatedAgainstTheOfficerModel);
-
-                    if (num > 0)
+                    ModelState.Clear();  // Wipe the tree
+                    if (TryValidateModel(model.officerActionContemplatedAgainstTheOfficerAsOnDate_12, nameof(model.officerActionContemplatedAgainstTheOfficerAsOnDate_12)))
                     {
-                        TempData["successmsg"] = "Data Submitted Successfuly";
-                        TempData.Keep("successmsg");
+                        _actionContemplatedAgainstTheOfficerModel.masterReferenceId = int.Parse(MasterRefId);
+                        _actionContemplatedAgainstTheOfficerModel.officerId = int.Parse(Id);
+                        _actionContemplatedAgainstTheOfficerModel.whether_CaseContemplated = "Yes";
+                        _actionContemplatedAgainstTheOfficerModel.detailsOfTheCase = model.officerActionContemplatedAgainstTheOfficerAsOnDate_12.detailsOfTheCase;
+                        _actionContemplatedAgainstTheOfficerModel.presentStatusOftheCase = model.officerActionContemplatedAgainstTheOfficerAsOnDate_12.presentStatusOftheCase;
+                        _actionContemplatedAgainstTheOfficerModel.actionBy = HttpContext.Session.GetString("Username");
+                        _actionContemplatedAgainstTheOfficerModel.actionBy_SessionId = HttpContext.Session.Id;
+                        _actionContemplatedAgainstTheOfficerModel.actionBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+
+                        int num = await _ministry.InsertActionContemplatedAgainstTheOfficer(_actionContemplatedAgainstTheOfficerModel);
+
+                        if (num > 0)
+                        {
+                            TempData["successmsg"] = "Data Submitted Successfuly";
+                            TempData.Keep("successmsg");
+                        }
+                        else
+                        {
+                            TempData["successmsg"] = "Data Not Submitted";
+                        }
+                        //return Redirect(Url.Action("UpdateReferenceReceivedCVC", new { id = Id }) + "#section12");
+                        return Redirect(Url.Action("UpdateReferenceReceivedCVC", new { id = Id, refId = MasterRefId, flag = _flag }) + "#section12");
                     }
                     else
                     {
-                        TempData["successmsg"] = "Data Not Submitted";
+                        TempData["successmsg"] = "Error: Something Went Wrong in model state";
+                        TempData.Keep("successmsg");
+                        //return Redirect(Url.Action("UpdateReferenceReceivedCVC", new { id = Id }) + "#section12");
+                        return Redirect(Url.Action("UpdateReferenceReceivedCVC", new { id = Id, refId = MasterRefId, flag = _flag }) + "#section12");
                     }
-
-                    return RedirectToAction("UpdateReferenceReceivedCVC", new { id = Id });
                 }
-                else
+                catch (Exception ex)
                 {
-                    TempData["successmsg"] = "Error: Something Went Wrong in model state";
-                    TempData.Keep("successmsg");
-                    return RedirectToAction("UpdateReferenceReceivedCVC", new { id = Id });
+                    ModelState.AddModelError(string.Empty, "Failed to load country list.");
+                    return View();
                 }
             }
-            catch (Exception ex)
+            else
             {
-                ModelState.AddModelError(string.Empty, "Failed to load country list.");
-                return View();
+                return RedirectToAction("LogoutRedirect", "Account");
             }
         }
 
         #endregion
 
+        //13
         #region Date 08_07_2025
 
         [HttpPost]
         public async Task<IActionResult> AddComplaintWithVigilanceAnglePending(OfficerDetailMainModel model)
         {
-            string Id = HttpContext.Session.GetString("vcofficerId");
-
-            //ActionContemplatedAgainstTheOfficerModel _actionContemplatedAgainstTheOfficerModel = new ActionContemplatedAgainstTheOfficerModel();
-
-            ComplaintWithVigilanceAnglePendingModel _vigilanceAnglePendingModel = new ComplaintWithVigilanceAnglePendingModel();
-
-            try
+            if (!string.IsNullOrEmpty(HttpContext.Session.GetString("MasterRefID")) || !string.IsNullOrEmpty(HttpContext.Session.GetString("vcofficerId")))
             {
-                ModelState.Remove("officerComplaintWithVigilanceAnglePending_13.whether_vigilanceAngelPending");
+                string Id = HttpContext.Session.GetString("vcofficerId");
+                string MasterRefId = HttpContext.Session.GetString("MasterRefID");
+                string _flag = HttpContext.Session.GetString("flag");                
+                
+                ComplaintWithVigilanceAnglePendingModel _vigilanceAnglePendingModel = new ComplaintWithVigilanceAnglePendingModel();
 
-                ModelState.Clear();  // Wipe the tree
-                if (TryValidateModel(model.officerComplaintWithVigilanceAnglePending_13, nameof(model.officerComplaintWithVigilanceAnglePending_13)))
+                try
                 {
-                    _vigilanceAnglePendingModel.officerId = int.Parse(Id);
-                    _vigilanceAnglePendingModel.whether_vigilanceAngelPending = "Yes";
-                    _vigilanceAnglePendingModel.detailsOfTheCase = model.officerComplaintWithVigilanceAnglePending_13.detailsOfTheCase;
-                    _vigilanceAnglePendingModel.presentStatusOftheCase = model.officerComplaintWithVigilanceAnglePending_13.presentStatusOftheCase;
-                    _vigilanceAnglePendingModel.addtionalRemarks = model.officerComplaintWithVigilanceAnglePending_13.addtionalRemarks;
-                    _vigilanceAnglePendingModel.actionBy = HttpContext.Session.GetString("Username");
-                    _vigilanceAnglePendingModel.actionBy_SessionId = HttpContext.Session.Id;
-                    _vigilanceAnglePendingModel.actionBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+                    ModelState.Remove("officerComplaintWithVigilanceAnglePending_13.whether_vigilanceAngelPending");
 
-                    int num = await _ministry.InsertComplaintWithVigilanceAnglePending(_vigilanceAnglePendingModel);
-
-                    if (num > 0)
+                    ModelState.Clear();  // Wipe the tree
+                    if (TryValidateModel(model.officerComplaintWithVigilanceAnglePending_13, nameof(model.officerComplaintWithVigilanceAnglePending_13)))
                     {
-                        TempData["successmsg"] = "Data Submitted Successfuly";
-                        TempData.Keep("successmsg");
+                        _vigilanceAnglePendingModel.masterReferenceId = int.Parse(MasterRefId);
+                        _vigilanceAnglePendingModel.officerId = int.Parse(Id);
+                        _vigilanceAnglePendingModel.whether_vigilanceAngelPending = "Yes";
+                        _vigilanceAnglePendingModel.detailsOfTheCase = model.officerComplaintWithVigilanceAnglePending_13.detailsOfTheCase;
+                        _vigilanceAnglePendingModel.presentStatusOftheCase = model.officerComplaintWithVigilanceAnglePending_13.presentStatusOftheCase;
+                        _vigilanceAnglePendingModel.addtionalRemarks = model.officerComplaintWithVigilanceAnglePending_13.addtionalRemarks;
+                        _vigilanceAnglePendingModel.actionBy = HttpContext.Session.GetString("Username");
+                        _vigilanceAnglePendingModel.actionBy_SessionId = HttpContext.Session.Id;
+                        _vigilanceAnglePendingModel.actionBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+                        
+                        int num = await _ministry.InsertComplaintWithVigilanceAnglePending(_vigilanceAnglePendingModel);
+
+                        if (num > 0)
+                        {
+                            TempData["successmsg"] = "Data Submitted Successfuly";
+                            TempData.Keep("successmsg");
+                        }
+                        else
+                        {
+                            TempData["successmsg"] = "Data Not Submitted";
+                        }
+                        //return Redirect(Url.Action("UpdateReferenceReceivedCVC", new { id = Id }) + "#section13");
+                        return Redirect(Url.Action("UpdateReferenceReceivedCVC", new { id = Id, refId = MasterRefId, flag = _flag }) + "#section13");
                     }
                     else
                     {
-                        TempData["successmsg"] = "Data Not Submitted";
+                        TempData["successmsg"] = "Error: Something Went Wrong in model state";
+                        TempData.Keep("successmsg");
+                        //return Redirect(Url.Action("UpdateReferenceReceivedCVC", new { id = Id }) + "#section13");
+                        return Redirect(Url.Action("UpdateReferenceReceivedCVC", new { id = Id, refId = MasterRefId, flag = _flag }) + "#section13");
                     }
-
-                    return RedirectToAction("UpdateReferenceReceivedCVC", new { id = Id });
                 }
-                else
+                catch (Exception ex)
                 {
-                    TempData["successmsg"] = "Error: Something Went Wrong in model state";
-                    TempData.Keep("successmsg");
-                    return RedirectToAction("UpdateReferenceReceivedCVC", new { id = Id });
+                    ModelState.AddModelError(string.Empty, "Failed to load country list.");
+                    return View();
                 }
             }
-            catch (Exception ex)
+            else
             {
-                ModelState.AddModelError(string.Empty, "Failed to load country list.");
-                return View();
+                return RedirectToAction("LogoutRedirect", "Account");
             }
         }
 
         #endregion
 
 
-
+        //---------------------------------------------------------------------------------------------------------------------------
         #region Start New Reference To CVC
 
 
@@ -634,7 +715,7 @@ namespace VigilanceClearance.Controllers
                 }
                 else
                 {
-                    return RedirectToAction("Login", "Account");
+                    return RedirectToAction("LogoutRedirect", "Account");
                 }
             }
             catch (Exception)
@@ -669,7 +750,7 @@ namespace VigilanceClearance.Controllers
                 }
                 else
                 {
-                    return RedirectToAction("Login", "Home");
+                    return RedirectToAction("LogoutRedirect", "Home");
                 }
             }
             catch (Exception)
@@ -743,7 +824,7 @@ namespace VigilanceClearance.Controllers
 
                 else
                 {
-                    return RedirectToAction("Login", "Home");
+                    return RedirectToAction("LogoutRedirect", "Home");
                 }
 
             }
@@ -755,17 +836,17 @@ namespace VigilanceClearance.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> New_Reference_Details(int id)
+        public async Task<IActionResult> New_Reference_Details(int MasterRefID)
         {
             try
             {
-                TempData["RefId"] = id;
-                var result = await _pesb.Get_Vc_Reference_Received_For_Details_GetById_Async(id);
+                TempData["RefId"] = MasterRefID;
+                var result = await _pesb.Get_Vc_Reference_Received_For_Details_GetById_Async(MasterRefID);
 
                 var model = new AddNewOfficerMainModel
                 {
                     new_Reference_Model = result.FirstOrDefault(),
-                    officerList = await _ministry.GetOfficerListAsync(id.ToString()),
+                    officerList = await _ministry.GetOfficerListAsync(MasterRefID.ToString()),
                 };
 
                 return View(model);
@@ -849,7 +930,7 @@ namespace VigilanceClearance.Controllers
                     {
                         success = true,
 
-                        redirectUrl = Url.Action("New_Reference_Details", new { id = objmodel.insertNewOfficerDetailFromMinistryModel.masterReferenceID })
+                        redirectUrl = Url.Action("New_Reference_Details", new { MasterRefID = objmodel.insertNewOfficerDetailFromMinistryModel.masterReferenceID })
 
                     });
 
@@ -858,7 +939,7 @@ namespace VigilanceClearance.Controllers
 
                 else
                 {
-                    return RedirectToAction("Login", "Home");
+                    return RedirectToAction("LogoutRedirect", "Home");
                 }
             }
             catch (Exception)
@@ -869,10 +950,24 @@ namespace VigilanceClearance.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> ForwardToApprover(int id)
+        public async Task<IActionResult> ForwardToApprover(int id ,string flag)
         {
             try
             {
+                string _pendingWith = string.Empty;
+                if (flag == "APPROVER")
+                {
+                    _pendingWith = "MINISTRY_APPROVER";
+                }
+                else if (flag == "CVO")
+                {
+                    _pendingWith = "MINISTRY_CVO";
+                }
+                else if (flag == "COORD")
+                {
+                    _pendingWith = "CVC_COORD2_DH";
+                }
+
                 var userDetailsJson = HttpContext.Session.GetString("UserDetails");
 
                 if (!string.IsNullOrEmpty(userDetailsJson))
@@ -883,7 +978,7 @@ namespace VigilanceClearance.Controllers
                     UpdateRefFromPESBModel _updateRefModel = new UpdateRefFromPESBModel();
 
                     _updateRefModel.mainReferenceID = id;
-                    _updateRefModel.pendingWith = "MINISTRY_APPROVER";
+                    _updateRefModel.pendingWith = _pendingWith;
                     _updateRefModel.updatedBy = _UserName;
                     _updateRefModel.updatedBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString();
                     _updateRefModel.updatedBy_SessionId = HttpContext.Session.Id;
@@ -891,32 +986,77 @@ namespace VigilanceClearance.Controllers
                     int num = await _ministry.UpdateReferenceFromPESB(_updateRefModel);
                     if (num == 0)
                     {
-                        //return Json(new { success = false, message = "Record not saved." });
-                        return RedirectToAction("New_ReferenceList");
+                        //return RedirectToAction("New_ReferenceList");
+                        TempData["msg"] = "Forward to Successfully";
                     }
                     else
                     {
-                        //return Json(new
-                        //{
-                        //    success = true,
+                        //return RedirectToAction("New_ReferenceList");
+                        TempData["msg"] = "Error: Something went wrong Please try again or contact system Admin";
+                    }
 
-                        //    redirectUrl = Url.Action("New_Reference_Details", new { id = id })
-                        //});
-
+                    if (flag == "APPROVER")
+                    {
                         return RedirectToAction("New_ReferenceList");
+                    }
+                    else if (flag == "CVO" || flag == "COORD")
+                    {
+                        return RedirectToAction("GetReferenceListPendingWith_MinistryApprover");
+                    }
+                    else
+                    {
+                        return RedirectToAction("New_ReferenceList"); // Chnage karna hai ministry CVO Login me redirect karna
                     }
                 }
                 else
                 {
-                    return RedirectToAction("Login", "Home");
+                    return RedirectToAction("LogoutRedirect", "Account");
                 }
-
                 //return View();
             }
             catch (Exception)
             {
                 ViewBag.Error = "Something went wrong while loading the page.";
                 return View();
+            }
+        }
+
+        #endregion
+
+
+        #region Start the code of ministry Approver as on date 22_07_2025
+
+        [HttpGet]
+        public async Task<IActionResult> GetReferenceListPendingWith_MinistryApprover()
+        {
+            try
+            {
+                var userDetailsJson = HttpContext.Session.GetString("UserDetails");
+                if (!string.IsNullOrEmpty(userDetailsJson))
+                {
+                    var _Role = HttpContext.Session.GetString("UserRole");
+
+                    var userDetails = System.Text.Json.JsonSerializer.Deserialize<UserDetailsModel>(userDetailsJson);
+                    string _MinMastercode = userDetails.MinMasterCode;
+                    string _MinCode = userDetails.MinCode;
+
+                   // List<ReferenceReceivedFromCVCModel> apiResponse = await _ministry.GetReferenceReceivedFromCVClist(_MinMastercode);
+                    List<ReferenceListPendingWith_MinistryApproverModel> apiResponse = await _ministry.GetReferenceListPendingWith_MinistryApproverList(_MinCode, _Role);
+                    if (apiResponse != null)
+                    {
+                        return View(apiResponse);
+                    }
+
+                    return View(new List<ReferenceReceivedFromCVCModel>());
+                }
+                else
+                {
+                    return RedirectToAction("LogoutRedirect", "Account");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
 

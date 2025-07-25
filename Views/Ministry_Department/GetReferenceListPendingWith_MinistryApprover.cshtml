@@ -1,10 +1,12 @@
-﻿@using VigilanceClearance.Models.ViewModel.Ministry
-@model List<References_from_coord2_To_MinistryModel>
+﻿@using VigilanceClearance.Models.Ministry_ApproverModels
+@model List<ReferenceListPendingWith_MinistryApproverModel>
+
 @{
-    ViewData["Title"] = "ViewReferenceReceivedCVC";
+    ViewData["Title"] = "GetReferenceListPendingWith_MinistryApprover";
     Layout = "~/Views/Shared/_MinistryLayout.cshtml";
 }
 
+@* <h1>GetReferenceListPendingWith_MinistryApprover</h1> *@
 
 <style>
     .table-responsive {
@@ -21,6 +23,12 @@
     }
 </style>
 
+@if (TempData["msg"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["msg"]
+    </div>
+}
 
 <section>
     <div class="card">
@@ -33,7 +41,7 @@
                     <a asp-action="Index" asp-route-id="#" class="btn btn-light btn-sm">Back</a>
                 </div>
             </div>
-            
+
         </div>
         <div class="card-body p-2">
             <div class="table-responsive">
@@ -42,13 +50,15 @@
                         <tr>
                             <th>Action</th>
                             <th>Sr.No.</th>
+                            <th>Master ReferenceId</th>
+                            <th>Pending With</th>
                             <th>Reference Received For</th>
                             <th>Reference Received From</th>
                             <th>From Code</th>
                             <th>Post Category</th>
                             <th>Post Sub Category</th>
                             <th>Org Name</th>
-                            <th>Min Desc</th>
+                            <th>Min Name</th>
                             <th>Ref/File No</th>
                             <th>Submission Date</th>
                             <th>CVC Ref/File No</th>
@@ -62,18 +72,22 @@
                             {
 
                                 <tr>
+                                    @*<td>
+                                          <a asp-action="ViewOfficerListForGivenProposal" asp-route-id="@item.Id" class="btn btn-info btn-sm">View</a>
+                                    </td>*@
                                     <td>
-                                        <a asp-action="ViewOfficerListForGivenProposal" asp-route-id="@item.id" class="btn btn-info btn-sm">View</a>
-                                        @* <a asp-action="UpdateReferenceReceivedCVC" asp-route-id="@item.id" class="btn btn-warning btn-sm">Update</a> *@
+                                        <button class="btn btn-sm btn-primary" onclick="location.href='@Url.Action("New_Reference_Details", "Ministry_Department", new { MasterRefID = item.Id })'">Details</button>
                                     </td>
                                     <td>@sno</td>
+                                    <td>@item.Id</td>
+                                    <td>@item.PendingWith</td>
                                     <td>@item.ReferenceReceivedFor</td>
                                     <td>@item.ReferenceReceivedFrom</td>
                                     <td>@item.ReferenceReceivedFromCode</td>
-                                    <td>@item.selectionForThePostCategory</td>
-                                    <td>@item.selectionForThePostSubCategory</td>
+                                    <td>@item.SelectionForThePostCategory</td>
+                                    <td>@item.SelectionForThePostSubCategory</td>
                                     <td>@item.OrgName</td>
-                                    <td>@item.MinName</td>
+                                    <td>@item.MinDesc</td>
                                     <td>@item.ReferenceNo_FileNo</td>
                                     <td>@item.ReferenceOrSubmissionToCvcDate</td>
                                     <td>@item.CVC_ReferenceID_FileNo</td>
@@ -87,5 +101,3 @@
         </div>
     </div>
 </section>
-
-

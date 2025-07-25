@@ -27,6 +27,8 @@ namespace VigilanceClearance.Models.OfficerDetailModel
         public List<ActionContemplatedAgainstTheOfficerModel> ActionContemplatedAgainstTheOfficerModellist { get; set; }
         public List<ComplaintWithVigilanceAnglePendingModel> ComplaintWithVigilanceAnglePendingModellist { get; set; }
 
+        public PESB.new_reference_model new_Reference_Model { get; set; }
+
 
 
     }

@@ -2,6 +2,7 @@
 {
     public class ActionContemplatedAgainstTheOfficerModel
     {
+        public int masterReferenceId { get; set; }
         public int officerId { get; set; }
         public string whether_CaseContemplated { get; set; }
         public string detailsOfTheCase { get; set; }

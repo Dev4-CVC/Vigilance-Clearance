@@ -13,8 +13,7 @@
 
 
 @* Flatpickr CSS  *@
-<link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
-
+@* <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet"> *@
 
 @* 1st card "Details of the officer" *@
 <div class="container-fluid">
@@ -41,7 +40,8 @@
                             </div>
                             <div class="col-md-4">
                                 <label>Date of Birth</label>
-                                <input asp-for="insertNewOfficerDetailFromMinistryModel.officer_DateOfBirth" class="form-control datepicker" placeholder="yyyy-mm-dd" />
+                                <input asp-for="insertNewOfficerDetailFromMinistryModel.officer_DateOfBirth" id="BirthDate" class="form-control datepicker" placeholder="yyyy-mm-dd" type="text" />
+                               
                                 <span asp-validation-for="insertNewOfficerDetailFromMinistryModel.officer_DateOfBirth" class="text-danger"></span>
                             </div>
                         </div>
@@ -50,12 +50,12 @@
                         <div class="row mb-3">
                             <div class="col-md-4">
                                 <label>Date of Retirement</label>
-                                <input asp-for="insertNewOfficerDetailFromMinistryModel.officer_RetirementDate" id="DateOfRetirement" class="form-control datepicker" placeholder="yyyy-mm-dd" />
+                                <input asp-for="insertNewOfficerDetailFromMinistryModel.officer_RetirementDate" id="DateOfRetirement" class="form-control datepicker" placeholder="yyyy-mm-dd" type="text"/>
                                 <span asp-validation-for="insertNewOfficerDetailFromMinistryModel.officer_RetirementDate" class="text-danger"></span>
                             </div>
                             <div class="col-md-4">
                                 <label>Date of Entry into Service</label>
-                                <input asp-for="insertNewOfficerDetailFromMinistryModel.officer_ServiceEntryDate" id="DateOfEntry" class="form-control datepicker" placeholder="yyyy-mm-dd" />
+                                <input asp-for="insertNewOfficerDetailFromMinistryModel.officer_ServiceEntryDate" id="DateOfEntry" class="form-control datepicker" placeholder="yyyy-mm-dd" type="text"/>
                                 <span asp-validation-for="insertNewOfficerDetailFromMinistryModel.officer_ServiceEntryDate" class="text-danger"></span>
                             </div>
                             <div class="col-md-4">
@@ -100,40 +100,27 @@
 
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+@* <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script> *@
 <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
-@* 2nd Card script (date picker)  *@
+
+
+
+
 <script>
-    flatpickr(".datepicker", {
-        dateFormat: "Y-m-d",
-        allowInput: false
-    });
-
-
-    var entryPicker, retirementPicker;
-
-    // Initialize Date of Entry first
-    entryPicker = flatpickr("#DateOfEntry", {
-        dateFormat: "Y-m-d",
-        allowInput: false,
-        onChange: function (selectedDates) {
-            if (selectedDates.length > 0) {
-                // Set minDate of retirementPicker
-                retirementPicker.set('minDate', selectedDates[0]);
-            }
-        }
-    });
-
-    // Initialize Date of Retirement
-    retirementPicker = flatpickr("#DateOfRetirement", {
-        dateFormat: "Y-m-d",
-        allowInput: false
+    $(function () {
+        $(".datepicker").datepicker({
+            changeMonth: true,
+            changeYear: true,           
+            yearRange: "1950:" + new Date().getFullYear(),
+            dateFormat: "yy-mm-dd"
+        });
     });
 </script>
+
 
 @* 2nd Card script (toggle for other service and cadre) *@
 <script>
@@ -172,62 +159,6 @@
     });
 </script>
 
-@* 3rd card Script (Org and Ministry)*@
-<script>
-    $(document).ready(function () {
-        $('#orgCode').change(function () {
-            var orgCode = $(this).val();
-            var ministryDropdown = $('#minCode');
-
-            // Clear the ministry dropdown
-            ministryDropdown.empty();
-
-            // Disable dropdown and set default option if no organization is selected
-            if (!orgCode) {
-                ministryDropdown.prop('disabled', true)
-                    .append($('<option>').val('').text('-- Select Ministry --'));
-                return;
-            }
-
-            console.log("Sending AJAX for orgCode: " + orgCode); // Debug log for selected organization code
-
-            // Send AJAX request to fetch ministries by organization code
-            $.ajax({
-                url: '@Url.Action("GetMinistryByOrgCode", "PESB")', // Adjust the controller/action as necessary
-                type: 'GET',
-                data: { id: orgCode }, // Pass organization code to server
-                dataType: "json",
-                success: function (data) {
-                    ministryDropdown.empty(); // Clear current options
-
-                    // Check if no data or invalid data
-                    if (!data || data.length === 0 || (data.length === 1 && !data[0].Value && !data[0].value)) {
-                        ministryDropdown.prop('disabled', true)
-                            .append($('<option>').val('').text('-- No Ministry Available --'));
-                        return;
-                    }
-
-                    // Add default "Select Ministry" option
-                    // ministryDropdown.append($('<option>').val('').text('-- Select Ministry --'));
-
-                    // Populate the ministry dropdown with received data
-                    $.each(data, function (i, item) {
-                        var val = item.Value || item.value; // Check both possible key names
-                        var txt = item.Text || item.text;   // Check both possible key names
-                        ministryDropdown.append($('<option>').val(val).text(txt));
-                    });
-
-                    // Enable dropdown after options are added
-                    ministryDropdown.prop('disabled', false);
-                },
-                error: function (xhr) {
-                    alert("Error loading ministries: " + xhr.statusText); // Display error on failure
-                }
-            });
-        });
-    });
-
-</script>
 
 @* sweet alert for officer details *@
 @if (TempData["SuccessMessage_Of_officer_details"] != null)
@@ -249,13 +180,14 @@
 <script>
     $(document).ready(function () {
         $('#addofficerdetailsBtn').click(function () {
+            alert('ok');
             let isValid = true;
             $('.text-danger').text(''); // Clear old errors
             debugger;
             // Get form values
             const officer_Name = $('#insertNewOfficerDetailFromMinistryModel_officer_Name').val().trim();
             const officer_FatherName = $('#insertNewOfficerDetailFromMinistryModel_officer_FatherName').val().trim();
-            const officer_DateOfBirth = $('#insertNewOfficerDetailFromMinistryModel_officer_DateOfBirth').val().trim();
+            const officer_DateOfBirth = $('#BirthDate').val().trim();
             const officer_ServiceEntryDate = $('#DateOfEntry').val().trim();
             const officer_RetirementDate = $('#DateOfRetirement').val().trim();
             const officer_Service = $('#Service').val();
@@ -275,7 +207,7 @@
                 isValid = false;
             }
             if (!officer_DateOfBirth) {
-                $('#insertNewOfficerDetailFromMinistryModel_officer_DateOfBirth').next('.text-danger').text('Please enter Date of Birth.');
+                $('#BirthDate').next('.text-danger').text('Please enter Date of Birth.');
                 isValid = false;
             }
             if (!officer_ServiceEntryDate) {
