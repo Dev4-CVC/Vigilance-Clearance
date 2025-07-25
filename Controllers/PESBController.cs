@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
@@ -12,6 +13,7 @@ using VigilanceClearance.Models.ViewModel.PESB;
 
 namespace VigilanceClearance.Controllers
 {
+    [Authorize(Roles = "User")]
     public class PESBController : Controller
     {
         private readonly IHttpClientFactory _clientFactory;
