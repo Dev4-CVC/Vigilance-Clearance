@@ -26,6 +26,23 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Views\CBI_DealingHand\Index.cshtml" />
+    <None Include="Views\CBI_DealingHand\ViewOfficerListForGivenProposal.cshtml" />
+    <None Include="Views\CBI_DealingHand\ViewReferenceReceivedCVC.cshtml" />
+    <None Include="Views\CBI_DealingHand\_CBIAdverseCommentForm.cshtml" />
+    <None Include="Views\Coord2_BranchOfficer\Index.cshtml" />
+    <None Include="Views\Coord2_BranchOfficer\VcReferenceReceivedDetailsGetAll.cshtml" />
+    <None Include="Views\Coord2_BranchOfficer\ViewOfficerListForGivenProposal.cshtml" />
+    <None Include="Views\Coord2_BranchOfficer\ViewOfficerListForGivenProposalDHDraft.cshtml" />
+    <None Include="Views\Coord2_DealingHand\Index.cshtml" />
+    <None Include="Views\Coord2_DealingHand\VcReferenceReceivedDetailsGetAll.cshtml" />
+    <None Include="Views\Coord2_DealingHand\ViewOfficerListForGivenProposal.cshtml" />
+    <None Include="Views\Coord2_DealingHand\ViewOfficerListForGivenProposalDHDraft.cshtml" />
+    <None Include="Views\Coord2_DealingHand\_SaveCoord2DealingHandComment.cshtml" />
+    <None Include="Views\DealingHand\DealingHand_Officer_CompleteProfile.cshtml" />
+    <None Include="Views\DealingHand\DH_Dashboard.cshtml" />
+    <None Include="Views\DealingHand\Pending_Officers.cshtml" />
+    <None Include="Views\DealingHand\Pending_References_With_Branches.cshtml" />
     <None Include="wwwroot\build\config\postcss.config.js" />
     <None Include="wwwroot\build\config\rollup.config.js" />
     <None Include="wwwroot\build\js\AdminLTE.js" />

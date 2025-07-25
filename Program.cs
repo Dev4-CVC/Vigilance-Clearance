@@ -13,6 +13,8 @@ using VigilanceClearance.Middleware;
 using VigilanceClearance.Services;
 using VigilanceClearance.Interface.Admin;
 using VigilanceClearance.DataAccessLayer.Admin_Service;
+using VigilanceClearance.DataAccessLayer.Dealing_Hand_Service;
+using VigilanceClearance.Interface.Dealing_Hand;
 
 var time = 30;
 var builder = WebApplication.CreateBuilder(args);
@@ -51,6 +53,7 @@ builder.Services.AddScoped<IAdmin, Admin_Service>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPESB, PESB_Services>();
 builder.Services.AddScoped<IMinistry, Ministry_Service>();
+builder.Services.AddScoped<IDealingHand, Dealing_Hand_Service>();
 
 var cultureInfo = new CultureInfo("en-GB");
 cultureInfo.DateTimeFormat.ShortDatePattern = "yyyy-MM-dd";

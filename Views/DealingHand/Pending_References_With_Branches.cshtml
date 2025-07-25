@@ -1,0 +1,43 @@
+﻿@model VigilanceClearance.Models.Dealing_Hand.Dealing_Hand_View_Model
+
+@{
+    Layout = "~/Views/Shared/_DealingHandLayout.cshtml";
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Action</th>
+            <th>@Html.DisplayNameFor(model => model.pending_list_for_branch_DH_list.First().ReferenceId)</th>
+            <th>@Html.DisplayNameFor(model => model.pending_list_for_branch_DH_list.First().ReferenceReceivedFor)</th>
+            <th>@Html.DisplayNameFor(model => model.pending_list_for_branch_DH_list.First().ReferenceReceivedFrom)</th>
+            <th>@Html.DisplayNameFor(model => model.pending_list_for_branch_DH_list.First().selectionForThePostCategory)</th>
+            <th>@Html.DisplayNameFor(model => model.pending_list_for_branch_DH_list.First().selectionForThePostSubCategory)</th>
+            <th>@Html.DisplayNameFor(model => model.pending_list_for_branch_DH_list.First().MinName)</th>
+            <th>@Html.DisplayNameFor(model => model.pending_list_for_branch_DH_list.First().OrgName)</th>
+            <th>@Html.DisplayNameFor(model => model.pending_list_for_branch_DH_list.First().MinCode)</th>
+            <th>@Html.DisplayNameFor(model => model.pending_list_for_branch_DH_list.First().OrgCode)</th>
+            <th>@Html.DisplayNameFor(model => model.pending_list_for_branch_DH_list.First().PendingWith)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.pending_list_for_branch_DH_list)
+        {
+            <tr>
+                <td>
+                    <a href="@Url.Action("Pending_Officers", "DealingHand", new { id = item.ReferenceId })" class="btn btn-primary">View</a>
+                </td>
+                <td>@Html.DisplayFor(modelItem => item.ReferenceId)</td>
+                <td>@Html.DisplayFor(modelItem => item.ReferenceReceivedFor)</td>
+                <td>@Html.DisplayFor(modelItem => item.ReferenceReceivedFrom)</td>
+                <td>@Html.DisplayFor(modelItem => item.selectionForThePostCategory)</td>
+                <td>@Html.DisplayFor(modelItem => item.selectionForThePostSubCategory)</td>
+                <td>@Html.DisplayFor(modelItem => item.MinName)</td>
+                <td>@Html.DisplayFor(modelItem => item.OrgName)</td>
+                <td>@Html.DisplayFor(modelItem => item.MinCode)</td>
+                <td>@Html.DisplayFor(modelItem => item.OrgCode)</td>
+                <td>@Html.DisplayFor(modelItem => item.PendingWith)</td>
+            </tr>
+        }
+    </tbody>
+</table>

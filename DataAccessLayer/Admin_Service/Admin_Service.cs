@@ -10,6 +10,7 @@ using VigilanceClearance.Models.PESB;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using VigilanceClearance.Models;
 using System.Net;
+using VigilanceClearance.Models.DTOs;
 
 namespace VigilanceClearance.DataAccessLayer.Admin_Service
 {
@@ -27,6 +28,7 @@ namespace VigilanceClearance.DataAccessLayer.Admin_Service
 
         public async Task<List<Users_Model>> Get_Users_List_Async()
         {
+            List<Users_Model> result = new List<Users_Model>();
             var accessToken = _httpContextAccessor.HttpContext?.Session.GetString("AccessToken");
             if (string.IsNullOrEmpty(accessToken))
                 return new List<Users_Model>();
@@ -43,10 +45,42 @@ namespace VigilanceClearance.DataAccessLayer.Admin_Service
                     Console.WriteLine($"API failure: {response.StatusCode} | {error}");
                 }
 
-
                 var jsonContent = await response.Content.ReadAsStringAsync();
-                var usersList = JsonConvert.DeserializeObject<List<Users_Model>>(jsonContent);
-                return usersList ?? new List<Users_Model>();
+                var usersList = JsonConvert.DeserializeObject<List<UserWithRolesDto>>(jsonContent);
+
+                if (usersList != null)
+                {
+                    foreach (var user in usersList)
+                    {
+                        string roles = string.Empty;
+                        foreach (var role in user.Roles)
+                        {
+                            roles += role.ToString() + ", ";
+                        }
+                        if (roles.EndsWith(", "))
+                        {
+                            roles = roles.Substring(0, roles.Length - 2);
+                        }
+                        //string roles = string.Empty;
+                        //for (int i = 0; i < user.Roles.Count; i++)
+                        //{
+                        //    roles += user.Roles[i];
+                        //    if (i < user.Roles.Count - 1)
+                        //    {
+                        //        roles += ", ";
+                        //    }
+                        //}
+                        result.Add(new Users_Model
+                        {
+                            UserName = user.UserName,
+                            email = user.Email,
+                            //role = user.Roles.Count >= 1 ? user.Roles[0] : string.Empty,
+                            role= roles
+                        });
+                    }
+                }
+
+                return result ?? new List<Users_Model>();
             }
             catch (Exception ex)
             {
@@ -85,7 +119,7 @@ namespace VigilanceClearance.DataAccessLayer.Admin_Service
                 return new List<SelectListItem>();
             }
         }
-        public async Task<int> Insert_Add_New_User_Async(Users_Model objmodel)
+        public async Task<int> Insert_Add_New_User_Async(RegisterDto objmodel)
         {
             try
             {
@@ -103,13 +137,12 @@ namespace VigilanceClearance.DataAccessLayer.Admin_Service
                     PropertyNameCaseInsensitive = true
                 };
 
-                objmodel.roles = new List<string> { objmodel.Roles };
                 var json = System.Text.Json.JsonSerializer.Serialize(objmodel, options);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
                 var response = await _httpClient.PostAsync(requestUrl, content);
-                
-                
+
+
                 var responseContent = await response.Content.ReadAsStringAsync();
 
                 if (responseContent.Contains("already exists", StringComparison.OrdinalIgnoreCase))
