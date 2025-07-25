@@ -1,0 +1,69 @@
+﻿@model VigilanceClearance.Models.ViewModel.Coord2_DealingHand.Coord2DealingHandCommentModel
+<div class="modal-body" id="Coord2DHCommentContainer">
+    <div class="d-flex justify-content-between mb-2">
+        <p class="mb-0"><strong>Officer ID:</strong> <span id="displayOfficerId"></span></p>
+        <p class="mb-0"><strong>Officer Name:</strong> <span id="displayOfficerName"></span></p>
+    </div>
+<div class="form-group">
+    <label asp-for="Coord2_DH_comments.AdverseOrNothingAdverse">Comment Type</label>
+    <select class="form-select form-select-sm"
+            asp-for="Coord2_DH_comments.AdverseOrNothingAdverse"
+            class="form-select form-select-sm"
+            onchange="toggleRemarks(this.value)">
+        <option value="">-- Select --</option>
+        <option value="Nothing Adverse">Nothing Adverse</option>
+        <option value="Adverse/Comments">Adverse/Comments</option>
+    </select>
+    <span class="text-danger" asp-validation-for="Coord2_DH_comments.AdverseOrNothingAdverse"></span>
+</div>
+
+<div class="form-group mt-3" id="remarksGroup" style="display:none;">
+    <label asp-for="Coord2_DH_comments.AdverseRemarks">Case Details</label>
+    <textarea asp-for="Coord2_DH_comments.AdverseRemarks"
+              class="form-control"
+              rows="3"
+              placeholder="Enter details here"></textarea>
+    <span class="text-danger" asp-validation-for="Coord2_DH_comments.AdverseRemarks"></span>
+</div>
+
+<input type="hidden" name="officerID" id="modalOfficerId" />
+<input type="hidden" name="OfficerName" id="modalOfficerName" />
+
+
+<!-- Bootstrap Bundle with Popper (REQUIRED for modal and btn-close to work) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+<script>
+
+        function toggleRemarks(value) {
+            const remarksGroup = document.getElementById('remarksGroup');
+            const remarksTextarea = document.getElementById('AdverseRemarks');
+
+            if (value === "Adverse/Comments") {
+                remarksGroup.style.display = 'block';
+                remarksTextarea.readOnly = false;
+                remarksTextarea.required = true;
+                remarksTextarea.value = "";
+            } else {
+                // Hide for "Nothing Adverse" and default
+                remarksGroup.style.display = 'none';
+                remarksTextarea.readOnly = false;
+                remarksTextarea.required = false;
+                remarksTextarea.value = "";
+            }
+        }
+
+
+        function COORD2DHComment(officerId, officerName) {
+        document.getElementById('modalOfficerId').value = officerId;
+        document.getElementById('modalOfficerName').value = officerName;
+
+        document.getElementById('displayOfficerId').innerText = officerId;
+        document.getElementById('displayOfficerName').innerText = officerName;
+
+        const modal = new bootstrap.Modal(document.getElementById('coord2DHCommentModal'));
+        modal.show();
+    }
+</script>

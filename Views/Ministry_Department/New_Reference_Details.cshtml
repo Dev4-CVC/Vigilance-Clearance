@@ -179,14 +179,14 @@
                                                         @if (Model.new_Reference_Model.pendingWith == "MINISTRY_DH")
                                                         {
                                                             <button class="btn btn-sm btn-primary"
-                                                                    onclick="location.href='@Url.Action("UpdateReferenceReceivedCVC", "Ministry_Department", new { id = item.Id, refId = Model.new_Reference_Model.Id, flag = "ReceivedFromMinistry" })'">
+                                                                    onclick="location.href='@Url.Action("UpdateReferenceReceivedCVC", "Ministry_Department", new { id = item.Id, refId = Model.new_Reference_Model.id, flag = "ReceivedFromMinistry" })'">
                                                                 Update
                                                             </button>
                                                         }
                                                         else
                                                         {
                                                             <button class="btn btn-sm btn-primary"
-                                                                    onclick="location.href='@Url.Action("UpdateReferenceReceivedCVC", "Ministry_Department", new { id = item.Id, refId = Model.new_Reference_Model.Id, flag = "ReceivedFromMinistry" })'">
+                                                                    onclick="location.href='@Url.Action("UpdateReferenceReceivedCVC", "Ministry_Department", new { id = item.Id, refId = Model.new_Reference_Model.id, flag = "ReceivedFromMinistry" })'">
                                                                 View
                                                             </button>
                                                             // <span>With Ministry Approver</span>

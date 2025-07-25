@@ -26,9 +26,6 @@ namespace VigilanceClearance.DataAccessLayer.PESB_Service
             this._httpContextAccessor = httpContextAccessor;
             this._httpClient = clientFactory.CreateClient();
         }
-
-        //db table name: tbl_Master_Vc_Reference
-        //Action Method: PESB_Add_New_Reference
         public async Task<List<SelectListItem>> GetReferenceDropDownAsync()
         {
             var accessToken = _httpContextAccessor.HttpContext?.Session.GetString("AccessToken");
@@ -59,11 +56,6 @@ namespace VigilanceClearance.DataAccessLayer.PESB_Service
                 return new List<SelectListItem>();
             }
         }
-
-
-        //db table name: tbl_Master_Vc_Post
-        //Action Method: PESB_Add_New_Reference 
-        //(Select Item List)
         public async Task<List<SelectListItem>> GetPostDescriptionsDropDownAsync(string ReferenceCode)
         {
             var accessToken = _httpContextAccessor.HttpContext?.Session.GetString("AccessToken");
@@ -95,11 +87,6 @@ namespace VigilanceClearance.DataAccessLayer.PESB_Service
                 return new List<SelectListItem>();
             }
         }
-
-
-        //db table name: tbl_Master_Vc_Post_SubCategory
-        //Action Method: PESB_Add_New_Reference 
-        //(Select Item List)
         public async Task<List<SelectListItem>> GetSubPostsByPostCodeInternal(string postCode)
         {
             if (string.IsNullOrWhiteSpace(postCode)) return new List<SelectListItem>();
@@ -135,11 +122,6 @@ namespace VigilanceClearance.DataAccessLayer.PESB_Service
                 return new List<SelectListItem>();
             }
         }
-
-
-        //db table name: tbl_Master_Vc_MinistryNew
-        //Action Method: PESB_Add_New_Reference
-        //(Select Item List)
         public async Task<List<SelectListItem>> GetOrganizationDropDownAsync(string id = "0")
         {
             if (string.IsNullOrWhiteSpace(id)) return new List<SelectListItem>();
@@ -174,11 +156,6 @@ namespace VigilanceClearance.DataAccessLayer.PESB_Service
                 return new List<SelectListItem>();
             }
         }
-
-
-        //db table name: tbl_Master_Vc_MinistryNew
-        //Action Method: PESB_Add_New_Reference
-        //(Select Item List)
         public async Task<List<SelectListItem>> GetMinistryByPostCodeInternal(string id)
         {
             if (string.IsNullOrWhiteSpace(id)) return new List<SelectListItem>();
@@ -214,11 +191,6 @@ namespace VigilanceClearance.DataAccessLayer.PESB_Service
                 return new List<SelectListItem>();
             }
         }
-
-
-        //db table name: tbl_Master_Vc_ReferenceReceivedFor
-        //Action Method: PESB_Add_New_Reference  
-        //(Insert Add new reference)
         public async Task<int> InsertAddNewReferenceAsync(PESB_Add_New_Reference_Model objmodel)
         {
             try
@@ -263,12 +235,6 @@ namespace VigilanceClearance.DataAccessLayer.PESB_Service
                 return 0;
             }
         }
-
-
-
-        //db table name: tbl_Master_Vc_ReferenceReceivedFor
-        //Action Method: PESB_Appointment
-        //(List of new references)
         public async Task<List<VcReferenceReceivedFor_VM>> Get_VC_ReferenceReceivedFor_List_GetByIdAsync(int id, string username)
         {
             if (string.IsNullOrWhiteSpace(username)) return new List<VcReferenceReceivedFor_VM>();
@@ -299,12 +265,6 @@ namespace VigilanceClearance.DataAccessLayer.PESB_Service
                 return new List<VcReferenceReceivedFor_VM>();
             }
         }
-
-
-
-        //db table name: tbl_Master_Vc_ReferenceReceivedFor
-        //Action Method: New_Reference_Details
-        //(Details of new reference)
         public async Task<List<VcReferenceReceivedFor_VM>> Get_VC_ReferenceReceivedFor_Details_Async(int id)
         {
             if (id <= 0) return new List<VcReferenceReceivedFor_VM>();
@@ -335,13 +295,6 @@ namespace VigilanceClearance.DataAccessLayer.PESB_Service
                 return new List<VcReferenceReceivedFor_VM>();
             }
         }
-
-
-
-
-
-        //db table name: 
-        //Action Method: PESB Reports  
         public async Task<int> InsertOfficerDetailsAsync(OfficerDetails_Model objmodel)
         {
             try
@@ -386,8 +339,6 @@ namespace VigilanceClearance.DataAccessLayer.PESB_Service
                 return 0;
             }
         }
-
-
         public async Task<int> InsertOfficerPostingDetailsAsync(OfficerPostingDetails_Model objmodel)
         {
             try
@@ -434,22 +385,25 @@ namespace VigilanceClearance.DataAccessLayer.PESB_Service
         }
 
 
-
-
-
+        //=================================================================================
+        //=================================================================================
         //new operation:  dated on 9 july 2025
         //new reference 
         public async Task<int> Insert_Add_New_Reference_Async(new_reference_model objmodel)
         {
             try
             {
+                if (objmodel == null)
+                    throw new ArgumentNullException(nameof(objmodel));
+
+
                 var accessToken = _httpContextAccessor.HttpContext?.Session.GetString("AccessToken");
                 if (string.IsNullOrEmpty(accessToken))
                     throw new UnauthorizedAccessException("Access token is missing.");
 
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
-                var requestUrl = $"{APIURL}VcReferenceReceivedFor/VcReferenceReceivedForInsert";
+                var requestUrl = $"{APIURL}VcReferenceReceivedFor/ReferenceReceivedForInsert_PESB";
 
                 var options = new JsonSerializerOptions
                 {
@@ -470,7 +424,7 @@ namespace VigilanceClearance.DataAccessLayer.PESB_Service
                 }
 
                 var responseJson = await response.Content.ReadAsStringAsync();
-
+                
                 if (int.TryParse(responseJson, out int result))
                     return result;
 
@@ -821,50 +775,81 @@ namespace VigilanceClearance.DataAccessLayer.PESB_Service
                 return new List<officer_details_model>();
             }
         }
-
-
-
-        #region Added as on date 11_07_2025
-
-        public async Task<List<SelectListItem>> GetOrgByMinCode(string Mincode)
+        public async Task<List<officer_posting_details_model>> Get_Officer_Details_GetbyIdAsync(int id)
         {
-            if (string.IsNullOrWhiteSpace(Mincode)) return new List<SelectListItem>();
+            if (id <= 0) return new List<officer_posting_details_model>();
 
             var accessToken = _httpContextAccessor.HttpContext?.Session.GetString("AccessToken");
-            if (string.IsNullOrEmpty(accessToken)) return new List<SelectListItem>();
+            if (string.IsNullOrEmpty(accessToken)) return new List<officer_posting_details_model>();
 
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
-            string requestUrl = $"{APIURL}DropDown/GetOrgByMinCode?Mincode={Uri.EscapeDataString(Mincode)}";
+            var requestUrl = $"{APIURL}OfficerPostingDetails/OfficerPostingDetailsGetById?id={id}";
+
             try
             {
                 var response = await _httpClient.GetAsync(requestUrl);
+                if (!response.IsSuccessStatusCode)
+                {
+                    return new List<officer_posting_details_model>();
+                }
+
+                var jsonContent = await response.Content.ReadAsStringAsync();
+
+                var apiResponse = JsonConvert.DeserializeObject<ApiResponseWrapper<List<officer_posting_details_model>>>(jsonContent);
+
+                return apiResponse?.isSuccess == true && apiResponse.data != null
+                    ? apiResponse.data
+                    : new List<officer_posting_details_model>();
+            }
+            catch (Exception)
+            {
+                return new List<officer_posting_details_model>();
+            }
+        }
+        public async Task<int> Update_Reference_From_PESB_Async(PESB_Update_Referencefrom_model objmodel)
+        {
+            try
+            {
+                var accessToken = _httpContextAccessor.HttpContext?.Session.GetString("AccessToken");
+                if (string.IsNullOrEmpty(accessToken))
+                    throw new UnauthorizedAccessException("Access token is missing.");
+
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+                var requestUrl = $"{APIURL}VcReferenceReceivedFor/UpdateReferenceFromPESB";
+
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    PropertyNameCaseInsensitive = true
+                };
+
+                var json = System.Text.Json.JsonSerializer.Serialize(objmodel, options);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync(requestUrl, content);
 
                 if (!response.IsSuccessStatusCode)
                 {
                     var errorContent = await response.Content.ReadAsStringAsync();
-                    return new List<SelectListItem>();
+                    Console.WriteLine($"API Error: {response.StatusCode} - {errorContent}");
+                    return 0;
                 }
 
-                var jsonContent = await response.Content.ReadAsStringAsync();
-                var items = JsonConvert.DeserializeObject<List<DropDownResponseModel>>(jsonContent) ?? new List<DropDownResponseModel>();
+                var responseJson = await response.Content.ReadAsStringAsync();
 
+                if (int.TryParse(responseJson, out int result))
+                    return result;
 
-                return items.Select(item => new SelectListItem
-                {
-                    Value = item.Value,
-                    Text = item.Text
-                }).ToList();
+                // Optionally handle more structured API response if needed
+                return 1;
             }
             catch (Exception ex)
-
             {
-                return new List<SelectListItem>();
+                Console.WriteLine($"Exception: {ex.Message}");
+                return 0;
             }
         }
-        #endregion
-
-
-
     }
 }

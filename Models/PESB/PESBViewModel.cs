@@ -27,6 +27,9 @@ namespace VigilanceClearance.Models.PESB
 
 
         //insert Officer posting details:
+
+        public int OfficerId { get; set; }
+        public int ReferenceId { get; set; }
         public officer_posting_details_model officer_posting_details { get; set; }
         public List<officer_posting_details_model> officer_posting_details_List { get; set; }
     }

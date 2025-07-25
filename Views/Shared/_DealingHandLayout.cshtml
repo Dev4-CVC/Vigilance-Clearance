@@ -1,0 +1,411 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.title | Vigilance Clearance</title>
+    <meta name="author" content="Vigilance Clearance">
+    <meta name="MobileOptimized" content="width">
+    <meta name="HandheldFriendly" content="true">
+    <meta name="copyright" content="Copyright 2025">
+    <link rel="icon" type="image/x-icon" href="~/images/Logo/cvcimage.jpg">
+    <meta name="twitter:title" content="@ViewBag.title" />
+
+    @* Google Fonts  *@
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+
+    <link href="~/ltscript/plugins/fontawesome-free/css/all.min.css" rel="stylesheet" />
+    @* DataTables  *@
+    <link href="~/ltscript/plugins/datatables-bs4/css/datatables.bootstrap4.css" rel="stylesheet" />
+    <link href="~/ltscript/plugins/datatables-bs4/css/datatables.bootstrap4.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/ltscript/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" href="~/ltscript/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+    <link href="~/ltscript/dist/css/adminlte.min.css" rel="stylesheet" />
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" rel="stylesheet" />
+
+    <link href="~/css/stylesheet.css" rel="stylesheet" />
+    <style>
+        .content-wrapper {
+            background-color: #f4f6f9;
+        }
+
+        .ml-custom-header {
+            margin-left: 250px;
+            border-bottom: 1px solid black;
+            background: linear-gradient(to right, #0d6efd, #20c997); /* Two colors */
+            /* Optional padding or height for visibility */
+            padding: 10px;
+            color: white; /* For contrast */
+        }
+
+        .content-header {
+            padding: 5px 10px;
+            background-color: #FFF;
+            border-bottom: 1px solid black;
+            margin-top: 0px;
+            margin-bottom: 12px
+        }
+
+        .hover-link:hover {
+            background-color: #20B2AA !important;
+            color: #fff !important;
+        }
+
+        .nav-treeview .nav-link:hover {
+            background-color: #ADD8E6 !important;
+            color: #000 !important;
+        }
+
+        .hover-link:hover i,
+        .hover-link:hover p {
+            color: #fff !important;
+        }
+
+        .nav-treeview .nav-link:hover i,
+        .nav-treeview .nav-link:hover p {
+            color: #000 !important;
+        }
+
+        .main-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 250px;
+            overflow-y: auto;
+            z-index: 1030;
+        }
+
+        #visitorCount {
+            font-weight: bold;
+            color: #007bff; /* Bootstrap primary color */
+            padding: 2px 8px;
+            background-color: #e7f1ff;
+            border-radius: 6px;
+            margin-left: 8px;
+            font-size: 14px;
+        }
+
+        /* scroll down css */
+        .nav-treeview {
+            max-height: 300px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #ccc transparent;
+        }
+
+            .nav-treeview::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .nav-treeview::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            .nav-treeview::-webkit-scrollbar-thumb {
+                background-color: #999;
+                border-radius: 4px;
+            }
+
+
+
+        /* //dropdown */
+        /* Style for the dropdown button */
+        .dropdown .dropbtn {
+            font-size: 18px;
+            color: #000;
+            text-align: center;
+            padding: 14px 16px;
+            background-color: inherit;
+            border: none;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* Dropdown container */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+            max-width: 100%;
+            overflow-x: visible;
+        }
+
+
+        /* Dropdown content (hidden by default) */
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #f9f9f9;
+            min-width: 180px;
+            box-shadow: 4px 10px 16px rgba(114, 0, 0, 0.2);
+            z-index: 1;
+            padding: 10px;
+            left: auto;
+        }
+
+
+            /* Override default link styles inside dropdown */
+            .dropdown-content a.btn {
+                display: block;
+                width: 100%;
+                margin-bottom: 8px;
+                text-align: left;
+            }
+
+                /* Optional: remove last margin */
+                .dropdown-content a.btn:last-child {
+                    margin-bottom: 0;
+                }
+
+        /* Show dropdown on hover */
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .text-muted {
+            color: #6c757d;
+            font-weight: normal;
+        }
+    </style>
+</head>
+@{
+            var username = Context.Session.GetString("Username");
+            var FullName = Context.Session.GetString("Fullname");
+            int? userId = Context.Session.GetInt32("UserId");
+}
+<body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+        @* Project Heading / Breadcrumb *@
+        <div class="content-header ml-custom-header" style="margin-bottom: 0rem;">
+            <div class="container-fluid d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    <div class="image" style="margin-right: 20px;">
+                        <img src="@Url.Content("~/images/logo/cvcimage.jpg")" class="img-circle elevation-2" alt="Logo" style="width: 40px; height: 40px;" />
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">Vigilance Clearance</h4>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center ms-auto mt-2 mt-sm-0">
+                    <h5 class="mb-0 me-3">
+                        <i class="fas fa-user me-2"></i> Welcome, <span class="font-weight-bold p-2">@username</span>
+                    </h5>
+                    <div class="dropdown">
+                        <button class="dropbtn">Account <i class="fas fa-caret-down"></i></button>
+                        <div class="dropdown-content">
+                            <a asp-action="ProfileOfUser" asp-controller="Account" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-edit"></i> Profile
+                            </a>
+                            @* @if (User.Identity.IsAuthenticated)
+                            {
+                                <a asp-action="Logout" asp-controller="Account" class="btn btn-sm btn-outline-danger">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </a>
+                            } *@
+                            <a asp-action="ResetPassword" asp-controller="Account" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-edit"></i> Change Password
+                            </a>
+                            @* <a asp-action="Logout" asp-controller="Account" method="post" class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a> *@
+                            <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" style="width: 100%; text-align: left;">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* Sidebar navbar *@
+        <aside class="main-sidebar sidebar-dark-primary elevation-4">
+            <div class="sidebar">
+                <div class="user-panel mt-3 pb-3 d-flex align-items-center">
+                    <div class="image">
+                        <img src="@Url.Content("~/images/logo/cvcimage.jpg")" class="img-circle elevation-2" alt="User Image" />
+                    </div>
+                    <div class="info"> <span class="d-block text-white">Ministry Dashboard</span></div>
+                </div>
+
+                @* Sidebar Menu *@
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                        @* Interface heading above all tabs *@
+                        <li class="nav-header" style="font-size: 1rem; background-color: #343a40; color: #ffffff; padding: 10px;">
+                            INTERFACE
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="@Url.Content("~/Ministry_Department/Index")" class="nav-link hover-link">
+                                <i class="nav-icon fas fa-home"></i><p>Home</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="@Url.Content("~/Ministry_Department/ViewReferenceReceivedCVC")" class="nav-link hover-link">
+                                <i class="nav-icon fas fa-edit"></i><p>Reference Received From CVC</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="@Url.Content("~/SuperAdmin/MasterUser")" class="nav-link hover-link">
+                                <i class="nav-icon fas fa-users"></i><p>New Reference to CVC</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="@Url.Content("~/SuperAdmin/MasterUser")" class="nav-link hover-link">
+                                <i class="nav-icon fas fa-users"></i><p>Search</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="@Url.Content("~/SuperAdmin/MasterUser")" class="nav-link hover-link">
+                                <i class="far fa-circle nav-icon"></i><p>Reports</p>
+                            </a>
+                        </li>
+
+
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+
+        @* Content Wrapper. Contains page content *@
+        <div class="content-wrapper">
+            <div class="content-header custom-padding-x">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-12 d-flex justify-content-between align-items-center flex-wrap">
+                            @* <h1 class="mb-0">@ViewBag.title</h1> *@
+                            <h1 class="mb-0">  </h1>
+                            <!-- Right Side: Breadcrumb -->
+                            <div class="d-flex align-items-center flex-wrap">
+                                <ol class="breadcrumb mb-0">
+                                    <li class="breadcrumb-item">
+                                        <a href="@Url.Content("~/Ministry_Department/Index")">Home</a>
+                                    </li>
+                                    <li class="breadcrumb-item active">@ViewBag.Title</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* Main content *@
+            <div class="content">
+                @RenderBody()
+            </div>
+        </div>
+
+        @* Main Footer  *@
+        <footer class="main-footer bg-light text-center text-md-start py-3 px-3 mt-auto">
+            <div class="container-fluid d-flex flex-column flex-md-row justify-content-between align-items-center">
+                <div class="text-muted">
+                    <strong>
+                        &copy; 2024–2025
+                        <a href="@Url.Content("~/PESB/PESBDashboard")" class="text-decoration-none">Vigilance Clearance</a>
+                    </strong>
+                    All rights reserved.
+                </div>
+                <div class="d-flex align-items-center gap-3 mt-2 mt-md-0">
+                    <span class="text-muted">Version 1.0</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="~/ltscript/plugins/jquery/jquery.min.js"></script>
+    <script src="~/ltscript/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    @* DataTables  & Plugins  *@
+    <script src="~/ltscript/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="~/ltscript/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/ltscript/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/ltscript/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <script src="~/ltscript/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/ltscript/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+    <script src="~/ltscript/plugins/jszip/jszip.min.js"></script>
+    <script src="~/ltscript/plugins/pdfmake/pdfmake.min.js"></script>
+    <script src="~/ltscript/plugins/pdfmake/vfs_fonts.js"></script>
+    <script src="~/ltscript/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+    <script src="~/ltscript/plugins/datatables-buttons/js/buttons.print.min.js"></script>
+    <script src="~/ltscript/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <script src="~/ltscript/dist/js/adminlte.min.js"></script>
+
+    @* DataTables Buttons Extension + Dependencies  *@
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Initialize DataTable with export buttons for #example1
+            const table1 = $("#example1").DataTable({
+                responsive: true,
+                lengthChange: false,
+                autoWidth: false,
+                buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"]
+            });
+
+            // Append buttons to a specific container inside the DataTable wrapper
+            table1.buttons().container()
+                .appendTo('#example1_wrapper .col-md-6:eq(0)');
+
+            // Initialize a basic DataTable for #example2
+            $("#example2").DataTable({
+                paging: true,
+                lengthChange: false,
+                searching: false,
+                ordering: true,
+                info: true,
+                autoWidth: false,
+                responsive: true
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            let params1 = (new URL(window.location.href)).toString();
+            var parts2qu = params1.split('?');
+            let count = parts2qu.length;
+            if (count > 1) {
+                window.location.href = '/404.html';
+            }
+        });
+    </script>
+
+    <script>
+        let count = localStorage.getItem("visitorCount");
+
+        if (count === null) {
+            count = 1;
+        } else {
+            count = parseInt(count) + 1;
+        }
+
+        localStorage.setItem("visitorCount", count);
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const countElement = document.getElementById("visitorCount");
+            if (countElement) {
+                countElement.innerText = count;
+            }
+        });
+    </script>
+</body>
+</html>

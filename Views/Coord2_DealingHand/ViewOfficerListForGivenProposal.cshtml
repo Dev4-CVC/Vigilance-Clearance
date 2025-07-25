@@ -1,0 +1,442 @@
+﻿@using VigilanceClearance.Models.ViewModel.Coord2_DealingHand
+@model List<OfficerAndPostingViewModel>
+@{
+    ViewData["Title"] = "ViewOfficerListForGivenProposal";
+    Layout = "~/Views/Shared/_CBILayout.cshtml";
+}
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .table-responsive {
+        overflow-x: unset; /* disable horizontal scroll */
+        overflow-y: auto;
+        max-height: none;
+        width: 100%;
+    }
+
+    .table {
+        width: 100%;
+        table-layout: auto; /* allow table to grow */
+    }
+
+        .table th, .table td {
+            white-space: normal !important; /* allow wrapping */
+            word-wrap: break-word;
+            vertical-align: top;
+        }
+
+        .table thead th {
+            background-color: #f8f9fa;
+            z-index: 1;
+        }
+
+    .card {
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .table {
+        width: 100% !important;
+        table-layout: auto; /* allow natural width */
+    }
+
+        .table th, .table td {
+            white-space: normal !important;
+            word-break: break-word;
+            vertical-align: top;
+        }
+
+    .card-body {
+        overflow-x: hidden; /* prevent horizontal scroll */
+        padding: 1rem;
+    }
+
+    body {
+        overflow-x: hidden;
+    }
+
+    .btn-sm {
+        padding: 0.35rem 0.75rem;
+        border-radius: 0.25rem;
+    }
+
+</style>
+
+
+<section>
+    <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h3 class="card-title mb-0">Simplified Officer List</h3>
+            <a asp-controller="Coord2_DealingHand" asp-action="ViewOfficerListForGivenProposalDHDraft" class="btn btn-warning btn-sm fw-semibold">
+                SEND PROPOSAL 
+            </a>
+        </div>
+
+        
+
+        <div class="card-body p-2">
+            <div>
+                @* <table class="table table-bordered table-hover table-sm"> *@
+                <table class="table table-bordered table-hover table-sm w-100" style="table-layout: auto;">
+                    <thead class="thead-light" style="font-size-adjust">
+                        <tr>
+                            <th style ="padding-bottom: 25px;">S.No.</th>
+                            <th style="display:none">Officer Id</th>
+                            <th>Name of the <br />Officer</th>@* 
+                            <th>Father's <br />Name</th>
+                            <th>Date of<br /> Birth</th>
+                            <th>Date of <br />Retirement</th>
+                            <th>Date of Entry<br /> into Service</th> *@
+                            <th>Service Details<br /> (Batch/Year/Cadre)</th>
+                            <th>Officer  <br />Cadre</th>
+                            @* <th style="padding-bottom: 25px;">Posting  Details</th> *@
+                            
+                            <th style="padding-bottom: 25px;">Ministry's Comments </th>
+                            <th style="padding-bottom: 25px;">Vigilance Section's Comments</th>
+                            <th style="padding-bottom: 25px;">CBI's Feedback </th>
+                            <th style="padding-bottom: 25px;">DH COMMENTS </th>
+                            <th style="padding-bottom: 25px;">SO COMMENTS </th>
+                            <th style="padding-bottom: 25px;">BO COMMENTS </th>
+                            <th style="padding-bottom: 25px;">Decision</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int sno = 1;
+                        }
+
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@sno</td>
+                                <td style="display:none">@item.Id</td>
+                                <td>@item.Officer_Name</td>
+                            @*     <td>@item.Officer_FatherName</td>
+                                <td>@item.Officer_DateOfBirth?.ToString("dd-MM-yyyy")</td>
+                                <td>@item.Officer_RetirementDate?.ToString("dd-MM-yyyy")</td>
+                                <td>@item.Officer_ServiceEntryDate?.ToString("dd-MM-yyyy")</td> *@
+                                <td>@item.Officer_Batch_Year</td>
+                                <td>@item.Officer_Cadre</td>
+                              @*   <td>
+                                   
+                                    <div>
+                                        @{
+                                            int SrNo = 1;
+                                        }
+                                        <table class="table table-bordered table-hover table-sm">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>Sr. No.</th>
+                                                    <th>Ministry</th>
+                                                    <th>Designation</th>
+                                                    <th>Place Of Posting</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var postingDetails in item.postingDetailsOfOfficers)
+                                                {
+                                                    <tr>
+                                                        <td>@SrNo</td>
+                                                        <td>@postingDetails.orgMinistry</td>
+                                                        <td>@postingDetails.designation</td>
+                                                        <td>@postingDetails.placeOfPosting</td>
+                                                    </tr>
+                                                    SrNo++;
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td> *@
+
+                                <td>
+                                    <div>
+                                        @{
+                                            int SrNoMin = 1;
+                                        }
+
+                                        <table class="table table-bordered table-hover table-sm">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>Sr. No.</th>
+                                                    <th>Ministry Comments</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if (item.mINFeedbackModels != null && item.mINFeedbackModels.Any())
+                                                {
+                                                    foreach (var mINFeedback in item.mINFeedbackModels)
+                                                    {
+                                                        <tr>
+                                                            <td>@SrNoMin</td>
+                                                            <td>@mINFeedback.ministry_Comments</td>
+                                                        </tr>
+                                                        SrNoMin++;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <tr>
+                                                        <td colspan="2" class="text-center text-muted">NO COMMENT</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div>
+                                        @{
+                                            int SrNoVig = 1;
+                                        }
+
+                                        <table class="table table-bordered table-hover table-sm">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>Sr. No.</th>
+                                                    <th>Vigilance Comments</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if (item.vIGFeedbackModels != null && item.vIGFeedbackModels.Any())
+                                                {
+                                                    foreach (var vIGFeedback in item.vIGFeedbackModels)
+                                                    {
+                                                        <tr>
+                                                            <td>@SrNoVig</td>
+                                                            <td>@vIGFeedback.vig_Branch_Comments</td>
+                                                        </tr>
+                                                        SrNoVig++;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <tr>
+                                                        <td colspan="2" class="text-center text-muted">NO COMMENT</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div>
+                                        @{
+                                            int SrNoCbi = 1;
+                                        }
+                                        <table class="table table-bordered table-hover table-sm">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>Sr. No.</th>
+                                                    <th>Feedback of CBI</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if (item.cBIFeedbackModels != null && item.cBIFeedbackModels.Any())
+                                                {
+                                                    foreach (var cBIFeedbackModels in item.cBIFeedbackModels)
+                                                    {
+                                                        <tr>
+                                                            <td>@SrNoCbi</td>
+                                                            <td>@cBIFeedbackModels.FeebbackOf_CBI</td>
+                                                        </tr>
+                                                        SrNoCbi++;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <tr>
+                                                        <td colspan="2" class="text-center text-muted">NO COMMENT</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div>
+                                        @{
+                                            int SrNoCdh = 1;
+                                        }
+                                        <table class="table table-bordered table-hover table-sm">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>Sr. No.</th>
+                                                    <th>Comments Of DH</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if (item.CVC_COORD2_DH_COMMENTS != null && item.CVC_COORD2_DH_COMMENTS.Any())
+                                                {
+                                                    foreach (var comment in item.CVC_COORD2_DH_COMMENTS)
+                                                    {
+                                                        <tr>
+                                                            <td>@SrNoCdh</td>
+                                                            <td>@comment.CVC_COORD2_DH_COMMENTS</td>
+                                                        </tr>
+                                                        SrNoCdh++;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <tr>
+                                                        <td colspan="2" class="text-center text-muted">NO COMMENT</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div>
+                                        @{
+                                            int SrNoCso = 1;
+                                        }
+                                        <table class="table table-bordered table-hover table-sm">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>Sr. No.</th>
+                                                    <th>Comments Of SO</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if (item.CVC_COORD2_SO_COMMENTS != null && item.CVC_COORD2_SO_COMMENTS.Any())
+                                                {
+                                                    foreach (var CVC_COORD2_SO_COMMENTS in item.CVC_COORD2_SO_COMMENTS)
+                                                    {
+                                                        <tr>
+                                                            <td>@SrNoCso</td>
+                                                            <td>@CVC_COORD2_SO_COMMENTS.CVC_COORD2_SO_COMMENTS</td>
+                                                        </tr>
+                                                        SrNoCso++;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <tr>
+                                                        <td colspan="2" class="text-center text-muted">NO COMMENT</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div>
+                                        @{
+                                            int SrNoCbo = 1;
+                                        }
+                                        <table class="table table-bordered table-hover table-sm">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>Sr. No.</th>
+                                                    <th>Comments Of BO</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if (item.CVC_COORD2_BO_COMMENTS != null && item.CVC_COORD2_BO_COMMENTS.Any())
+                                                {
+                                                    foreach (var CVC_COORD2_BO_COMMENTS in item.CVC_COORD2_BO_COMMENTS)
+                                                    {
+                                                        <tr>
+                                                            <td>@SrNoCbo</td>
+                                                            <td>@CVC_COORD2_BO_COMMENTS.CVC_COORD2_BO_COMMENTS</td>
+                                                        </tr>
+                                                        SrNoCbo++;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <tr>
+                                                        <td colspan="2" class="text-center text-muted">NO COMMENT</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <button type="button"
+                                            class="btn btn-primary"
+                                            onclick="COORD2DHComment(@item.Id, '@item.Officer_Name')">
+                                        Add Comment
+                                    </button>
+                                </td>
+                            </tr>
+                            sno++;
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="modal fade" id="coord2DHCommentModal" tabindex="-1" aria-labelledby="coord2DHCommentModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form method="post" asp-controller="Coord2_DealingHand" asp-action="SaveCoord2DealingHandComment">
+            @Html.AntiForgeryToken()
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Coord2 DH Comment Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="cbiAdverseCommentContainer">
+                    @await Html.PartialAsync("_SaveCoord2DealingHandComment", new Coord2DealingHandCommentModel { OfficerId = 0 })
+                </div>
+                <input type="hidden" name="OfficerId" id="modalOfficerId" />
+                <input type="hidden" name="OfficerName" id="modalOfficerName" />
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        let lastChangedSelect = null;
+
+        function COORD2DHComment(officerId, officerName) {
+            document.getElementById('modalOfficerId').value = officerId;
+            document.getElementById('modalOfficerName').value = officerName;
+
+            document.getElementById('displayOfficerId').innerText = officerId;
+            document.getElementById('displayOfficerName').innerText = officerName;
+
+            const modal = new bootstrap.Modal(document.getElementById('coord2DHCommentModal'));
+            modal.show();
+        }
+        // Reset dropdown when modal is closed
+        const modalEl = document.getElementById('coord2DHCommentModal');
+        modalEl.addEventListener('hidden.bs.modal', function () {
+            if (lastChangedSelect) {
+                lastChangedSelect.value = ""; // reset to default
+                lastChangedSelect = null; // clear reference
+            }
+        });
+    </script>
+}
+<script>
+    document.querySelector('.btn-close').addEventListener('click', function () {
+        console.log('Close clicked');
+    });
+
+    document.querySelector('.btn-secondary').addEventListener('click', function () {
+        console.log('Cancel clicked');
+    });
+</script>

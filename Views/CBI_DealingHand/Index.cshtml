@@ -1,0 +1,136 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_MinistryLayout.cshtml";
+}
+
+@* <h1>Index</h1> *@
+
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    .card-container {
+        display: flex;
+        gap: 25px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .card {
+        flex: 1 1 300px;
+        max-width: 380px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 25px;
+        position: relative;
+        color: #fff;
+        overflow: hidden;
+        transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(25deg);
+        }
+
+    .card-body {
+        position: relative;
+        z-index: 2;
+    }
+
+    .card a.btn {
+        display: inline-block;
+        margin-top: 1rem;
+        padding: 10px 20px;
+        border-radius: 25px;
+        background: #ffffff;
+        color: #007bff;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+    }
+
+        .card a.btn:hover {
+            background: #007bff;
+            color: #fff;
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.5);
+        }
+
+    .card-icon {
+        font-size: 3rem;
+        color: rgba(255, 255, 255, 0.3);
+        position: absolute;
+        top: 20px;
+        right: 25px;
+    }
+
+    /* Gradient background themes for cards */
+    .ministry-card {
+        background: linear-gradient(135deg, #0062E6, #33cccc);
+    }
+
+    .department-card {
+        background: linear-gradient(135deg, #7b2ff7, #f107a3);
+    }
+
+    .organization-card {
+        background: linear-gradient(135deg, #11998e, #38ef7d);
+    }
+</style>
+
+<div class="card-container">
+
+    <div class="card ministry-card">
+        <div class="card-body">
+            <i class="card-icon fas fa-university"></i>
+
+            <h5>Reference Received from CVC</h5>
+            <a asp-controller="Cbi_DealingHand" asp-action="ViewReferenceReceivedCVC" class="btn">View Details</a>
+        </div>
+    </div>
+
+    <div class="card department-card">
+        <div class="card-body">
+            <i class="card-icon fas fa-building"></i>
+            @*  <h5>Total Departments: 55</h5> *@
+            <h5>Pending With CBI </h5>
+            <a asp-controller="SuperAdmin" asp-action="Department" class="btn">View Details</a>
+        </div>
+    </div>
+
+    <div class="card organization-card">
+        <div class="card-body">
+            <i class="card-icon fas fa-sitemap"></i>
+            @*  <h5>Total Organizations: 55</h5> *@
+            <h5>Search</h5>
+            <a asp-controller="SuperAdmin" asp-action="Organization" class="btn">View Details</a>
+        </div>
+    </div>
+</div>
+
+<div class="card-container">
+
+    <div class="card organization-card">
+        <div class="card-body">
+            <i class="card-icon fas fa-sitemap"></i>
+            @*   <h5>Total Organizations: 55</h5> *@
+            <h5>Reports</h5>
+            <a asp-controller="SuperAdmin" asp-action="Organization" class="btn">View Details</a>
+        </div>
+    </div>
+
+</div>

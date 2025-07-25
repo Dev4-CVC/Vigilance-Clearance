@@ -1,10 +1,11 @@
-﻿using VigilanceClearance.Models.Modal_Properties;
+﻿using VigilanceClearance.Models.Dealing_Hand;
+using VigilanceClearance.Models.Modal_Properties;
 
 namespace VigilanceClearance.Models.OfficerDetailModel
 {
     public class OfficerDetailMainModel
     {
-        public OfficerPersonalDetailModel officerPersonalDetailModel { get; set; }  
+        public OfficerPersonalDetailModel officerPersonalDetailModel { get; set; }
 
         public OfficerPostingDetails officerPostingDetail7 { get; set; }
 
@@ -29,7 +30,10 @@ namespace VigilanceClearance.Models.OfficerDetailModel
 
         public PESB.new_reference_model new_Reference_Model { get; set; }
 
+        #region added by Sudarshan 23 7 2025
+        public VigBranchCommentsInsert vig_branch_comments{ get; set; }
 
+        #endregion
 
     }
 }

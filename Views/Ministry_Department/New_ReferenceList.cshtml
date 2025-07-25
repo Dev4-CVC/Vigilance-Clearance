@@ -51,14 +51,17 @@
                     <tr>
                         <td>@(i + 1)</td>
                         <td>
-                            <button class="btn btn-sm btn-primary" onclick="location.href='@Url.Action("New_Reference_Details", "Ministry_Department", new { MasterRefID = item.Id })'">Details</button>
+
+                            <button class="btn btn-sm btn-primary" onclick="location.href='@Url.Action("New_Reference_Details", "Ministry_Department", new { MasterRefID = item.id })'">Details</button>
+
+                           @*  <button class="btn btn-sm btn-primary" onclick="location.href='@Url.Action("New_Reference_Details", "Ministry_Department", new { id = item.id })'">Details</button> *@
                         </td>
-                        <td>@item.Id</td>
+                        <td>@item.id</td>
                         <td>@item.referenceReceivedFor</td>
                         <td>@item.referenceReceivedFrom</td>
                         <td>@item.selectionForThePostCategory</td>
                         <td>@item.selectionForThePostSubCategory</td>
-                        <td>@item.referenceNoFileNo</td>
+                        <td>@item.cvcReferenceIdFileNo</td>
                         <td>@item.referenceOrSubmissionToCvcDate</td>
                         <td>@item.cvcReferenceIdFileNo</td>
                         <td>@item.createdBy</td>

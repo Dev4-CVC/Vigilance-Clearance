@@ -1,0 +1,49 @@
+﻿@model VigilanceClearance.Models.Dealing_Hand.Dealing_Hand_View_Model
+
+@{
+    Layout = "~/Views/Shared/_DealingHandLayout.cshtml";
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Action</th>
+            <th>@Html.DisplayNameFor(model => model.pending_officer_details_for_cvc_users_list.First().id)</th>
+            <th>@Html.DisplayNameFor(model => model.pending_officer_details_for_cvc_users_list.First().Officer_Name)</th>
+            <th>@Html.DisplayNameFor(model => model.pending_officer_details_for_cvc_users_list.First().Officer_FatherName)</th>
+            <th>@Html.DisplayNameFor(model => model.pending_officer_details_for_cvc_users_list.First().Officer_Service)</th>
+            <th>@Html.DisplayNameFor(model => model.pending_officer_details_for_cvc_users_list.First().Officer_Other_Service)</th>
+            <th>@Html.DisplayNameFor(model => model.pending_officer_details_for_cvc_users_list.First().Officer_Cadre)</th>
+            <th>@Html.DisplayNameFor(model => model.pending_officer_details_for_cvc_users_list.First().Officer_Batch_Year)</th>
+            <th>@Html.DisplayNameFor(model => model.pending_officer_details_for_cvc_users_list.First().Officer_ServiceEntryDate)</th>
+            <th>@Html.DisplayNameFor(model => model.pending_officer_details_for_cvc_users_list.First().Officer_RetirementDate)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.pending_officer_details_for_cvc_users_list != null && Model.pending_officer_details_for_cvc_users_list.Any())
+        {
+            foreach (var item in Model.pending_officer_details_for_cvc_users_list)
+            {
+                <tr>
+                    <td>
+                        <a href="@Url.Action("DealingHand_Officer_CompleteProfile", "DealingHand", new { id = item.id })" class="btn btn-primary">View</a>
+                    </td>
+                    <td>@Html.DisplayFor(modelItem => item.id)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Officer_Name)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Officer_FatherName)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Officer_Service)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Officer_Other_Service)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Officer_Cadre)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Officer_Batch_Year)</td>
+                    <td>@(item.Officer_ServiceEntryDate?.ToString("yyyy-MM-dd") ?? "N/A")</td>
+                    <td>@(item.Officer_RetirementDate?.ToString("yyyy-MM-dd") ?? "N/A")</td>
+
+                </tr>
+            }
+        }
+        else
+        {
+            <tr><td colspan="9">No records found.</td></tr>
+        }
+    </tbody>
+</table>

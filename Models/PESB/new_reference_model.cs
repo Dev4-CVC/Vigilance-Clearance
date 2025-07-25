@@ -6,7 +6,7 @@ namespace VigilanceClearance.Models.PESB
     public class new_reference_model
     {
         [Key]
-        public int Id { get; set; }
+        public int id { get; set; }
 
         [Required(ErrorMessage = "Reference Received For is required")]
         [Display(Name = "Reference")]
@@ -34,10 +34,10 @@ namespace VigilanceClearance.Models.PESB
 
 
         [Display(Name = "Reference No./ File No.")]
-        public string? referenceNoFileNo { get; set; } = null;
+        public string? referenceNoFileNo { get; set; }
         
         [Display(Name = "Submission to CVC Date")]
-        public string? referenceOrSubmissionToCvcDate { get; set; }
+        public DateTime? referenceOrSubmissionToCvcDate { get; set; }
 
         [Display(Name = "Reference File No.")]
         public string? cvcReferenceIdFileNo { get; set; }

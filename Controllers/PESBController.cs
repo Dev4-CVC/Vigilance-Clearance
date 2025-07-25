@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using System;
 using System.Reflection.Metadata;
 using VigilanceClearance.Interface.PESB;
 using VigilanceClearance.Models.Modal_Properties.PESB;
@@ -38,218 +41,6 @@ namespace VigilanceClearance.Controllers
             }
         }
 
-
-        //Insert Operation --> Details pf the officer
-        //[HttpGet("PESB/PESBReports/{referenceid?}")]
-        public async Task<IActionResult> PESBReports()
-        {
-            ViewBag.title = "PESB : Reports";
-            string id = "0";
-            //if (referenceid.HasValue)
-            //{
-            //    ViewBag.ReferenceId = referenceid.Value;
-            //}
-            try
-            {
-                var model = new OfficerDetails_VM
-                {
-                    Service_List = await _pesb.Get_Service_DropDownAsync(),
-                    Batch_List = await _pesb.Get_Batch_DropDownAsync(),
-                    Cadre_List = await _pesb.Get_Cadre_DropDownAsync(),
-                    orgName_List = await _pesb.GetOrganizationDropDownAsync(id),
-                    minDesc_List = new List<SelectListItem>()
-                };
-                return View(model);
-            }
-            catch (Exception)
-            {
-                ViewBag.Error = "Something went wrong while loading the page.";
-                return View();
-            }
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> PESBReports(OfficerDetails_VM model)
-        {
-            OfficerDetails_Model objmodel = new OfficerDetails_Model();
-            ViewBag.title = "PESB Report Form";
-            try
-            {
-                ModelState.Remove("Service_List");
-                ModelState.Remove("Batch_List");
-                ModelState.Remove("Cadre_List");
-                ModelState.Remove("orgName_List");
-                ModelState.Remove("minDesc_List");
-                ModelState.Remove("orgCode");
-                ModelState.Remove("minCode");
-                ModelState.Remove("OfficerId");
-                ModelState.Remove("Designation");
-                ModelState.Remove("PlaceOfPosting");
-                ModelState.Remove("FromDate");
-                ModelState.Remove("ToDate");
-
-                //var _service = model.officer_Service;
-                var _service = model.officer_Service;
-                var Otherservice = string.Empty;
-                var _Cadre = string.Empty;
-
-                if (_service == "OTHERS")
-                {
-                    Otherservice = model.OtherService;
-                }
-                else
-                {
-                    ModelState.Remove("OtherService");
-                }
-
-                if (_service == "IPS" || _service == "IAS" || _service == "IFoS")
-                {
-                    _Cadre = model.officer_Cadre;
-                }
-                else
-                {
-                    ModelState.Remove("officer_Cadre");
-                }
-
-                // Validate model
-                if (!ModelState.IsValid)
-                {
-                    model.Service_List = await _pesb.Get_Service_DropDownAsync();
-                    model.Batch_List = await _pesb.Get_Batch_DropDownAsync();
-                    model.Cadre_List = await _pesb.Get_Cadre_DropDownAsync();
-                    return View(model);
-                }
-
-                // Assign values from model
-                objmodel.masterReferenceID = model.referenceid;
-
-                objmodel.officer_Name = model.officer_Name;
-                objmodel.officer_FatherName = model.officer_FatherName;
-                objmodel.officer_DateOfBirth = (DateTime)model.officer_DateOfBirth;
-                objmodel.officer_RetirementDate = (DateTime)model.officer_RetirementDate;
-                objmodel.officer_ServiceEntryDate = (DateTime)model.officer_ServiceEntryDate;
-                objmodel.officer_Service = _service;
-                objmodel.officer_other_Service = Otherservice;
-                objmodel.officer_Cadre = _Cadre;
-                objmodel.officer_Batch_Year = model.officer_Batch_Year;
-
-                objmodel.createdBy = HttpContext.Session.GetString("Username");
-                objmodel.createdBy_SessionId = HttpContext.Session.Id;
-                objmodel.createdBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
-
-                // Call API
-                int num = await _pesb.InsertOfficerDetailsAsync(objmodel);
-                if (num == 0)
-                {
-                    ModelState.AddModelError(string.Empty, "Record not saved.");
-                    model.Service_List = await _pesb.Get_Service_DropDownAsync();
-                    model.Batch_List = await _pesb.Get_Batch_DropDownAsync();
-                    model.Cadre_List = await _pesb.Get_Cadre_DropDownAsync();
-                    return View("PESBReports", model);
-                }
-
-                TempData["SuccessMessage_Of_officer_details"] = "Officer details added successfully!";
-                return RedirectToAction("PESBReports");
-            }
-            catch (Exception ex)
-            {
-                ViewBag.Error = "An unexpected error occurred. Please try again.";
-                return View(model);
-            }
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> OfficerPostingDetails(OfficerDetails_VM model)
-        {
-            string id = "0";
-            OfficerPostingDetails_Model objmodel = new OfficerPostingDetails_Model();
-
-            model.OfficerId = 1;
-            ModelState.Remove("officer_Name");
-            ModelState.Remove("officer_FatherName");
-            ModelState.Remove("officer_DateOfBirth");
-            ModelState.Remove("officer_ServiceEntryDate");
-            ModelState.Remove("officer_RetirementDate");
-            ModelState.Remove("officer_Service");
-            ModelState.Remove("officer_Batch_Year");
-            ModelState.Remove("officer_Cadre");
-            ModelState.Remove("OtherService");
-            ModelState.Remove("Service_List");
-            ModelState.Remove("Batch_List");
-            ModelState.Remove("Cadre_List");
-            ModelState.Remove("orgName_List");
-            ModelState.Remove("minDesc_List");
-
-            if (!ModelState.IsValid)
-            {
-                model.orgName_List = await _pesb.GetOrganizationDropDownAsync(id);
-                model.minDesc_List = new List<SelectListItem>();
-                return View(model);
-            }
-
-            try
-            {
-                objmodel.vcOfficerId = model.OfficerId;
-                objmodel.orgCode = model.orgCode;
-                objmodel.orgMinistry = model.minCode;
-                objmodel.designation = model.Designation;
-                objmodel.placeOfPosting = model.PlaceOfPosting;
-                objmodel.fromDate = (DateTime)model.FromDate;
-                objmodel.toDate = (DateTime)model.ToDate;
-
-                objmodel.actionBy = HttpContext.Session.GetString("Username");
-                objmodel.actionBy_SessionId = HttpContext.Session.Id;
-                objmodel.actionBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
-
-
-                // Call API
-                int num = await _pesb.InsertOfficerPostingDetailsAsync(objmodel);
-                if (num == 0)
-                {
-                    ModelState.AddModelError(string.Empty, "Record not saved.");
-                    model.Service_List = await _pesb.Get_Service_DropDownAsync();
-                    model.Batch_List = await _pesb.Get_Batch_DropDownAsync();
-                    model.Cadre_List = await _pesb.Get_Cadre_DropDownAsync();
-                    return View("PESBReports", model);
-                }
-
-                TempData["SuccessMessage_Of_officer_positing_details"] = "Officer posting details added successfully!";
-                return RedirectToAction("PESBReports");
-            }
-            catch (Exception ex)
-            {
-                ViewBag.Error = "An unexpected error occurred. Please try again.";
-                return View(model);
-            }
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> OfficerDetails()
-        {
-            int id = 0;
-            try
-            {
-                ViewBag.title = "Officer Details";
-
-                string username = HttpContext.Session.GetString("Username");
-                if (string.IsNullOrEmpty(username))
-                {
-                    return RedirectToAction("Login", "Account");
-                }
-
-                //var model = new OfficerDetails_Model
-                //{
-                //    data_List = await _pesb.Get_VC_ReferenceReceivedFor_List_GetByIdAsync(id, username)
-                //};
-                return View();
-            }
-            catch (Exception)
-            {
-                ViewBag.Error = "Something went wrong while loading the page.";
-                return View();
-            }
-        }
-
         [HttpGet]
         public async Task<IActionResult> PESB_Appointment()
         {
@@ -276,154 +67,6 @@ namespace VigilanceClearance.Controllers
                 return View();
             }
         }
-
-
-
-        //Add New Reference Insert Operation
-        [HttpGet]
-        public async Task<IActionResult> PESB_Add_New_Reference()
-        {
-            ViewBag.title = "PESB : Add New Reference";
-            var referenceReceivedFor = "APPOINTMENT";
-            string id = "0";
-            try
-            {
-                var model = new AddNewReference_VM
-                {
-                    referenceReceivedFor_List = await _pesb.GetReferenceDropDownAsync(),
-                    selectionForThePostCategory_List = await _pesb.GetPostDescriptionsDropDownAsync(referenceReceivedFor),
-                    selectionForThePostSubCategory_List = new List<SelectListItem>(),
-                    orgName_List = await _pesb.GetOrganizationDropDownAsync(id),
-                    minDesc_List = new List<SelectListItem>(),
-                    referenceReceivedFor = "APPOINTMENT"
-                };
-
-                return View(model);
-            }
-            catch (Exception)
-            {
-                ViewBag.Error = "Something went wrong while loading the page.";
-                return View();
-            }
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> PESB_Add_New_Reference(AddNewReference_VM model)
-        {
-            PESB_Add_New_Reference_Model objmodel = new PESB_Add_New_Reference_Model();
-            ViewBag.title = "PESB : Add New Reference";
-            string id = "0";
-            try
-            {
-                ModelState.Remove("ReferenceReceivedFor_List");
-                ModelState.Remove("selectionForThePostCategory_List");
-                ModelState.Remove("selectionForThePostSubCategory_List");
-                ModelState.Remove("orgName_List");
-                ModelState.Remove("minDesc_List");
-
-                if (!ModelState.IsValid)
-                {
-                    model.referenceReceivedFor_List = await _pesb.GetReferenceDropDownAsync();
-                    model.selectionForThePostCategory_List = await _pesb.GetPostDescriptionsDropDownAsync(model.referenceReceivedFor ?? "APPOINTMENT");
-                    model.selectionForThePostSubCategory_List = new List<SelectListItem>();
-                    model.orgName_List = await _pesb.GetOrganizationDropDownAsync(id);
-                    model.minDesc_List = new List<SelectListItem>();
-                    model.referenceReceivedFor = "APPOINTMENT";
-                    return View(model);
-                }
-                else
-                {
-                    //if (model.selectionForThePostSubCategory == "Other" && string.IsNullOrWhiteSpace(model.OtherSubPost))
-                    //{
-                    //    ModelState.AddModelError("OtherSubPost", "Please enter sub post.");
-                    //}
-                    objmodel.referenceReceivedFor = model.referenceReceivedFor;
-                    objmodel.referenceReceivedFrom = "PESB";
-                    objmodel.referenceReceivedFromCode = "PESB";
-
-                    objmodel.selectionForThePostCategory = model.selectionForThePostCategory;
-                    objmodel.selectionForThePostSubCategory = model.selectionForThePostSubCategory;
-
-                    objmodel.orgCode = model.orgCode;
-                    objmodel.orgName = null;
-
-                    objmodel.minCode = model.minCode;
-                    objmodel.minDesc = null;
-
-                    objmodel.referenceNoFileNo = model.referenceNoFileNo;
-                    objmodel.referenceOrSubmissionToCvcDate = model.referenceOrSubmissionToCvcDate;
-                    objmodel.cvcReferenceIdFileNo = model.cvcReferenceIdFileNo;
-
-                    objmodel.createdBy = HttpContext.Session.GetString("Username");
-                    objmodel.createdOn = DateTime.Now;
-                    objmodel.createdBySessionId = HttpContext.Session.Id;
-                    objmodel.createdByIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
-
-                    objmodel.updateBy = null;
-                    objmodel.updatedOn = null;
-                    objmodel.updatedBySessionId = null;
-                    objmodel.updatedByIp = null;
-
-                    objmodel.pendingWith = "CVC";
-                    objmodel.uid = null;
-                    objmodel.referenceId = null;
-
-                    int num = await _pesb.InsertAddNewReferenceAsync(objmodel);
-                    if (num == 0)
-                    {
-                        ModelState.AddModelError(string.Empty, "Record not saved.");
-                        model.referenceReceivedFor_List = await _pesb.GetReferenceDropDownAsync();
-                        model.selectionForThePostCategory_List = await _pesb.GetPostDescriptionsDropDownAsync(model.referenceReceivedFor ?? "APPOINTMENT");
-                        model.selectionForThePostSubCategory_List = new List<SelectListItem>();
-                        model.orgName_List = await _pesb.GetOrganizationDropDownAsync(id);
-                        model.minDesc_List = new List<SelectListItem>();
-                        return View("PESB_Add_New_Reference", model);
-                    }
-                    else
-                    {
-                        TempData["FormAction"] = "submit"; // or "forward"
-                        TempData["SuccessMessage"] = "Reference added successfully!";
-                        return RedirectToAction("PESB_Appointment", "PESB");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                // Log the exception
-                ViewBag.Error = "An unexpected error occurred. Please try again.";
-                model.referenceReceivedFor_List = await _pesb.GetReferenceDropDownAsync();
-                model.selectionForThePostCategory_List = await _pesb.GetPostDescriptionsDropDownAsync(model.referenceReceivedFor ?? "APPOINTMENT");
-                model.selectionForThePostSubCategory_List = await _pesb.GetSubPostsByPostCodeInternal(model.selectionForThePostCategory ?? "");
-                model.orgName_List = await _pesb.GetOrganizationDropDownAsync("0");
-                model.minDesc_List = string.IsNullOrWhiteSpace(model.minCode)
-                    ? new List<SelectListItem>()
-                    : await _pesb.GetMinistryByPostCodeInternal(model.minCode);
-                return View("PESB_Add_New_Reference", model);
-            }
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> New_Reference_Details(int id)
-        {
-            ViewBag.title = "PESB: Reference Details";
-            try
-            {
-                var result = await _pesb.Get_VC_ReferenceReceivedFor_Details_Async(id);
-                var model = result.FirstOrDefault();
-                if (model == null)
-                {
-                    ViewBag.Error = "No data found.";
-                    return View();
-                }
-                return View(model);
-            }
-            catch (Exception)
-            {
-                ViewBag.Error = "Something went wrong while loading the page.";
-                return View();
-            }
-        }
-
 
 
 
@@ -472,11 +115,21 @@ namespace VigilanceClearance.Controllers
             string id = "0";
             try
             {
+                
+                objmodel.new_reference.referenceReceivedFor = objmodel.new_reference.referenceReceivedFor;
                 objmodel.new_reference.referenceReceivedFrom = "PESB";
                 objmodel.new_reference.referenceReceivedFromCode = "PESB";
+                objmodel.new_reference.selectionForThePostCategory = objmodel.new_reference.selectionForThePostCategory;
+                objmodel.new_reference.selectionForThePostSubCategory= objmodel.new_reference.selectionForThePostSubCategory;
 
+                objmodel.new_reference.orgCode = objmodel.new_reference.orgCode;
+                objmodel.new_reference.minCode = objmodel.new_reference.minCode;
                 objmodel.new_reference.orgName = null;
                 objmodel.new_reference.minDesc = null;
+
+                objmodel.new_reference.referenceNoFileNo = objmodel.new_reference.referenceNoFileNo;
+                objmodel.new_reference.referenceOrSubmissionToCvcDate= objmodel.new_reference.referenceOrSubmissionToCvcDate;
+                objmodel.new_reference.cvcReferenceIdFileNo= objmodel.new_reference.cvcReferenceIdFileNo;
 
                 objmodel.new_reference.createdBy = HttpContext.Session.GetString("Username");
                 objmodel.new_reference.createdByIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
@@ -488,44 +141,30 @@ namespace VigilanceClearance.Controllers
                 objmodel.new_reference.updatedBySessionId = null;
                 objmodel.new_reference.updatedOn = null;
 
-                objmodel.new_reference.pendingWith = "CVC";
-                objmodel.new_reference.uid = null;
+                objmodel.new_reference.pendingWith = "PESB";
                 objmodel.new_reference.referenceId = "ABC123";
 
                 int isInserted = await _pesb.Insert_Add_New_Reference_Async(objmodel.new_reference);
                 if (isInserted > 0)
                 {
-                    return Json(new { success = true });
+                    // return Json(new { success = true });
+                    return Json(new
+                    {
+                        success = true,
+                        redirectUrl = Url.Action("PESB_Appointment")
+                    });
                 }
                 else
                 {
                     return Json(new { success = false, error_new_reference_message = "This record is not saved." });
                 }
+
             }
             catch (Exception ex)
             {
                 return View("new_reference");
             }
         }
-
-
-        #region Added Code for bind the Post On change Reference 
-
-        [HttpGet]
-        public async Task<IActionResult> GetPostsByRefCode(string RefCode)
-        {
-            try
-            {
-                var RefPosts = await _pesb.GetPostDescriptionsDropDownAsync(RefCode);
-                return Json(RefPosts);
-            }
-            catch
-            {
-                return Json(new { Error = "Failed to load sub-posts." });
-            }
-        }
-
-        #endregion
 
         [HttpGet]
         public async Task<IActionResult> GetSubPostsByPostCode(string postCode)
@@ -601,7 +240,6 @@ namespace VigilanceClearance.Controllers
             {
                 HttpContext.Session.SetInt32("RefId", id);
 
-               
                 var result = await _pesb.Get_Vc_Reference_Received_For_Details_GetById_Async(id);
                 var data = result.FirstOrDefault();
                 if (data == null)
@@ -632,6 +270,7 @@ namespace VigilanceClearance.Controllers
         {
             ViewBag.title = "Officer Details Reports";
             string id = "0";
+
 
             int? referenceid = HttpContext.Session.GetInt32("RefId");
 
@@ -714,12 +353,17 @@ namespace VigilanceClearance.Controllers
                     return Json(new { success = false, message = "Record not saved." });
                 }
 
+
                 // ✅ Return JSON with redirect URL
                 return Json(new
                 {
                     success = true,
                     redirectUrl = Url.Action("Reference_Details", new { id = id })
                 });
+                // return RedirectToAction("Reference_Details", new { id = id });
+                //return Json(new { success = true, redirectUrl = Url.Action("Reference_Details", new { id = id }) });
+                // ✅ Return reference ID for client-side redirect
+                // return Json(new { success = true, masterReferenceID = referenceid });
 
             }
             catch (Exception ex)
@@ -728,69 +372,62 @@ namespace VigilanceClearance.Controllers
             }
         }
 
-
         [HttpGet]
-        //public async Task<IActionResult> Officer_list(int id)
-        //{
-        //    ViewBag.title = "Officer Details";
-        //    try
-        //    {
-        //        string username = HttpContext.Session.GetString("Username");
-        //        if (string.IsNullOrEmpty(username))
-        //        {
-        //            return RedirectToAction("Login", "Account");
-        //        }
+        public async Task<IActionResult> officer_posting_details()
+        {
+            ViewBag.title = "Officer Posting Details ";
+            string id = "0";
 
-        //        HttpContext.Session.SetInt32("RefId", id);
+            int? officerid = HttpContext.Session.GetInt32("officerId");
+            int? referenceid = HttpContext.Session.GetInt32("RefId");
 
-        //        int? referenceid = HttpContext.Session.GetInt32("RefId");
+            if (!officerid.HasValue)
+            {
+                ViewBag.Error = "Reference ID not found in session.";
+                return View(); // Or redirect back to a safe page
+            }
 
-        //        if (referenceid.HasValue)
-        //        {
-        //            ViewBag.ReferenceId = referenceid.Value;
-        //        }
-
-        //        var model = new PESBViewModel
-        //        {
-        //            //officer_details_List = await _pesb.Get_Officer_List_GetById_Async(id)
-        //        };
-
-        //        if (model == null)
-        //        {
-        //            ViewBag.Error = "No data found.";
-        //            return View();
-        //        }
-        //        return View(model);
-        //    }
-        //    catch (Exception)
-        //    {
-        //        ViewBag.Error = "Something went wrong while loading the page.";
-        //        return View();
-        //    }
-
-        //}
-
+            ViewBag.ReferenceId = officerid.Value;
+            try
+            {
+                var model = new PESBViewModel
+                {
+                    OfficerId = officerid ?? 0,
+                    ReferenceId = referenceid ?? 0,
+                    officer_posting_details = new officer_posting_details_model(), // 👈 this line is critical!
+                    organization_ddl_List = await _pesb.GetOrganizationDropDownAsync(id),
+                    ministry_ddl_List = new List<SelectListItem>(),
+                    //officer_details_List = await _pesb.Get_Officer_List_GetById_Async(referenceid.Value),
+                    //officer_posting_details_List = await _pesb.Get_Officer_Posting_List_GetById_Async(referenceid.Value),
+                };
+                return View(model);
+            }
+            catch (Exception)
+            {
+                ViewBag.Error = "Something went wrong while loading the page.";
+                return View();
+            }
+        }
 
         [HttpPost]
         public async Task<IActionResult> officer_posting_details([FromBody] PESBViewModel objmodel)
         {
             string id = "0";
 
+            int? officerid = HttpContext.Session.GetInt32("officerId");
+            int? referenceid = HttpContext.Session.GetInt32("RefId");
+            int? officerpostingid = HttpContext.Session.GetInt32("officerPostingId");
 
-            //int? officerid = HttpContext.Session.GetInt32("RefId");
-
-            int? officerid = HttpContext.Session.GetInt32("OfficerId");
-
-
-            if (!officerid.HasValue)
+            if (!officerid.HasValue || !referenceid.HasValue)
             {
-                ViewBag.Error = "officer ID not found in session.";
-                return View();
+                ViewBag.Error = "Required session values not found.";
+                return View(objmodel); // Return with error
             }
 
             try
             {
-                objmodel.officer_posting_details.vcOfficerId = (int)officerid;
+                objmodel.officer_posting_details.vcOfficerId = officerid.Value;
+                objmodel.officer_posting_details.MasterReferenceId = referenceid.Value;
                 objmodel.officer_posting_details.orgCode = objmodel.officer_posting_details.orgCode;
                 objmodel.officer_posting_details.orgMinistry = objmodel.officer_posting_details.orgMinistry;
                 objmodel.officer_posting_details.designation = objmodel.officer_posting_details.designation;
@@ -802,23 +439,20 @@ namespace VigilanceClearance.Controllers
                 objmodel.officer_posting_details.actionBy_SessionId = HttpContext.Session.Id;
                 objmodel.officer_posting_details.actionBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
 
-
                 int result = await _pesb.Insert_Officer_Posting_Details_Async(objmodel.officer_posting_details);
-
                 if (result == 0)
                 {
                     return Json(new { success = false, message = "Record not saved." });
                 }
-
-                return Json(new { success = true });
-
+                
+                var redirectUrl = Url.Action("ViewOfficerDetails", new { id = officerid, masterrefid = referenceid });
+                return Json(new { success = true, redirectUrl });
             }
             catch (Exception ex)
             {
                 return Json(new { success = false, message = "An unexpected error occurred." });
             }
         }
-
 
         [HttpGet]
         public async Task<IActionResult> Officer_list(int id)
@@ -861,22 +495,13 @@ namespace VigilanceClearance.Controllers
             }
         }
 
-
-
         [HttpGet]
         public async Task<IActionResult> Officer_Details(int masterReferenceID)
         {
             ViewBag.title = "Reference Details";
             try
             {
-                //HttpContext.Session.SetInt32("RefId", masterReferenceID);
-
                 int referenceid = (int)HttpContext.Session.GetInt32("RefId");
-
-                //if (referenceid.HasValue)
-                //{
-                //    ViewBag.ReferenceId = referenceid.Value;
-                //}
 
                 var masterreferenceresult = await _pesb.Get_Vc_Reference_Received_For_Details_GetById_Async(masterReferenceID);
                 var modelreference = masterreferenceresult.FirstOrDefault();
@@ -885,16 +510,12 @@ namespace VigilanceClearance.Controllers
                     ViewBag.Error = "No data found.";
                     return View();
                 }
-
-
                 var model = new PESBViewModel
                 {
                     new_reference = modelreference,
                     officer_details_List = await _pesb.Get_Officer_List_GetById_Async(referenceid)
                 };
-
                 return View(model);
-
             }
             catch (Exception)
             {
@@ -903,6 +524,71 @@ namespace VigilanceClearance.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> ForwardedToCVC(int id)
+        {
+            try
+            {
 
+
+                PESB_Update_Referencefrom_model objmodel = new PESB_Update_Referencefrom_model();
+                objmodel.MainReferenceID = id;
+                objmodel.UpdatedBy = HttpContext.Session.GetString("Username");
+                objmodel.UpdatedBy_SessionId = HttpContext.Session.Id;
+                objmodel.UpdatedBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+                objmodel.PendingWith = "CVC_COORD2_DH";
+                int result = await _pesb.Update_Reference_From_PESB_Async(objmodel);
+
+                if (result == 1)
+                {
+                    return RedirectToAction("PESB_Appointment");
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Data not updated." });
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                return Json(new { success = false, message = "An unexpected error occurred." });
+            }
+        }
+
+
+        [HttpGet("ViewOfficerDetails/{id}/{masterrefid}")]
+        public async Task<IActionResult> ViewOfficerDetails(int id, int masterrefid)
+            {
+            try
+            {
+                HttpContext.Session.SetInt32("officerId", id);
+                HttpContext.Session.SetInt32("masterRefId", masterrefid);
+
+
+                var Reference_Received_Details = await _pesb.Get_Vc_Reference_Received_For_Details_GetById_Async(masterrefid);
+                var Officer_Details = await _pesb.Get_Officer_Details_Async(id);
+
+                var data1 = Reference_Received_Details.FirstOrDefault();
+                var data2 = Officer_Details.FirstOrDefault();
+                if (data1 == null || data2 == null)
+                {
+                    ViewBag.Error = "No data found.";
+                    return View();
+                }
+                var model = new PESBViewModel
+                {
+                    new_reference = data1,
+                    officer_details = data2,
+                    officer_posting_details_List = await _pesb.Get_Officer_Posting_List_GetById_Async(id)
+                };
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "An unexpected error occurred." });
+            }
+        }
     }
 }

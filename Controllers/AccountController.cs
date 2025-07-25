@@ -46,6 +46,7 @@ namespace VigilanceClearance.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (!ModelState.IsValid)
@@ -80,18 +81,26 @@ namespace VigilanceClearance.Controllers
                     .ToArray();
 
                 HttpContext.Session.SetString("AccessToken", tokenResponse.Token);
-                //HttpContext.Session.SetString("Username", model.Username);
-
+                HttpContext.Session.SetString("Username", model.Username);
                 var UserDetails = await _authService.GetUserDetailsbyUserName(username);
 
                 // Serialize to JSON
-                var userDetailsJson = System.Text.Json.JsonSerializer.Serialize(UserDetails);                                                                          
+                var userDetailsJson = System.Text.Json.JsonSerializer.Serialize(UserDetails);
+
                 HttpContext.Session.SetString("UserDetails", userDetailsJson);
                 HttpContext.Session.SetString("UserRole", roles[0].ToString());
                 HttpContext.Session.SetString("Username", username);
 
+                if (roles[0].ToString() == "ROLE_DH" || roles.Contains("ROLE_DH"))
+                {
+                    var userdetails_Json = System.Text.Json.JsonSerializer.Deserialize<UserDetailsModel>(userDetailsJson);
+                    string _section = userdetails_Json.ID.ToString();
+                    HttpContext.Session.SetString("Section", _section);
+                    return RedirectToAction("DH_Dashboard", "DealingHand");
+                }
+
                 if (roles.Contains("MINISTRY_DH"))
-                {                    
+                {
                     return RedirectToAction("Index", "Ministry_Department");
                 }
                else if (roles.Contains("MINISTRY_APPROVER"))
@@ -109,6 +118,49 @@ namespace VigilanceClearance.Controllers
                 else if (roles.Contains("Admin"))
                 {
                     return RedirectToAction("Users", "Admin");
+                }
+                else if (roles.Contains("Coor"))
+                {
+                    return RedirectToAction("Users", "Admin");
+                }
+                //COORD2 starts 
+                else if (roles.Contains("CVC_COORD2_DH"))
+                {
+                    return RedirectToAction("Index", "Coord2_DealingHand");
+                }
+                else if (roles.Contains("CVC_COORD2_SO"))
+                {
+                    return RedirectToAction("Index", "Coord2_BranchOfficer");
+                }
+                else if (roles.Contains("CVC_COORD2_BO"))
+                {
+                    return RedirectToAction("Index", "Coord2_BranchOfficer");
+                }
+                //COORD2 ends
+
+                else if (roles.Contains("CBI_DH"))
+                {
+                    return RedirectToAction("Index", "CBI_DealingHand");
+                }
+                else if (roles.Contains("CBI_APPROVER"))
+                {
+                    return RedirectToAction("Index", "CBI_DealingHand");
+                }
+                else if (roles.Contains("CBI_CA"))
+                {
+                    return RedirectToAction("Index", "CBI_DealingHand");
+                }
+                else if (roles.Contains("ROLE_DH"))
+                {
+                    return RedirectToAction("DH_Dashboard", "DealingHand");
+                }
+                else if (roles.Contains("ROLE_SO"))
+                {
+                    return RedirectToAction("SO_Dashboard", "SectionOfficer");
+                }
+                else if (roles.Contains("ROLE_BO"))
+                {
+                    return RedirectToAction("BO_Dashboard", "BranchOfficer");
                 }
 
                 return View(model);

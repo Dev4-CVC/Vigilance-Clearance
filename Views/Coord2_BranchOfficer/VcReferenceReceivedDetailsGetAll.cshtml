@@ -1,0 +1,146 @@
+﻿@using VigilanceClearance.Models.ViewModel.Ministry
+@model List<ReferenceReceivedFromCVCModel>
+@{
+    ViewData["Title"] = "VcReferenceReceivedDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<style>
+    .table-responsive {
+        max-height: 500px;
+        overflow-x: auto;
+        overflow-y: auto;
+    }
+
+    .table thead th {
+        position: sticky;
+        top: 0;
+        background-color: #f8f9fa;
+        z-index: 1;
+    }
+</style>
+
+
+<section>
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title mb-0">View Reference Received CVC</h3>
+        </div>
+        <div class="card-body p-2">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover table-sm">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Action</th>
+                            <th>Sr.No.</th>
+                            <th>Reference Received For</th>
+                            <th>Reference Received From</th>
+                            <th>From Code</th>
+                            <th>Post Category</th>
+                            <th>Post Sub Category</th>
+                            <th>Org Name</th>
+                            <th>Min Desc</th>
+                            <th>Ref/File No</th>
+                            <th>Submission Date</th>
+                            <th>CVC Ref/File No</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @foreach (var item in Model)
+                        {
+
+                            int sno = 1;
+                            <tr>
+                                <td>
+                                    <a asp-action="ViewOfficerListForGivenProposal" asp-route-id="@item.id" class="btn btn-info btn-sm">View</a>
+
+                                </td>
+                                <td>@sno</td>
+                                <td>@item.ReferenceReceivedFor</td>
+                                <td>@item.ReferenceReceivedFrom</td>
+                                <td>@item.ReferenceReceivedFromCode</td>
+                                <td>@item.selectionForThePostCategory</td>
+                                <td>@item.selectionForThePostSubCategory</td>
+                                <td>@item.OrgName</td>
+                                <td>@item.MinDesc</td>
+                                <td>@item.ReferenceNo_FileNo</td>
+                                <td>@item.ReferenceOrSubmissionToCvcDate</td>
+                                <td>@item.CVC_ReferenceID_FileNo</td>
+                            </tr>
+                            sno++;
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@*   <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Designation</th>
+                            <th>Department</th>
+                            <th>Joining Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>101</td>
+                            <td>Meher Kumar</td>
+                            <td>Developer</td>
+                            <td>IT</td>
+                            <td>2022-01-15</td>
+                            <td>
+                                <a asp-action="viewDetailsReferenceReceivedCVC" asp-route-id="1" class="btn btn-info btn-sm">View</a>
+                                <a asp-action="UpdateReferenceReceivedCVC" asp-route-id="1" class="btn btn-warning btn-sm">Update</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>102</td>
+                            <td>Anjali Verma</td>
+                            <td>Designer</td>
+                            <td>UI/UX</td>
+                            <td>2021-08-20</td>
+                            <td>
+                                <a asp-action="viewDetailsReferenceReceivedCVC" asp-route-id="2" class="btn btn-info btn-sm">View</a>
+                                <a asp-action="UpdateReferenceReceivedCVC" asp-route-id="2" class="btn btn-warning btn-sm">Update</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>103</td>
+                            <td>Raj Singh</td>
+                            <td>Tester</td>
+                            <td>QA</td>
+                            <td>2023-03-10</td>
+                            <td>
+                                <a asp-action="viewDetailsReferenceReceivedCVC" asp-route-id="3" class="btn btn-info btn-sm">View</a>
+                                <a asp-action="UpdateReferenceReceivedCVC" asp-route-id="3" class="btn btn-warning btn-sm">Update</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>104</td>
+                            <td>Rahul Singh</td>
+                            <td>Tester</td>
+                            <td>QA</td>
+                            <td>2023-03-10</td>
+                            <td>
+                                <a asp-action="viewDetailsReferenceReceivedCVC" asp-route-id="4" class="btn btn-info btn-sm">View</a>
+                                <a asp-action="UpdateReferenceReceivedCVC" asp-route-id="4" class="btn btn-warning btn-sm">Update</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div> *@
+@* </div>
+
+    </div>
+
+</section> *@

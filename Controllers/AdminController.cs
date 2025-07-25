@@ -4,6 +4,7 @@ using System.CodeDom;
 using VigilanceClearance.Interface.Admin;
 using VigilanceClearance.Interface.PESB;
 using VigilanceClearance.Models.Admin;
+using VigilanceClearance.Models.DTOs;
 using VigilanceClearance.Models.ViewModel.PESB;
 
 namespace VigilanceClearance.Controllers
@@ -31,7 +32,7 @@ namespace VigilanceClearance.Controllers
         public async Task<IActionResult> Users()
         {
             ViewBag.title = "Users";
-            
+
             string username = HttpContext.Session.GetString("Username");
             if (string.IsNullOrEmpty(username))
             {
@@ -98,7 +99,13 @@ namespace VigilanceClearance.Controllers
 
             try
             {
-                int isInserted = await _admin.Insert_Add_New_User_Async(objmodel.users);
+                RegisterDto registerobj = new RegisterDto();
+                registerobj.userName= objmodel.users.UserName; 
+                registerobj.email= objmodel.users.email; 
+                registerobj.password= objmodel.users.password; 
+                registerobj.role= objmodel.users.role; 
+
+                int isInserted = await _admin.Insert_Add_New_User_Async(registerobj);
 
                 if (isInserted == -1)
                 {

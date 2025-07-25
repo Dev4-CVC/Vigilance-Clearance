@@ -171,8 +171,8 @@ namespace VigilanceClearance.Controllers
                         OrganizationList = await _ministry.GetOrganizationDropDownAsync("0"),
                         Organization = null // or default
                     },
-
-                    officerPersonalDetailModel = new OfficerPersonalDetailModel
+                    officerPersonalDetailModel = new Models.OfficerDetailModel.OfficerPersonalDetailModel
+                    //officerPersonalDetailModel = new OfficerPersonalDetailModel
                     {
                         Officer_Name = firstOfficer.Officer_Name,
                         Officer_FatherName = firstOfficer.Officer_FatherName,
@@ -743,7 +743,7 @@ namespace VigilanceClearance.Controllers
                     {
                         reference_received_for_ddl_List = await _pesb.GetReferenceDropDownAsync(),
                         sub_post_ddl_List = new List<SelectListItem>(),
-                        organization_ddl_List = await _pesb.GetOrgByMinCode(_Mincode),
+                        organization_ddl_List = await _pesb.GetOrganizationDropDownAsync(_Mincode),
                         ministry_ddl_List = new List<SelectListItem>(),
                     };
                     return View(model);
@@ -805,7 +805,7 @@ namespace VigilanceClearance.Controllers
                     _insertRefModel.minDesc = "null";
                     _insertRefModel.pendingWith = HttpContext.Session.GetString("UserRole").ToString();
                     _insertRefModel.referenceID = objmodel.new_reference.referenceNoFileNo ?? "";
-                    _insertRefModel.cvC_ReferenceID_FileNo = objmodel.new_reference.cvcReferenceIdFileNo ?? "";
+                    _insertRefModel.cvC_ReferenceID_FileNo = objmodel.new_reference.cvcReferenceIdFileNo?? "";
                     _insertRefModel.actionBy = _UserName;
                     _insertRefModel.actionBy_SessionId = HttpContext.Session.Id;
                     _insertRefModel.actionBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString();

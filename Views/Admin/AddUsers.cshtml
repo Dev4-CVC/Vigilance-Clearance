@@ -16,9 +16,9 @@
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                     <div class="form-group mb-3">
-                        <label asp-for="users.userName" class="control-label"></label>
-                        <input asp-for="users.userName" class="form-control" placeholder="Enter Username" required />
-                        <span asp-validation-for="users.userName" class="text-danger"></span>
+                        <label asp-for="users.UserName" class="control-label"></label>
+                        <input asp-for="users.UserName" class="form-control" placeholder="Enter Username" required />
+                        <span asp-validation-for="users.UserName" class="text-danger"></span>
                     </div>
 
                     <div class="form-group mb-3">
@@ -34,11 +34,11 @@
                     </div>
 
                     <div class="form-group mb-3">
-                        <label asp-for="users.Roles" class="control-label"></label>
-                        <select asp-for="users.Roles" class="form-control" asp-items="Model.roles_ddl_List" required>
+                        <label asp-for="users.role" class="control-label"></label>
+                        <select asp-for="users.role" class="form-control" asp-items="Model.roles_ddl_List" required>
                             <option value="">-- Select Role --</option>
                         </select>
-                        <span asp-validation-for="users.Roles" class="text-danger"></span>
+                        <span asp-validation-for="users.role" class="text-danger"></span>
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center">
@@ -58,10 +58,10 @@
         e.preventDefault(); // Prevent default form submission
 
         // Basic manual validation (can be expanded if needed)
-        const userName = document.getElementById('users_userName').value.trim();
+        const userName = document.getElementById('users_UserName').value.trim();
         const email = document.getElementById('users_email').value.trim();
         const password = document.getElementById('users_password').value.trim();
-        const role = document.getElementById('users_Roles').value;
+        const role = document.getElementById('users_role').value;
 
         if (!userName || !email || !password || !role) {
             Swal.fire({
@@ -82,11 +82,11 @@
             confirmButtonText: 'Yes, create user!'
         }).then((result) => {
             if (result.isConfirmed) {
-                e.target.submit(); // Submit form if confirmed
+                e.target.submit();
             }
         });
 
-        return false; // Wait for user confirmation before submission
+        return false;
     }
 </script>
 

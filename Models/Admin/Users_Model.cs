@@ -7,10 +7,9 @@ namespace VigilanceClearance.Models.Admin
     {
         public string userId { get; set; }
 
-
         [Required(ErrorMessage = "User Name is required.")]
         [Display(Name = "User Name")]
-        public string userName { get; set; }
+        public string UserName { get; set; }
 
         [Required(ErrorMessage = "Email is required.")]
         [EmailAddress(ErrorMessage = "Invalid email format.")]
@@ -26,10 +25,10 @@ namespace VigilanceClearance.Models.Admin
         [Required(ErrorMessage = "Role is required.")]
         [Display(Name = "Roles")]
         [JsonPropertyName("selectedRole")]
-        public string Roles { get; set; }
+        public string role { get; set; }
 
 
         [JsonPropertyName("roles")]
-        public List<string> roles { get; set; }
+        public List<string> role_list { get; set; }
     }
 }
