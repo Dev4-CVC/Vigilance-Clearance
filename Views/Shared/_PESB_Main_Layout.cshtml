@@ -246,15 +246,20 @@
                             <a asp-action="ProfileOfUser" asp-controller="Account" class="btn btn-sm btn-outline-primary">
                                 <i class="fas fa-edit"></i> Profile
                             </a>
-                            @if (User.Identity.IsAuthenticated)
+                           @*  @if (User.Identity.IsAuthenticated)
                             {
                                 <a asp-action="Logout" asp-controller="Account" class="btn btn-sm btn-outline-danger">
                                     <i class="fas fa-sign-out-alt"></i> Logout
                                 </a>
-                            }
+                            } *@
                             <a asp-action="ResetPassword" asp-controller="Account" class="btn btn-sm btn-outline-primary">
                                 <i class="fas fa-edit"></i> Change Password
                             </a>
+                            <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" style="width: 100%; text-align: left;">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>

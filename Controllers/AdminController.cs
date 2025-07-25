@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.CodeDom;
 using VigilanceClearance.Interface.Admin;
@@ -9,6 +10,7 @@ using VigilanceClearance.Models.ViewModel.PESB;
 
 namespace VigilanceClearance.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
         private readonly IHttpClientFactory _clientFactory;
