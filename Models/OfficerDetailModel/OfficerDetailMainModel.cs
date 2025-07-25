@@ -30,8 +30,6 @@ namespace VigilanceClearance.Models.OfficerDetailModel
 
         public PESB.new_reference_model new_Reference_Model { get; set; }
 
-
-
         #region added by Sudarshan 23 7 2025
         public VigBranchCommentsInsert vig_branch_comments{ get; set; }
 

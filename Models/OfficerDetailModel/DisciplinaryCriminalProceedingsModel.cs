@@ -2,6 +2,7 @@
 {
     public class DisciplinaryCriminalProceedingsModel
     {
+        public int masterReferenceId { get; set; }
         public int officerId { get; set; }
         public string whether_DisciplinaryCriminalProceedingsPending { get; set; }
         public string whether_Suspended { get; set; }

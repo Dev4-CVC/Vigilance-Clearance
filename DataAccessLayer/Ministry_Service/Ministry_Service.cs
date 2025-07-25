@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Json;
 using VigilanceClearance.Interface.Ministry;
 using VigilanceClearance.Models;
+using VigilanceClearance.Models.Ministry_ApproverModels;
 using VigilanceClearance.Models.Modal_Properties;
 using VigilanceClearance.Models.New_Reference_to_CVCModels;
 using VigilanceClearance.Models.OfficerDetailModel;
@@ -682,8 +683,7 @@ namespace VigilanceClearance.DataAccessLayer.Ministry_Service
                 if (string.IsNullOrEmpty(accessToken))
                     throw new UnauthorizedAccessException("Access token is missing.");
 
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);              
                 var requestUrl = $"{BaseUrl}ComplaintWithVigilanceAnglePending_13/addComplaintWithVigilanceAnglePending";
 
                 var options = new JsonSerializerOptions
@@ -935,12 +935,82 @@ namespace VigilanceClearance.DataAccessLayer.Ministry_Service
             }
         }
 
+        #endregion
+
+        // End the code for the New Reference To CVC
+
+
+        #region Added as on date 22_07_2025 For Ministry Approver
+        public async Task<List<ReferenceListPendingWith_MinistryApproverModel>> GetReferenceListPendingWith_MinistryApproverList(string _MinCode, string _Role)
+        {
+            var accessToken = _httpContextAccessor.HttpContext?.Session.GetString("AccessToken");
+            if (string.IsNullOrEmpty(accessToken)) return new List<ReferenceListPendingWith_MinistryApproverModel>();
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+            //var requestUrl = $"{BaseUrl}Ministry/GetReferenceListPendingWithMinistryApprover?MinCode={Uri.EscapeDataString(_MinCode)}";
+            var requestUrl = $"{BaseUrl}Ministry/GetReferenceListPendingWithMinistryApprover?MinCode={Uri.EscapeDataString(_MinCode)}&Role={Uri.EscapeDataString(_Role)}";
+
+            try
+            {
+                var response = await _httpClient.GetAsync(requestUrl);
+                if (!response.IsSuccessStatusCode)
+                {
+                    return new List<ReferenceListPendingWith_MinistryApproverModel>();
+                }
+                var jsonContent = await response.Content.ReadAsStringAsync();
+                var apiResponse = JsonConvert.DeserializeObject<FetchAPIDataModel<ReferenceListPendingWith_MinistryApproverModel>>(jsonContent);
+
+                if (apiResponse != null && apiResponse.isSuccess && apiResponse.data != null)
+                {
+                    return apiResponse.data;
+                }
+
+                return new List<ReferenceListPendingWith_MinistryApproverModel>();
+            }
+            catch (Exception)
+            {
+                return new List<ReferenceListPendingWith_MinistryApproverModel>();
+            }
+        }
 
         #endregion
 
 
+        #region Added as on date 24_07_2025  For the References_from_coord2
 
-        // End the code for the New Reference To CVC
+        public async Task<List<References_from_coord2_To_MinistryModel>> References_from_coord2_To_Ministry(string _Mincode)
+        {
+            var accessToken = _httpContextAccessor.HttpContext?.Session.GetString("AccessToken");
+            if (string.IsNullOrEmpty(accessToken)) return new List<References_from_coord2_To_MinistryModel>();
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+            var requestUrl = $"{BaseUrl}Ministry/GetReferencesfromcoord2ToMinistry?MinCode={Uri.EscapeDataString(_Mincode)}";
+
+            try
+            {
+                var response = await _httpClient.GetAsync(requestUrl);
+                if (!response.IsSuccessStatusCode)
+                {
+                    return new List<References_from_coord2_To_MinistryModel>();
+                }
+                var jsonContent = await response.Content.ReadAsStringAsync();
+                var apiResponse = JsonConvert.DeserializeObject<FetchAPIDataModel<References_from_coord2_To_MinistryModel>>(jsonContent);
+
+                if (apiResponse != null && apiResponse.isSuccess && apiResponse.data != null)
+                {
+                    return apiResponse.data;
+                }
+                return new List<References_from_coord2_To_MinistryModel>();
+            }
+            catch (Exception)
+            {
+                return new List<References_from_coord2_To_MinistryModel>();
+            }
+        }
+        #endregion
 
     }
+
 }

@@ -82,8 +82,6 @@ namespace VigilanceClearance.Controllers
 
                 HttpContext.Session.SetString("AccessToken", tokenResponse.Token);
                 HttpContext.Session.SetString("Username", model.Username);
-
-
                 var UserDetails = await _authService.GetUserDetailsbyUserName(username);
 
                 // Serialize to JSON
@@ -102,6 +100,14 @@ namespace VigilanceClearance.Controllers
                 }
 
                 if (roles.Contains("MINISTRY_DH"))
+                {
+                    return RedirectToAction("Index", "Ministry_Department");
+                }
+               else if (roles.Contains("MINISTRY_APPROVER"))
+                {
+                    return RedirectToAction("Index", "Ministry_Department");
+                }
+                else if (roles.Contains("MINISTRY_CVO"))
                 {
                     return RedirectToAction("Index", "Ministry_Department");
                 }
@@ -157,7 +163,6 @@ namespace VigilanceClearance.Controllers
                     return RedirectToAction("BO_Dashboard", "BranchOfficer");
                 }
 
-
                 return View(model);
             }
             catch
@@ -192,6 +197,22 @@ namespace VigilanceClearance.Controllers
         }
 
 
+        [HttpGet]
+        public async Task<IActionResult> LogoutRedirect()
+        {
+            // Clear authentication cookie
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // Clear session
+            HttpContext.Session.Clear();
+
+            // Optional: Clear TempData
+            TempData.Clear();
+
+            // Optional: Redirect to Login or Home
+            return RedirectToAction("Login", "Account");
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
@@ -209,6 +230,7 @@ namespace VigilanceClearance.Controllers
             return RedirectToAction("Login", "Account");
         }
 
+        
 
     }
 }

@@ -5,9 +5,9 @@
         public int? masterReferenceID { get; set; }
         public string officer_Name { get; set; }
         public string officer_FatherName { get; set; }
-        public DateTime officer_DateOfBirth { get; set; }
-        public DateTime officer_RetirementDate { get; set; }
-        public DateTime officer_ServiceEntryDate { get; set; }
+        public string officer_DateOfBirth { get; set; }
+        public string officer_RetirementDate { get; set; }
+        public string officer_ServiceEntryDate { get; set; }
         public string officer_Service { get; set; }
         public string? officer_Other_Service { get; set; }
         public int officer_Batch_Year { get; set; }

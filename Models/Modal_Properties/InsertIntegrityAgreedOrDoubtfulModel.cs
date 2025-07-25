@@ -2,6 +2,7 @@
 {
     public class InsertIntegrityAgreedOrDoubtfulModel
     {
+        public int masterReferenceId { get; set; } 
         public int id { get; set; }
         public int officerId { get; set; }
         public string enteredInTheList { get; set; }

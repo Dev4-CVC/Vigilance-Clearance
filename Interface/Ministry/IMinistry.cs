@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using VigilanceClearance.Models.Ministry_ApproverModels;
 using VigilanceClearance.Models.Modal_Properties;
 using VigilanceClearance.Models.Modal_Properties.PESB;
 using VigilanceClearance.Models.New_Reference_to_CVCModels;
@@ -84,6 +85,15 @@ namespace VigilanceClearance.Interface.Ministry
 
         #endregion
 
+
+        #region Added as on date 22_07_2025 
+        Task<List<ReferenceListPendingWith_MinistryApproverModel>> GetReferenceListPendingWith_MinistryApproverList(string _MinCode, string _Role);
+        #endregion
+
+
+        #region Added as on date 24_07_2025 For the References_from_coord2
+        Task<List<References_from_coord2_To_MinistryModel>> References_from_coord2_To_Ministry(string _Mincode);
+        #endregion 
 
     }
 }

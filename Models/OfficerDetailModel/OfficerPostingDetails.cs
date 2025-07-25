@@ -16,6 +16,7 @@ namespace VigilanceClearance.Models.OfficerDetailModel
         [Required(ErrorMessage = "Designation is required.")]
         public string? Designation { get; set; }
 
+        [Display(Name = "Place Of Posting")]
         public string? PlaceOfPosting { get; set; }
 
         [Required(ErrorMessage = "Tenure From date is required.")]

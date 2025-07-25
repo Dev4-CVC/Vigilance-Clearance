@@ -178,6 +178,8 @@
             var username = Context.Session.GetString("Username");
             var FullName = Context.Session.GetString("Fullname");
             int? userId = Context.Session.GetInt32("UserId");
+
+            var _Role = Context.Session.GetString("UserRole");
 }
 <body class="hold-transition sidebar-mini">
     <div class="wrapper">
@@ -249,16 +251,39 @@
                                 <i class="nav-icon fas fa-home"></i><p>Home</p>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="@Url.Content("~/Ministry_Department/ViewReferenceReceivedCVC")" class="nav-link hover-link">
-                                <i class="nav-icon fas fa-edit"></i><p>Reference Received From CVC</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="@Url.Content("~/SuperAdmin/MasterUser")" class="nav-link hover-link">
-                                <i class="nav-icon fas fa-users"></i><p>New Reference to CVC</p>
-                            </a>
-                        </li>
+
+                        @{
+                            if (_Role == "MINISTRY_APPROVER")
+                            {
+                                <li class="nav-item">
+                                    <a href="@Url.Content("~/Ministry_Department/GetReferenceListPendingWith_MinistryApprover")" class="nav-link hover-link">
+                                        <i class="nav-icon fas fa-edit"></i><p>Reference Received From Ministry DH</p>
+                                    </a>
+                                </li>
+                            }
+                            else if (_Role == "MINISTRY_CVO")
+                            {
+                                <li class="nav-item">
+                                    <a href="@Url.Content("~/Ministry_Department/GetReferenceListPendingWith_MinistryApprover")" class="nav-link hover-link">
+                                        <i class="nav-icon fas fa-edit"></i><p>Reference Received From Ministry Approver</p>
+                                    </a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a href="@Url.Content("~/Ministry_Department/ViewReferenceReceivedCVC")" class="nav-link hover-link">
+                                        <i class="nav-icon fas fa-edit"></i><p>Reference Received From CVC</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="@Url.Content("~/SuperAdmin/MasterUser")" class="nav-link hover-link">
+                                        <i class="nav-icon fas fa-users"></i><p>New Reference to CVC</p>
+                                    </a>
+                                </li>
+                            }
+                        }
+                        
                         <li class="nav-item">
                             <a href="@Url.Content("~/SuperAdmin/MasterUser")" class="nav-link hover-link">
                                 <i class="nav-icon fas fa-users"></i><p>Search</p>
