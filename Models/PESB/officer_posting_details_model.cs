@@ -9,7 +9,10 @@ namespace VigilanceClearance.Models.ViewModel.PESB
         //public int OfficerId { get; set; }
         //public int referenceid { get; set; }
         public int Id  { get; set; }
+
+        public int MasterReferenceId { get; set; }
         public int vcOfficerId  { get; set; }
+    
 
         public string orgCode { get; set; }
         public string orgMinistry { get; set; }

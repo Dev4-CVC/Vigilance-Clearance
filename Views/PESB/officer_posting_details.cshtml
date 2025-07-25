@@ -4,31 +4,25 @@
     Layout = "~/Views/Shared/_PESB_Main_Layout.cshtml";
 }
 
-
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/flatpickr/dist/flatpickr.min.css" />
-<script src="https://unpkg.com/flatpickr"></script>
-<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <div class="row">
     <div class="col-md-4">
         <form asp-action="officer_posting_details">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-         
+            <input type="hidden" id="officerId" value="@Model.OfficerId" />
+            <input type="hidden" id="referenceId" value="@Model.ReferenceId" />
+
             <div class="form-group">
                 <label asp-for="officer_posting_details.orgCode" class="control-label"></label>
                 @* <input asp-for="officer_posting_details.orgCode" class="form-control" /> *@
                 @Html.DropDownListFor(model => model.officer_posting_details.orgCode, Model.organization_ddl_List, "-- Select Organization --",
-                         new { @class = "form-control", id = "orgCode", tabindex = "-1" })
+                new { @class = "form-control", id = "orgCode", tabindex = "-1" })
                 <span asp-validation-for="officer_posting_details.orgCode" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="officer_posting_details.orgMinistry" class="control-label"></label>
                 @* <input asp-for="officer_posting_details.orgMinistry" class="form-control" /> *@
                 @Html.DropDownListFor(model => model.officer_posting_details.orgMinistry, Model.ministry_ddl_List, "-- Select Ministry --",
-                         new { @class = "form-control", id = "minCode", tabindex = "-1" })
+                new { @class = "form-control", id = "minCode", tabindex = "-1" })
                 <span asp-validation-for="officer_posting_details.orgMinistry" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -55,16 +49,21 @@
             <div class="card-footer d-flex justify-content-end">
                 <button type="button" id="addPositionBtn" class="btn btn-primary">Submit</button>
                 @*   <button type="submit" id="addofficerdetailsBtn" class="btn btn-primary">Submit</button> *@
+                <a asp-action="ViewOfficerDetails" asp-route-id="@Model.OfficerId" asp-route-masterrefid="@Model.ReferenceId" class="btn btn-secondary">
+                    Back to List
+                </a>
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
 
-
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/flatpickr/dist/flatpickr.min.css" />
+<script src="https://unpkg.com/flatpickr"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @* 2nd Card script (date picker)  *@
 <script>
     flatpickr(".datepicker", {

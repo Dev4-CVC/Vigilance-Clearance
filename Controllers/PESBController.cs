@@ -115,11 +115,21 @@ namespace VigilanceClearance.Controllers
             string id = "0";
             try
             {
+                
+                objmodel.new_reference.referenceReceivedFor = objmodel.new_reference.referenceReceivedFor;
                 objmodel.new_reference.referenceReceivedFrom = "PESB";
                 objmodel.new_reference.referenceReceivedFromCode = "PESB";
+                objmodel.new_reference.selectionForThePostCategory = objmodel.new_reference.selectionForThePostCategory;
+                objmodel.new_reference.selectionForThePostSubCategory= objmodel.new_reference.selectionForThePostSubCategory;
 
+                objmodel.new_reference.orgCode = objmodel.new_reference.orgCode;
+                objmodel.new_reference.minCode = objmodel.new_reference.minCode;
                 objmodel.new_reference.orgName = null;
                 objmodel.new_reference.minDesc = null;
+
+                objmodel.new_reference.referenceNoFileNo = objmodel.new_reference.referenceNoFileNo;
+                objmodel.new_reference.referenceOrSubmissionToCvcDate= objmodel.new_reference.referenceOrSubmissionToCvcDate;
+                objmodel.new_reference.cvcReferenceIdFileNo= objmodel.new_reference.cvcReferenceIdFileNo;
 
                 objmodel.new_reference.createdBy = HttpContext.Session.GetString("Username");
                 objmodel.new_reference.createdByIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
@@ -132,7 +142,6 @@ namespace VigilanceClearance.Controllers
                 objmodel.new_reference.updatedOn = null;
 
                 objmodel.new_reference.pendingWith = "PESB";
-                objmodel.new_reference.uid = null;
                 objmodel.new_reference.referenceId = "ABC123";
 
                 int isInserted = await _pesb.Insert_Add_New_Reference_Async(objmodel.new_reference);
@@ -369,8 +378,8 @@ namespace VigilanceClearance.Controllers
             ViewBag.title = "Officer Posting Details ";
             string id = "0";
 
-
             int? officerid = HttpContext.Session.GetInt32("officerId");
+            int? referenceid = HttpContext.Session.GetInt32("RefId");
 
             if (!officerid.HasValue)
             {
@@ -383,18 +392,14 @@ namespace VigilanceClearance.Controllers
             {
                 var model = new PESBViewModel
                 {
+                    OfficerId = officerid ?? 0,
+                    ReferenceId = referenceid ?? 0,
                     officer_posting_details = new officer_posting_details_model(), // 👈 this line is critical!
                     organization_ddl_List = await _pesb.GetOrganizationDropDownAsync(id),
                     ministry_ddl_List = new List<SelectListItem>(),
                     //officer_details_List = await _pesb.Get_Officer_List_GetById_Async(referenceid.Value),
                     //officer_posting_details_List = await _pesb.Get_Officer_Posting_List_GetById_Async(referenceid.Value),
                 };
-                //var model = new PESBViewModel
-                //{
-
-                //    organization_ddl_List = await _pesb.GetOrganizationDropDownAsync("0"),
-                //    ministry_ddl_List = new List<SelectListItem>()
-                //};
                 return View(model);
             }
             catch (Exception)
@@ -413,15 +418,16 @@ namespace VigilanceClearance.Controllers
             int? referenceid = HttpContext.Session.GetInt32("RefId");
             int? officerpostingid = HttpContext.Session.GetInt32("officerPostingId");
 
-            if (!officerid.HasValue)
+            if (!officerid.HasValue || !referenceid.HasValue)
             {
-                ViewBag.Error = "officer ID not found in session.";
-                return View();
+                ViewBag.Error = "Required session values not found.";
+                return View(objmodel); // Return with error
             }
 
             try
             {
-                objmodel.officer_posting_details.vcOfficerId = (int)officerid;
+                objmodel.officer_posting_details.vcOfficerId = officerid.Value;
+                objmodel.officer_posting_details.MasterReferenceId = referenceid.Value;
                 objmodel.officer_posting_details.orgCode = objmodel.officer_posting_details.orgCode;
                 objmodel.officer_posting_details.orgMinistry = objmodel.officer_posting_details.orgMinistry;
                 objmodel.officer_posting_details.designation = objmodel.officer_posting_details.designation;
@@ -433,30 +439,12 @@ namespace VigilanceClearance.Controllers
                 objmodel.officer_posting_details.actionBy_SessionId = HttpContext.Session.Id;
                 objmodel.officer_posting_details.actionBy_IP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
 
-
                 int result = await _pesb.Insert_Officer_Posting_Details_Async(objmodel.officer_posting_details);
-
-                //if (result == 0)
-                //{
-                //    return Json(new { success = false, message = "Record not saved." });
-                //}
-
-                //return Json(new { success = true });
-
-                //if (result == 0)
-                //{
-                //    TempData["Error"] = "Record not saved.";
-                //    return RedirectToAction("ViewOfficerDetails", new { id = officerid, masterrefid = referenceid });
-                //}
-
-                //TempData["SuccessMessage_Of_Officer_Posting"] = "officer posting details saved successfully.";
-                //return RedirectToAction("ViewOfficerDetails", new { id = officerid, masterrefid = referenceid });
-
                 if (result == 0)
                 {
                     return Json(new { success = false, message = "Record not saved." });
                 }
-
+                
                 var redirectUrl = Url.Action("ViewOfficerDetails", new { id = officerid, masterrefid = referenceid });
                 return Json(new { success = true, redirectUrl });
             }
@@ -572,11 +560,12 @@ namespace VigilanceClearance.Controllers
 
         [HttpGet("ViewOfficerDetails/{id}/{masterrefid}")]
         public async Task<IActionResult> ViewOfficerDetails(int id, int masterrefid)
-        {
+            {
             try
             {
                 HttpContext.Session.SetInt32("officerId", id);
                 HttpContext.Session.SetInt32("masterRefId", masterrefid);
+
 
                 var Reference_Received_Details = await _pesb.Get_Vc_Reference_Received_For_Details_GetById_Async(masterrefid);
                 var Officer_Details = await _pesb.Get_Officer_Details_Async(id);

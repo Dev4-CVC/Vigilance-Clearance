@@ -1,0 +1,113 @@
+﻿@using VigilanceClearance.Models.OfficerDetailModel
+@using VigilanceClearance.Models.ViewModel.Coord2_DealingHand
+@model List<OfficerPersonalDetailModel>
+@{
+    ViewData["Title"] = "ViewOfficerListForGivenProposal";
+    Layout = "~/Views/Shared/_CBILayout.cshtml";
+}
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        overflow-x: hidden;
+    }
+
+    .table-responsive {
+        overflow-x: unset;
+        overflow-y: auto;
+        max-height: none;
+        width: 100%;
+    }
+
+    .table th, .table td {
+        white-space: normal !important;
+        word-break: break-word;
+        vertical-align: top;
+    }
+
+    .card {
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .btn-sm {
+        padding: 0.35rem 0.75rem;
+        border-radius: 0.25rem;
+    }
+</style>
+
+<section class="container-fluid mt-3">
+    <div class="row">
+        <!-- Left side: Officer List (25% width) -->
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h6 class="card-title mb-0">Officer List</h6>
+                    <a href="javascript:void(0);" id="sendProposalBtn" class="btn btn-warning btn-sm fw-semibold">
+                        SEND PROPOSAL TO BO
+                    </a>
+                </div>
+
+                <div class="card-body p-2">
+                    <table class="table table-bordered table-hover table-sm w-100">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>S.No.</th>
+                                <th>Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int sno = 1;
+                            }
+
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@sno</td>
+                                    <td>@item.Officer_Name</td>
+                                </tr>
+                                sno++;
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right side: Placeholder (75% width) -->
+        <div class="col-md-9">
+            <!-- This can later hold details, forms, preview, etc. -->
+        </div>
+    </div>
+</section>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#sendProposalBtn').click(function () {
+                $.ajax({
+                    url: '/Coord2_DealingHand/UpdateVcReferenceByDH',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    success: function (response) {
+                        if (response === 1) {
+                            alert("Proposal sent to BO successfully.");
+                        } else {
+                            alert("Failed to send proposal.");
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("AJAX Error:", status, error);
+                        alert("An error occurred while sending the proposal.");
+                    }
+                });
+            });
+        });
+    </script>
+}

@@ -1,8 +1,8 @@
 ﻿@model VigilanceClearance.Models.PESB.PESBViewModel
 
 @{
-	Layout = "~/Views/Shared/_PESB_Main_Layout.cshtml";
-	var username = Context.Session.GetString("Username");
+    Layout = "~/Views/Shared/_PESB_Main_Layout.cshtml";
+    var username = Context.Session.GetString("Username");
 }
 
 <!-- Flatpickr CSS -->
@@ -13,96 +13,96 @@
 
 
 <div class="row justify-content-center mt-4">
-	<div class="col-md-10">
-		<div class="card shadow border-0 rounded-4">
-			<div class="card-header bg-primary text-white">
-				<h4 class="mb-0">Add New Reference</h4>
-			</div>
+    <div class="col-md-10">
+        <div class="card shadow border-0 rounded-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Add New Reference</h4>
+            </div>
 
-			<div class="card-body">
-				<form asp-action="new_reference">
-					<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <div class="card-body">
+                <form asp-action="new_reference" method="post" id="newReferenceForm">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-					<div class="row">
-						<div class="form-group col-md-6">
-							<label asp-for="new_reference.referenceReceivedFor" class="control-label"></label>
-							@Html.DropDownListFor(model => model.new_reference.referenceReceivedFor,
-																Model.reference_received_for_ddl_List,
-																"-- Select Reference --",
-																new { @class = "form-control", id = "referenceReceivedFor", disabled = "disabled" })
-							@Html.HiddenFor(model => model.new_reference.referenceReceivedFor)
-							<span asp-validation-for="new_reference.referenceReceivedFor" class="text-danger"></span>
-						</div>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label asp-for="new_reference.referenceReceivedFor" class="control-label"></label>
+                            @Html.DropDownListFor(model => model.new_reference.referenceReceivedFor,
+                            Model.reference_received_for_ddl_List,
+                            "-- Select Reference --",
+                            new { @class = "form-control", id = "referenceReceivedFor", disabled = "disabled" })
+                            @Html.HiddenFor(model => model.new_reference.referenceReceivedFor)
+                            <span asp-validation-for="new_reference.referenceReceivedFor" class="text-danger"></span>
+                        </div>
 
-						<div class="form-group col-md-6">
-							<label asp-for="new_reference.selectionForThePostCategory" class="control-label"></label>
-							@Html.DropDownListFor(model => model.new_reference.selectionForThePostCategory,
-																Model.post_ddl_List,
-																"-- Select Post --",
-																new { @class = "form-control", id = "selectionForThePostCategory" })
-							<span asp-validation-for="new_reference.selectionForThePostCategory" class="text-danger"></span>
-						</div>
-					</div>
+                        <div class="form-group col-md-6">
+                            <label asp-for="new_reference.selectionForThePostCategory" class="control-label"></label>
+                            @Html.DropDownListFor(model => model.new_reference.selectionForThePostCategory,
+                            Model.post_ddl_List,
+                            "-- Select Post --",
+                            new { @class = "form-control", id = "selectionForThePostCategory" })
+                            <span asp-validation-for="new_reference.selectionForThePostCategory" class="text-danger"></span>
+                        </div>
+                    </div>
 
 
-					<div class="row">
-						<div class="form-group col-md-6">
-							<label asp-for="new_reference.selectionForThePostSubCategory" class="control-label"></label>
-							@Html.DropDownListFor(model => model.new_reference.selectionForThePostSubCategory,
-																Model.sub_post_ddl_List,
-																"-- Select Sub Post --",
-																new { @class = "form-control", id = "selectionForThePostSubCategory", tabindex = "-1", disabled = "disabled" })
-							<span asp-validation-for="new_reference.selectionForThePostSubCategory" class="text-danger"></span>
-						</div>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label asp-for="new_reference.selectionForThePostSubCategory" class="control-label"></label>
+                            @Html.DropDownListFor(model => model.new_reference.selectionForThePostSubCategory,
+                            Model.sub_post_ddl_List,
+                            "-- Select Sub Post --",
+                            new { @class = "form-control", id = "selectionForThePostSubCategory", tabindex = "-1", disabled = "disabled" })
+                            <span asp-validation-for="new_reference.selectionForThePostSubCategory" class="text-danger"></span>
+                        </div>
 
-						<div class="form-group col-md-6">
-							<label asp-for="new_reference.orgCode" class="control-label"></label>
-							@Html.DropDownListFor(model => model.new_reference.orgCode, Model.organization_ddl_List, "-- Select Organization --",
-																new { @class = "form-control", id = "orgCode", tabindex = "-1" })
-							<span asp-validation-for="new_reference.orgCode" class="text-danger"></span>
-						</div>
-					</div>
+                        <div class="form-group col-md-6">
+                            <label asp-for="new_reference.orgCode" class="control-label"></label>
+                            @Html.DropDownListFor(model => model.new_reference.orgCode, Model.organization_ddl_List, "-- Select Organization --",
+                            new { @class = "form-control", id = "orgCode", tabindex = "-1" })
+                            <span asp-validation-for="new_reference.orgCode" class="text-danger"></span>
+                        </div>
+                    </div>
 
-					<div class="row">
-						<div class="form-group col-md-6">
-							<label asp-for="new_reference.minCode" class="control-label"></label>
-							@Html.DropDownListFor(model => model.new_reference.minCode, Model.ministry_ddl_List, "-- Select Ministry --",
-																new { @class = "form-control", id = "minCode", tabindex = "-1", disabled = "disabled" })
-							<span asp-validation-for="new_reference.minCode" class="text-danger"></span>
-						</div>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label asp-for="new_reference.minCode" class="control-label"></label>
+                            @Html.DropDownListFor(model => model.new_reference.minCode, Model.ministry_ddl_List, "-- Select Ministry --",
+                            new { @class = "form-control", id = "minCode", tabindex = "-1", disabled = "disabled" })
+                            <span asp-validation-for="new_reference.minCode" class="text-danger"></span>
+                        </div>
 
-						<div class="form-group col-md-6">
-							<label asp-for="new_reference.ReferenceNo_FileNo" class="control-label"></label>
-							<input asp-for="new_reference.ReferenceNo_FileNo" class="form-control" placeholder="File No." />
-							<span asp-validation-for="new_reference.ReferenceNo_FileNo" class="text-danger"></span>
-						</div>
-					</div>
+                        <div class="form-group col-md-6">
+                            <label asp-for="new_reference.referenceNoFileNo" class="control-label"></label>
+                            <input asp-for="new_reference.referenceNoFileNo" class="form-control" placeholder="File No." />
+                            <span asp-validation-for="new_reference.referenceNoFileNo" class="text-danger"></span>
+                        </div>
+                    </div>
 
-					<div class="row">
-						<div class="form-group col-md-6">
-							<label asp-for="new_reference.ReferenceOrSubmissionToCvcDate" class="control-label"></label>
-							<input asp-for="new_reference.ReferenceOrSubmissionToCvcDate" class="form-control datepicker" placeholder="yyyy-mm-dd" />
-							<span asp-validation-for="new_reference.ReferenceOrSubmissionToCvcDate" class="text-danger"></span>
-						</div>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label asp-for="new_reference.referenceOrSubmissionToCvcDate" class="control-label"></label>
+                            <input asp-for="new_reference.referenceOrSubmissionToCvcDate" class="form-control datepicker" placeholder="yyyy-mm-dd" />
+                            <span asp-validation-for="new_reference.referenceOrSubmissionToCvcDate" class="text-danger"></span>
+                        </div>
 
-						<div class="form-group col-md-6">
-							<label asp-for="new_reference.CVC_ReferenceID_FileNo" class="control-label"></label>
-							<input asp-for="new_reference.CVC_ReferenceID_FileNo" class="form-control" placeholder="CVC Reference ID / File No." />
-							<span asp-validation-for="new_reference.CVC_ReferenceID_FileNo" class="text-danger"></span>
-						</div>
-					</div>
+                        <div class="form-group col-md-6">
+                            <label asp-for="new_reference.cvcReferenceIdFileNo" class="control-label"></label>
+                            <input asp-for="new_reference.cvcReferenceIdFileNo" class="form-control" placeholder="CVC Reference ID / File No." />
+                            <span asp-validation-for="new_reference.cvcReferenceIdFileNo" class="text-danger"></span>
+                        </div>
+                    </div>
 
-					<div class="form-group mt-4">
-						<div class="d-flex justify-content-end">
-							<button type="button" class="btn btn-success me-2" id="btnSaveNewReference" onclick="SaveNewReference()">Submit</button>
-							<a asp-action="PESB_Appointment" asp-controller="PESB" class="btn btn-primary">Go to Details</a>
-						</div>
-					</div>
+                    <div class="form-group mt-4">
+                        <div class="d-flex justify-content-end">
+                            <button type="button" class="btn btn-success me-2" id="btnSaveNewReference" onclick="SaveNewReference()">Submit</button>
+                            <a asp-action="PESB_Appointment" asp-controller="PESB" class="btn btn-primary">Go to Details</a>
+                        </div>
+                    </div>
 
-				</form>
-			</div>
-		</div>
-	</div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 
@@ -115,143 +115,229 @@
 
 @* Post and SubPost Script *@
 <script>
-	$(document).ready(function () {
+    $(document).ready(function () {
 
-		// Function to toggle visibility of "Other Sub Post" field
-		function toggleOtherField() {
-			var subPostVal = $('#selectionForThePostSubCategory').val();  // Make sure to use the correct ID for SubPost dropdown
-			if (subPostVal === 'Other') {
-				$('#OtherSubPostDiv').show();  // Show the "Other Sub Post" field
-			} else {
-				$('#OtherSubPostDiv').hide();  // Hide the "Other Sub Post" field
-				$('#OtherSubPost').val('');  // Clear the input field when hidden
-			}
-		}
+        // Function to toggle visibility of "Other Sub Post" field
+        function toggleOtherField() {
+            var subPostVal = $('#selectionForThePostSubCategory').val();  // Make sure to use the correct ID for SubPost dropdown
+            if (subPostVal === 'Other') {
+                $('#OtherSubPostDiv').show();  // Show the "Other Sub Post" field
+            } else {
+                $('#OtherSubPostDiv').hide();  // Hide the "Other Sub Post" field
+                $('#OtherSubPost').val('');  // Clear the input field when hidden
+            }
+        }
 
-		// Event listener for when Post Category is changed (dropdown selection)
-		$('#selectionForThePostCategory').change(function () {
-			var selectedPost = $(this).val();  // Get selected Post Category value
-			var subPostSelect = $('#selectionForThePostSubCategory');  // Get the Sub Post dropdown element
+        // Event listener for when Post Category is changed (dropdown selection)
+        $('#selectionForThePostCategory').change(function () {
+            var selectedPost = $(this).val();  // Get selected Post Category value
+            var subPostSelect = $('#selectionForThePostSubCategory');  // Get the Sub Post dropdown element
 
-			// Clear subpost dropdown and reset values
-			subPostSelect.empty();
-			subPostSelect.prop('disabled', true);  // Disable the Sub Post dropdown initially
-			// subPostSelect.append($('<option>').val('').text('-- Select Sub Post --'));  // Add a default "Select Sub Post" option
+            // Clear subpost dropdown and reset values
+            subPostSelect.empty();
+            subPostSelect.prop('disabled', true);  // Disable the Sub Post dropdown initially
+            // subPostSelect.append($('<option>').val('').text('-- Select Sub Post --'));  // Add a default "Select Sub Post" option
 
-			$('#OtherSubPostDiv').hide();  // Hide the "Other Sub Post" field
-			$('#OtherSubPost').val('');  // Clear "other" input field if hidden
+            $('#OtherSubPostDiv').hide();  // Hide the "Other Sub Post" field
+            $('#OtherSubPost').val('');  // Clear "other" input field if hidden
 
-			if (!selectedPost) {
-				return;  // Exit if no Post Category is selected
-			}
+            if (!selectedPost) {
+                return;  // Exit if no Post Category is selected
+            }
 
-			// Make AJAX request to get sub-posts based on selected Post Category
-			$.ajax({
-				url: '@Url.Action("GetSubPostsByPostCode", "PESB")',  // URL for getting sub-posts
-				type: 'GET',
-				data: { postCode: selectedPost },  // Pass selected Post Category code
-				dataType: "json",
-				success: function (data) {
-					if (!data || data.length === 0) {
-						// If no sub-posts available, disable dropdown and show a message
-						subPostSelect.append($('<option>').val('').text('-- No Sub Posts Available --'));
-						subPostSelect.prop('disabled', true);
-						$('#OtherSubPostDiv').hide();  // Hide "Other" field
-					} else {
-						// Populate the sub-post dropdown with available sub-posts
-						subPostSelect.append($('<option>').val('').text('-- Select Sub Post --'));  // Default option
-						$.each(data, function (i, item) {
-							subPostSelect.append($('<option>').val(item.value).text(item.text));  // Add each sub-post
-						});
-						subPostSelect.prop('disabled', false);  // Enable the dropdown
+            // Make AJAX request to get sub-posts based on selected Post Category
+            $.ajax({
+                url: '@Url.Action("GetSubPostsByPostCode", "PESB")',  // URL for getting sub-posts
+                type: 'GET',
+                data: { postCode: selectedPost },  // Pass selected Post Category code
+                dataType: "json",
+                success: function (data) {
+                    if (!data || data.length === 0) {
+                        // If no sub-posts available, disable dropdown and show a message
+                        subPostSelect.append($('<option>').val('').text('-- No Sub Posts Available --'));
+                        subPostSelect.prop('disabled', true);
+                        $('#OtherSubPostDiv').hide();  // Hide "Other" field
+                    } else {
+                        // Populate the sub-post dropdown with available sub-posts
+                        subPostSelect.append($('<option>').val('').text('-- Select Sub Post --'));  // Default option
+                        $.each(data, function (i, item) {
+                            subPostSelect.append($('<option>').val(item.value).text(item.text));  // Add each sub-post
+                        });
+                        subPostSelect.prop('disabled', false);  // Enable the dropdown
 
-						toggleOtherField();  // Check if the "Other" option needs to be shown
-					}
-				},
-				error: function (xhr) {
-					alert("Error loading sub posts: " + xhr.statusText);  // Handle AJAX errors
-				}
-			});
-		});
+                        toggleOtherField();  // Check if the "Other" option needs to be shown
+                    }
+                },
+                error: function (xhr) {
+                    alert("Error loading sub posts: " + xhr.statusText);  // Handle AJAX errors
+                }
+            });
+        });
 
-		// Event listener for when Sub Post Category is changed (dropdown selection)
-		$('#selectionForThePostSubCategory').change(toggleOtherField);  // Check if "Other" field should be shown
+        // Event listener for when Sub Post Category is changed (dropdown selection)
+        $('#selectionForThePostSubCategory').change(toggleOtherField);  // Check if "Other" field should be shown
 
-		// On page load, check if "Other" sub post should be shown
-		toggleOtherField();
+        // On page load, check if "Other" sub post should be shown
+        toggleOtherField();
 
-	});
+    });
 </script>
 
 @* date picker *@
 <script>
-	$(document).ready(function () {
-		flatpickr(".datepicker", {
-			dateFormat: "Y-m-d",
-			allowInput: false
-		});
-	});
+    $(document).ready(function () {
+        flatpickr(".datepicker", {
+            dateFormat: "Y-m-d",
+            allowInput: false
+        });
+    });
 </script>
 
 @* Org and Ministry Script *@
 <script>
-	$(document).ready(function () {
-		$('#orgCode').change(function () {
-			var orgCode = $(this).val();
-			var ministryDropdown = $('#minCode');
+    $(document).ready(function () {
+        $('#orgCode').change(function () {
+            var orgCode = $(this).val();
+            var ministryDropdown = $('#minCode');
 
-			// Clear the ministry dropdown
-			ministryDropdown.empty();
+            // Clear the ministry dropdown
+            ministryDropdown.empty();
 
-			// Disable dropdown and set default option if no organization is selected
-			if (!orgCode) {
-				ministryDropdown.prop('disabled', true)
-					.append($('<option>').val('').text('-- Select Ministry --'));
-				return;
-			}
+            // Disable dropdown and set default option if no organization is selected
+            if (!orgCode) {
+                ministryDropdown.prop('disabled', true)
+                    .append($('<option>').val('').text('-- Select Ministry --'));
+                return;
+            }
 
 
 
-			// Send AJAX request to fetch ministries by organization code
-			$.ajax({
-				url: '@Url.Action("GetMinistryByOrgCode", "PESB")', // Adjust the controller/action as necessary
-				type: 'GET',
-				data: { id: orgCode }, // Pass organization code to server
-				dataType: "json",
-				success: function (data) {
-					ministryDropdown.empty(); // Clear current options
+            // Send AJAX request to fetch ministries by organization code
+            $.ajax({
+                url: '@Url.Action("GetMinistryByOrgCode", "PESB")', // Adjust the controller/action as necessary
+                type: 'GET',
+                data: { id: orgCode }, // Pass organization code to server
+                dataType: "json",
+                success: function (data) {
+                    ministryDropdown.empty(); // Clear current options
 
-					// Check if no data or invalid data
-					if (!data || data.length === 0 || (data.length === 1 && !data[0].Value && !data[0].value)) {
-						ministryDropdown.prop('disabled', true)
-							.append($('<option>').val('').text('-- No Ministry Available --'));
-						return;
-					}
+                    // Check if no data or invalid data
+                    if (!data || data.length === 0 || (data.length === 1 && !data[0].Value && !data[0].value)) {
+                        ministryDropdown.prop('disabled', true)
+                            .append($('<option>').val('').text('-- No Ministry Available --'));
+                        return;
+                    }
 
-					// Add default "Select Ministry" option
-					// ministryDropdown.append($('<option>').val('').text('-- Select Ministry --'));
+                    // Add default "Select Ministry" option
+                    // ministryDropdown.append($('<option>').val('').text('-- Select Ministry --'));
 
-					// Populate the ministry dropdown with received data
-					$.each(data, function (i, item) {
-						var val = item.Value || item.value; // Check both possible key names
-						var txt = item.Text || item.text;   // Check both possible key names
-						ministryDropdown.append($('<option>').val(val).text(txt));
-					});
+                    // Populate the ministry dropdown with received data
+                    $.each(data, function (i, item) {
+                        var val = item.Value || item.value; // Check both possible key names
+                        var txt = item.Text || item.text;   // Check both possible key names
+                        ministryDropdown.append($('<option>').val(val).text(txt));
+                    });
 
-					// Enable dropdown after options are added
-					ministryDropdown.prop('disabled', false);
-				},
-				error: function (xhr) {
-					alert("Error loading ministries: " + xhr.statusText); // Display error on failure
-				}
-			});
-		});
-	});
+                    // Enable dropdown after options are added
+                    ministryDropdown.prop('disabled', false);
+                },
+                error: function (xhr) {
+                    alert("Error loading ministries: " + xhr.statusText); // Display error on failure
+                }
+            });
+        });
+    });
 
 </script>
 
 @* Save New Reference Data *@
+
 <script>
+    function SaveNewReference() {
+        const form = $("#newReferenceForm");
+
+        let isValid = true;
+        $(".text-danger").text(""); // Clear previous validation messages
+
+        // Basic front-end validation
+        if ($("#selectionForThePostCategory").val() === "") {
+            $("#selectionForThePostCategory").next(".text-danger").text("Please select Post Category.");
+            isValid = false;
+        }
+        if ($("#orgCode").val() === "") {
+            $("#orgCode").next(".text-danger").text("Please select Organization.");
+            isValid = false;
+        }
+        if ($("#new_reference_referenceNoFileNo").val() === "") {
+            $("#new_reference_referenceNoFileNo").next(".text-danger").text("Please enter File No.");
+            isValid = false;
+        }
+        if ($("#new_reference_referenceOrSubmissionToCvcDate").val() === "") {
+            $("#new_reference_referenceOrSubmissionToCvcDate").next(".text-danger").text("Please enter Reference Date.");
+            isValid = false;
+        }
+        if ($("#new_reference_cvcReferenceIdFileNo").val() === "") {
+            $("#new_reference_cvcReferenceIdFileNo").next(".text-danger").text("Please enter Reference File No.");
+            isValid = false;
+        }
+
+        if (!isValid) return;
+
+        Swal.fire({
+            title: "Confirm Submission",
+            text: "Do you want to save this reference?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Yes, Save",
+            cancelButtonText: "Cancel"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $('#btnSaveNewReference').prop('disabled', true).text("Submitting...");
+
+                // ✅ Use serialize to submit entire form including hidden fields
+                const formData = form.serialize();
+
+                $.ajax({
+                    type: "POST",
+                    url: form.attr("action"), // e.g., /PESB/new_reference
+                    data: formData,
+                    success: function (response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Saved successfully!",
+                                confirmButtonColor: '#3085d6'
+                            }).then(() => {
+                                window.location.href = response.redirectUrl;
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Failed to Save",
+                                text: response.error_new_reference_message || "An error occurred."
+                            });
+                        }
+                    },
+                    error: function (xhr) {
+                        console.error("Server error:", xhr.responseText);
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops!",
+                            text: "Something went wrong. Please try again."
+                        });
+                    },
+                    complete: function () {
+                        $('#btnSaveNewReference').prop('disabled', false).text("Submit");
+                    }
+                });
+            }
+        });
+    }
+</script>
+
+
+
+@* <script>
 	function SaveNewReference() {
 		const referenceReceivedFor = $("#referenceReceivedFor").val();
 		const selectionForThePostCategory = $("#selectionForThePostCategory").val();
@@ -350,7 +436,89 @@
 			}
 		});
 	}
-</script>
+</script> *@
+
+@* <script>
+    function SaveNewReference() {
+        const form = $("#newReferenceForm");
+
+        let isValid = true;
+        $(".text-danger").text("");
+
+        // Custom validation (as you've written it)
+        if ($("#selectionForThePostCategory").val() === "") {
+            $("#selectionForThePostCategory").next(".text-danger").text("Please select Post Category.");
+            isValid = false;
+        }
+        if ($("#orgCode").val() === "") {
+            $("#orgCode").next(".text-danger").text("Please select Organization.");
+            isValid = false;
+        }
+        if ($("#new_reference_referenceNoFileNo").val() === "") {
+            $("#new_reference_referenceNoFileNo").next(".text-danger").text("Please enter File No.");
+            isValid = false;
+        }
+        if ($("#new_reference_referenceOrSubmissionToCvcDate").val() === "") {
+            $("#new_reference_referenceOrSubmissionToCvcDate").next(".text-danger").text("Please enter Reference Date.");
+            isValid = false;
+        }
+        if ($("#new_reference_cvcReferenceIdFileNo").val() === "") {
+            $("#new_reference_cvcReferenceIdFileNo").next(".text-danger").text("Please enter Reference File No..");
+            isValid = false;
+        }
+
+        if (!isValid) return;
+
+        Swal.fire({
+            title: "Confirm Submission",
+            text: "Do you want to save this reference?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Yes, Save",
+            cancelButtonText: "Cancel"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $('#btnSaveNewReference').prop('disabled', true).text("Submitting...");
+
+                // Serialize form data
+                const formData = form.serialize();
+
+                $.ajax({
+                    type: "POST",
+                    url: form.attr("action"),
+                    data: $("#newReferenceForm").serialize(),
+                    success: function (response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Saved successfully!",
+                                confirmButtonColor: '#3085d6'
+                            }).then(() => {
+                                window.location.href = response.redirectUrl;
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Failed to Save",
+                                text: response.error_new_reference_message || "An error occurred."
+                            });
+                        }
+                    },
+                    error: function () {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops!",
+                            text: "Something went wrong. Please try again."
+                        });
+                    },
+                    complete: function () {
+                        $('#btnSaveNewReference').prop('disabled', false).text("Submit");
+                    }
+                });
+            }
+        });
+    }
 
 
 
+</script> *@
